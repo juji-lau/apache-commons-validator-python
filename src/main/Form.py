@@ -25,6 +25,7 @@ class Form:
         self._inherit: str = None
         self._processed: bool = False
         self.serializable = True
+        self.cloneable = False
 
     # Getter and setter for name
     @property

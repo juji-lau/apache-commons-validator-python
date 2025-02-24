@@ -1,6 +1,6 @@
 # apache-commons-validator-python
 
-License
+### License
 This code is licensed under the Apache License v2.
 
 Make sure the following is listed as a notice/attribution:

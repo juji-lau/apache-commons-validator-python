@@ -1,1 +1,4 @@
 .DS_Store
+src/__pycache__/
+src/main/__pycache__/
+src/test/__pycache__/

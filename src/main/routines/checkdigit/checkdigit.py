@@ -44,6 +44,7 @@ Changes:
 """
 
 from abc import ABC, abstractmethod
+from typing import Optional
 from code_validator import CodeValidator
 from checkdigit_exception import CheckDigitException
 
@@ -78,16 +79,18 @@ class CheckDigit(ABC):
         pass
 
     @abstractmethod
-    def calculate(self, code:str) -> str:
+    def calculate(self, code:str) -> Optional([str, CheckDigitException]):
         """
         Calculates the Check Digit for a code.  
-        Throws CheckDigitException if an error occurs.
 
-        Parameter(s):
+        Args:
             code (str): The code to calculate the Check Digit for.  It must not include the checkdigit
         
         Returns: 
             The calculated Check Digit
+
+        Raises:
+            CheckDigitException if an error occurs.
         """
         raise CheckDigitException
 
@@ -96,7 +99,7 @@ class CheckDigit(ABC):
         """
         Validates the check digit for the code
 
-        Parameter(s):
+        Args:
             code (str): The code to validate, the string must include the check digit.
   
         Returns: 

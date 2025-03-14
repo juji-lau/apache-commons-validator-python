@@ -26,11 +26,14 @@ License:
 Changes:
     - Removed `getInstance()` method, which supports singleton behavior in the Java version. Singleton behavior is implicit in this Python version.
     - Added a setter for the `convert` property. In the original Java version, `getInstance(convert)` provided a way to configure this, but it has been replaced with a direct attribute.
-
+    - removed ISBN_VALIDATOR and ISBN_VALIDATOR_NO_CONVERT from the java version (idk how to implement)
+    TODO: fix isbn10 dependency
 """
 
-import CodeValidator
-from checkdigit import CheckDigitException, EAN13CheckDigit, ISBN10CheckDigit
+from code_validator import CodeValidator
+from checkdigit.checkdigit_exception import CheckDigitException
+from checkdigit.ean13 import EAN13CheckDigit
+from checkdigit.isbn10 import ISBN10CheckDigit
 
 
 class ISBNValidator:
@@ -84,9 +87,9 @@ class ISBNValidator:
             convert (bool): If True, enables the conversion of ISBN-10 codes to ISBN-13.
 
         """
-        self._convert = convert       # Read only after instantiation 
-        self._isbn10_validator = CodeValidator(self.ISBN10_REGEX, 10, ISBN10CheckDigit.ISBN10_CHECK_DIGIT)
-        self._isbn13_validator = CodeValidator(self.ISBN13_REGEX, 13, EAN13CheckDigit.EAN13_CHECK_DIGIT)
+        self.__convert = convert       # Read only after instantiation 
+        self.__isbn10_validator = CodeValidator(self.ISBN10_REGEX, 10, ISBN10CheckDigit.ISBN10_CHECK_DIGIT)
+        self.__isbn13_validator = CodeValidator(self.ISBN13_REGEX, 13, EAN13CheckDigit.EAN13_CHECK_DIGIT)
         
         # Attributes to manage serialization and cloning capabilities
         self.serializable = True    # class is serializable
@@ -98,23 +101,36 @@ class ISBNValidator:
     @property
     def convert(self):
         """Returns the convert attribute."""
-        return self._convert
+        return self.__convert
     
     @convert.setter
     def convert(self, convert: bool) -> None:
         """ Sets the convert attribute."""
-        self._convert = convert
+        self.__convert = convert
+    
+    @property
+    def isbn10_validator(self):
+        """Returns the isbn10_validator attribute."""
+        return self.__isbn10_validator
+
+    @property
+    def isbn13_validator(self):
+        """Returns the isbn13_validator attribute."""
+        return self.__isbn13_validator
       
     def convert_to_isbn13(self, isbn10:str) -> str:
         """
         Convert an ISBN-10 code to an ISBN-13 code.
-        Python's version of: org.apache.validator.routines.ISBNValidator.convertToISBN13()
         
-        Parameters:
-          isbn10: The ISBN-10 code to convert. Must be a valid ISBN-10 with NO formatting characters.
+        Args:
+            isbn10 (str): The ISBN-10 code to convert. Must be a valid ISBN-10 with NO formatting characters.
 
         Returns:
-          isbn13: A converted ISBN-13 code, or None if the ISBN-10 code is not valid.
+            A converted ISBN-13 code, or None if the ISBN-10 code is not valid.
+        
+        Raises:
+            ValueError if isbn10 is invalid or has formatting errors.
+
         """
         # check for validity
         if isbn10 is None:
@@ -128,7 +144,7 @@ class ISBNValidator:
         # Calculate the new ISBN-13 code (drop the original checkdigit)
         isbn13 = "978" + isbn10[:-1]
         try:
-          checkDigit = self.isbn13_validator.getCheckDigit().calculate(isbn13)
+          checkDigit = self.isbn13_validator.get_check_digit().calculate(isbn13)
           isbn13 += checkDigit
           return isbn13
         except CheckDigitException as e:
@@ -138,13 +154,12 @@ class ISBNValidator:
     def is_valid(self, code:str) -> bool:
         """
         Checks if code is either a valid ISBN-10 or ISBN-13 code.
-        ython's version of: org.apache.validator.routines.ISBNValidator.isValid()
         
-        Parameter(s):
-          code: The code to check.
+        Args:
+            code (str): The code to check.
 
         Returns:
-          True if the code is a valid ISBN-10 or ISBN-13 code, otherwise false.
+            True if the code is a valid ISBN-10 or ISBN-13 code, otherwise false.
         """
         return self.is_valid_isbn10(code) or self.is_valid_isbn13(code)
 
@@ -152,41 +167,38 @@ class ISBNValidator:
     def is_valid_isbn10(self, code:str) -> bool:
         """
         Checks if code is a valid ISBN-10 code.
-        Python's version of: org.apache.validator.routines.ISBNValidator.isValidISBN10()
         
-        Parameters:
-          code: The ISBN-10 code to check.
+        Args:
+            code (str): The ISBN-10 code to check.
 
         Returns:
-          True if the code is a valid ISBN-10 code, otherwise false.
+            True if the code is a valid ISBN-10 code, False otherwise.
         """
-        return self._isbn10_validator.is_valid(code)
+        return self.isbn10_validator.is_valid(code)
     
     def is_valid_isbn13(self, code:str) -> bool:
         """
         Checks if code is a valid ISBN-13 code.
-        Python's version of: org.apache.validator.routines.ISBNValidator.isValidISBN13()
         
-        Parameters:
-          code: The ISBN-13 code to check.
+        Args:
+            code (str): The ISBN-13 code to check.
 
         Returns:
-          True if the code is a valid ISBN-13 code, otherwise false.
+            True if the code is a valid ISBN-13 code, otherwise false.
         """
-        return self._isbn13_validator.is_valid(code)
+        return self.isbn13_validator.is_valid(code)
 
     def validate(self, code:str) -> str:
         """
         Checks if code is either a valid ISBN-10 or ISBN-13 code.
         If valid, this method returns the ISBN code with formatting characters removed (i.e. space or hyphen).
         Converts an ISBN-10 codes to ISBN-13 if convertToISBN13 is true.
-        Python's version of: org.apache.validator.routines.ISBNValidator.validate()
         
-        Parameters:
-          code: The code to validate.
+        Args:
+            code (str): The code to validate.
 
         Returns:
-          A valid ISBN code if valid, otherwise None.
+            A valid ISBN code if valid, otherwise None.
         """
         result = self.validate_isbn13(code)
         if result is None:
@@ -199,15 +211,14 @@ class ISBNValidator:
         """
         Checks if code is a valid ISBN-10 code.
         If valid, this method returns the ISBN-10 code with formatting characters removed (i.e. space or hyphen).
-        Python's version of: org.apache.validator.routines.ISBNValidator.validateISBN10()
         
         Parameters:
-          code: The code to validate.
+            code (str): The code to validate.
 
         Returns:
-          A valid ISBN-10 code if valid, otherwise None.
+            A valid ISBN-10 code if valid, otherwise None.
         """
-        result = self._isbn10_validator.validate(code)
+        result = self.isbn10_validator.validate(code)
         if result is not None:
           return str(result)     
         return None
@@ -216,17 +227,16 @@ class ISBNValidator:
         """
         Checks if code is a valid ISBN-13 code.
         If valid, this method returns the ISBN-13 code with formatting characters removed (i.e. space or hyphen).
-        Python's version of: org.apache.validator.routines.ISBNValidator.validateISBN13()
         
         Parameters:
-          code: The code to validate.
+            code (str): The code to validate.
 
         Returns:
-          A valid ISBN-13 code if valid, otherwise None.
+            A valid ISBN-13 code if valid, otherwise None.
         """
         # check for validity
         if self.is_valid_isbn13(code):
-          result = self._isbn13_validator.validate(code)
+          result = self.isbn13_validator.validate(code)
           if result is not None:
             return str(result)
         return None

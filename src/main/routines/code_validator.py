@@ -64,13 +64,14 @@ License (Taken from apache.commons.validator.routines.ISBNValidator):
     limitations under the License.
 Changes:
   - Removed getInstance() which supports singletone behavior for a Java class.  In here, singleton behavior is implicit.
-  - Added a setter for self.convert.  getInstance(convert) provided a way to do this, but now that it's removed, this adds a new way
+  - Added a setter for self.convert.  getInstance(convert) provided a way to do this, but now that it's removed, this adds a new way.
+  TODO: Implement import dependencies, do serializeable/cloneable
 """
 import logging
 from typing import Optional
-import GenericValidator
-import RegexValidator
-from checkdigit import CheckDigit
+from generic_validator import GenericValidator
+from regex_validator import RegexValidator
+from checkdigit.checkdigit import CheckDigit
 
 
 class CodeValidator:
@@ -109,47 +110,47 @@ class CodeValidator:
         """
         # self._serialVersionUID = 446960910870938233L
         if regex is None and regex_validator is None:
-            self._regex_validator = None
+            self.__regex_validator = None
         elif regex_validator is not None:
-            self._regex_validator = regex_validator
+            self.__regex_validator = regex_validator
         else:
             self._regex_validator = RegexValidator(regex)
 
         if length is None:
-            self._min_length = min_length
-            self._max_length = max_length
+            self.__min_length = min_length
+            self.__max_length = max_length
         else:
-            self._min_length = length
-            self._max_length = length
+            self.__min_length = length
+            self.__max_length = length
 
-        self._checkdigit = checkdigit
+        self.__checkdigit = checkdigit
 
     
     @property
     def checkdigit(self) -> CheckDigit:
         """Returns the checkdigit attribute."""
-        return self._checkdigit
+        return self.__checkdigit
     
     @property
     def max_length(self) -> int:
         """Returns the max_length attribute."""
-        return self._max_length
+        return self.__max_length
 
     @property
     def min_length(self) -> int:
         """Returns the min_length attribute."""
-        return self._min_length
+        return self.__min_length
 
     @property
     def regex_validator(self) -> Optional[RegexValidator]:
         """Returns the regex_validator attribute."""
-        return self._regex_validator  
+        return self.regex_validator  
 
     def is_valid(self, input:str) -> bool:
         """
         Validates the input by calling validate().  returning either True or False.
 
-        Parameter(s):
+        Args:
             input (str): The code to validate and check for validity.
         Returns:
             False if the return value of validate() is None.
@@ -163,7 +164,7 @@ class CodeValidator:
         Note: This method trims the input and if self._regex_validator is set, it may also 
             change the input as part of the validation.
 
-        Parameter(s): 
+        Args: 
             input (str): The code to validate.
         
         Returns: 
@@ -180,17 +181,17 @@ class CodeValidator:
         
         # Validate/reformat using regular expression
         if self._regex_validator is not None:
-            code = self._regex_validator.validate(code)
+            code = self.regex_validator.validate(code)
             if code is None:
                 return None
 
         # Check length
-        if ((self._min_length >= 0 and len(code) < self._min_length) or
-            (self.max_length >= 0 and len(code) > self._max_length)):
+        if ((self.min_length >= 0 and len(code) < self.min_length) or
+            (self.max_length >= 0 and len(code) > self.max_length)):
             return None
 
         # Validate the check digit
-        if ((self._checkdigit is not None) and (not self._checkdigit.is_valid(code))):
+        if ((self.checkdigit is not None) and (not self.checkdigit.is_valid(code))):
             return None
 
         return code

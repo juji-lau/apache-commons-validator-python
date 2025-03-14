@@ -30,16 +30,21 @@ Changes:
         - I accept a Python str of len(1) in the place of Java's char.
         - Python does not support single characters
         - I raise a ValueError exception via CheckDigitException if the input is not a string of length 1.
+    NOTE: Commented option to use CheckDigit instead of AbstractCheckDigit; AbstractCheckDigit directly calls CheckDigit anyways.
+    Removed ABC from class inheritance because the highest parent already extends ABC:
+        - ModulusCheckDigit(AbstractCheckDigit(CheckDigit(ABC)))
 
 """
 # from modulus_checkdigit import ModulusCheckDigit
 from abc import ABC, abstractmethod
 from typing import Optional
 from abstract_checkdigit import AbstractCheckDigit
+# from checkdigit import CheckDigit
 from checkdigit_exception import CheckDigitException
 import GenericValidator
 
-class ModulusCheckDigit(ABC, AbstractCheckDigit):
+# class ModulusCheckDigit(CheckDigit):
+class ModulusCheckDigit(AbstractCheckDigit):
     """
     Abstract base class for Modulus Check Digit calculation and validation.
 

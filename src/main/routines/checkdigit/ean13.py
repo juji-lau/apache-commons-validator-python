@@ -30,7 +30,7 @@ License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigit
     limitations under the License.
 Changes:
     Removed singleton method
-    TODO: add serializeable and cloneable
+    TODO: add serializeable and cloneable, check singletons
 
 """
 from modulus_checkdigit import ModulusCheckDigit
@@ -59,7 +59,7 @@ class EAN13CheckDigit(ModulusCheckDigit):
         """
         super().__init__()
     
-    def weighted_value(self, char_value:int, left_pos:int, right_pos:int) -> int:
+    def _weighted_value(self, char_value:int, left_pos:int, right_pos:int) -> int:
         """
         Calculates the weighted value of a character in the code at a specified position.
 

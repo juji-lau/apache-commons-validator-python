@@ -81,7 +81,6 @@ class ISBNValidator:
         Initializes the ISBNValidator with default values.
         Initializes two validators, one for ISBN-10 and one for ISBN-13, using the appropriate
         regular expressions and check digits.
-        Python's version of: org.apache.validator.routines.ISBNValidator()
         
         Args:
             convert (bool): If True, enables the conversion of ISBN-10 codes to ISBN-13.

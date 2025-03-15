@@ -20,12 +20,13 @@ from typing import Final, Optional
 from GenericValidator import GenericValidator
 from datetime import datetime
 import locale
+import numpy as np
 
 class GenericTypeValidator:
     """
         GenericTypeValidator class provides methods to format and validate different 
-        types of data inputs. Removed function from Java version for 
-        double, long, and short since these do not exist in Python.
+        types of data inputs. Use NumPy data types for byte,
+        double, short, and long from Java version since these do not exist in Python.
     """
     serializable: Final[bool] = True
     cloneable: Final[bool] = False
@@ -36,9 +37,8 @@ class GenericTypeValidator:
     def format_byte(value: Optional[str]) -> Optional[int]:
         if value is None:
             return None
-
         try:
-            return int(value)
+            return np.int8(value)
         except ValueError:
             return None
 
@@ -99,7 +99,16 @@ class GenericTypeValidator:
     def format_float(value: Optional[str]) -> Optional[float]:
         if value is None:
             return None
-
+        try:
+            return np.float32(value)
+        except ValueError:
+            return None
+        
+    @staticmethod
+     # Method to convert a string value to a float with optional locale support
+    def format_double(value: Optional[str]) -> Optional[float]:
+        if value is None:
+            return None
         try:
             return float(value)
         except ValueError:
@@ -121,9 +130,26 @@ class GenericTypeValidator:
     def format_int(value: Optional[str]) -> Optional[int]:
         if value is None:
             return None
-
         try:
             return int(value)
+        except ValueError:
+            return None
+    
+    @staticmethod
+    def format_short(value: Optional[str]) -> Optional[int]:
+        if value is None:
+            return None
+        try:
+            return np.int16(value)
+        except ValueError:
+            return None
+    
+    @staticmethod
+    def format_long(value: Optional[str]) -> Optional[int]:
+        if value is None:
+            return None
+        try:
+            return np.int64(value)
         except ValueError:
             return None
 

@@ -26,7 +26,7 @@ import locale
 class GenericValidator:
     """
     This class contains basic methods for performing validations. Removed functions for
-    double, long, and short because these do not exist in Python (e.g. is_short, etc)
+    double, long, and short for is_in_range (just have one general is_in_range).
     """
 
     # Static constants for validators
@@ -93,6 +93,27 @@ class GenericValidator:
         Checks if the value can safely be converted to a float.
         """
         return GenericTypeValidator.format_float(value) is not None
+
+    @staticmethod
+    def is_double(value: str) -> bool:
+        """
+        Checks if the value can safely be converted to a double.
+        """
+        return GenericTypeValidator.format_double(value) is not None
+
+    @staticmethod
+    def is_long(value: str) -> bool:
+        """
+        Checks if the value can safely be converted to a short.
+        """
+        return GenericTypeValidator.format_long(value) is not None
+    
+    @staticmethod
+    def is_short(value: str) -> bool:
+        """
+        Checks if the value can safely be converted to a short.
+        """
+        return GenericTypeValidator.format_short(value) is not None
 
     @staticmethod
     def is_in_range(value, min_value, max_value) -> bool:

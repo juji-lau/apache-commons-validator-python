@@ -43,18 +43,25 @@ class GenericTypeValidator:
             return None
 
     @staticmethod
-     # Method to convert a string value to an integer (byte) with optional locale support
+    # Method to convert a string value to an integer (byte) with optional locale support
     def format_byte_locale(value: Optional[str], locale: Optional[str] = None) -> Optional[int]:
         if value is None:
             return None
 
         try:
+            # Set the locale if provided, otherwise use the default locale
             if locale:
                 locale.setlocale(locale.LC_ALL, locale)
-            return int(value)
-        except (ValueError, TypeError):
-            return None
+            else:
+                locale.setlocale(locale.LC_ALL, '')  # Use default locale
 
+            # Attempt to convert the value to np.int8 (byte type in NumPy)
+            return np.int8(value)
+
+        except (ValueError, TypeError):
+            # Return None if parsing fails or locale error occurs
+            return None
+    
     @staticmethod
     # Method to check if a string value represents a valid credit card and convert it to an integer
     def format_credit_card(value: Optional[str]) -> Optional[int]:
@@ -113,6 +120,28 @@ class GenericTypeValidator:
             return float(value)
         except ValueError:
             return None
+        
+    @staticmethod
+    def format_double_locale(value: Optional[str], locale: Optional[str] = None) -> Optional[float]:
+        """
+        Format a string value into a float (double-precision), respecting the provided locale.
+        Returns None if the value is invalid.
+        """
+        if value is None:
+            return None
+
+        try:
+            # Set the locale if provided, otherwise use the default locale
+            if locale:
+                locale.setlocale(locale.LC_ALL, locale)
+            else:
+                locale.setlocale(locale.LC_ALL, '')  # Use default locale
+
+            return float(value)  
+
+        except (ValueError, TypeError):
+            # Return None if parsing fails
+            return None
 
     @staticmethod
     def format_float_locale(value: Optional[str], locale: Optional[str] = None) -> Optional[float]:
@@ -134,6 +163,34 @@ class GenericTypeValidator:
             return int(value)
         except ValueError:
             return None
+
+        
+    @staticmethod
+    def format_int_locale(value: Optional[str], locale: Optional[str] = None) -> Optional[int]:
+        """
+        Format a string value into an integer, respecting the provided locale.
+        Returns None if the value is invalid or out of range.
+        """
+        if value is None:
+            return None
+        
+        try:
+            # Set the locale if provided, otherwise use the default locale
+            if locale:
+                locale.setlocale(locale.LC_ALL, locale)
+            else:
+                locale.setlocale(locale.LC_ALL, '')  # Use default locale
+
+            # Attempt to parse the value as a number
+            parsed_value = locale.atoi(value)  # Convert the string to an integer
+
+            # Return the parsed value as np.int32 (standard integer type in NumPy)
+            return np.int32(parsed_value)
+
+        except (ValueError, locale.Error):
+            # Return None if parsing fails or locale error occurs
+            return None
+    
     
     @staticmethod
     def format_short(value: Optional[str]) -> Optional[int]:
@@ -145,6 +202,32 @@ class GenericTypeValidator:
             return None
     
     @staticmethod
+    def format_short_locale(value: Optional[str], locale: Optional[str] = None) -> Optional[int]:
+        """
+        Format a string value into a short integer (16-bit), respecting the provided locale.
+        Returns None if the value is invalid or out of range.
+        """
+        if value is None:
+            return None
+
+        try:
+            # Set the locale if provided, otherwise use the default locale
+            if locale:
+                locale.setlocale(locale.LC_ALL, locale)
+            else:
+                locale.setlocale(locale.LC_ALL, '')  # Use default locale
+
+            # Attempt to parse the value as a short integer (16-bit)
+            parsed_value = locale.atoi(value)  # Convert the string to an integer
+
+            # Return the parsed value as np.int16 (16-bit integer type in NumPy)
+            return np.int16(parsed_value)
+
+        except (ValueError, locale.Error):
+            # Return None if parsing fails or locale error occurs
+            return None
+    
+    @staticmethod
     def format_long(value: Optional[str]) -> Optional[int]:
         if value is None:
             return None
@@ -152,17 +235,31 @@ class GenericTypeValidator:
             return np.int64(value)
         except ValueError:
             return None
-
+    
     @staticmethod
-    def format_int_locale(value: Optional[str], locale: Optional[str] = None) -> Optional[int]:
+    def format_long_locale(value: Optional[str], locale: Optional[str] = None) -> Optional[int]:
+        """
+        Format a string value into a long integer (64-bit), respecting the provided locale.
+        Returns None if the value is invalid or out of range.
+        """
         if value is None:
             return None
 
         try:
+            # Set the locale if provided, otherwise use the default locale
             if locale:
                 locale.setlocale(locale.LC_ALL, locale)
-            return int(value)
-        except (ValueError, TypeError):
+            else:
+                locale.setlocale(locale.LC_ALL, '')  # Use default locale
+
+            # Attempt to parse the value as a long integer (64-bit)
+            parsed_value = locale.atoi(value)  # Convert the string to an integer
+
+            # Return the parsed value as np.int64 (64-bit integer type in NumPy)
+            return np.int64(parsed_value)
+
+        except (ValueError, locale.Error):
+            # Return None if parsing fails or locale error occurs
             return None
 
 """ 

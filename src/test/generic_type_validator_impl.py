@@ -27,6 +27,7 @@ from src.main.GenericTypeValidator import GenericTypeValidator
 class GenericTypeValidatorImpl:
     """
     Contains validation methods for different unit tests.
+    Combined validate_[type](bean, field) and validate_[type](bean, field, locale).
     """
 
     FIELD_TEST_NULL: Final[str] = "NULL"

@@ -97,13 +97,11 @@ class RegexValidator:
         cloneable (bool): Indicates if the object can be cloned.
     
     """
-    # self.__serialVersionUID = -8832409930574867162
-
     # Attributes to manage serialization and cloning capabilities
     serializable = True    # class is serializable
     clone = False          # class is not cloneable
 
-    def __init__(self, regexs:Union([str, list[str]]), case_sensitive:bool = True):
+    def __init__(self, regexs:Union[str, list[str]], case_sensitive:bool = True):
         """
         Initializes the RegexValidator with one or more regular expressions.
 
@@ -119,26 +117,29 @@ class RegexValidator:
             flags = IGNORECASE
         
         # If regexs is empty or invalid
-        if regexs is None or len(regexs) == 0:
+        if regexs is None or len(regexs) == 0 or regexs == "":
             raise ValueError("Regular expressions are missing.")
         
         # If regexs is a single regular expression
-        if isinstance(regexs, str):
-            self.__patterns.append(compile(regexs, flags))
-            return
+        try:
+            if isinstance(regexs, str):
+                self.__patterns.append(compile(regexs, flags))
+                return
         
-        # If regexs is a list of regular expressions
-        if isinstance(regexs, list):
-            try:
+            # If regexs is a list of regular expressions
+            elif isinstance(regexs, list):
                 for regex in regexs:
+                    if regex == "":
+                        raise ValueError("Regular expressions are missing.")
                     self.__patterns.append(compile(regex, flags))
-            except Exception as e:
-                raise ValueError(f"Failed to compile {regex} with error message: {e}")
-            return
+                return
+            else:
+                # In all other cases, regexs is an invalid argument
+                raise ValueError("Regexs must be a String or a list of Strings.")
+        except Exception as e:
+            raise ValueError(f"Failed to compile {regexs} with error message: {e}")
         
-        # In all other cases, regexs is an invalid argument
-        raise ValueError("regexs must be a String or a list of Strings.")
-
+       
 
     @property
     def patterns(self) -> list[Pattern]:

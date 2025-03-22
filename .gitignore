@@ -25,6 +25,7 @@ __pycache__/
 
 # Reference files
 /src/example
+*.txt
 # /src/test/example
 
 # # Other system files (optional)

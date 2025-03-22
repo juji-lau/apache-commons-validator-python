@@ -27,16 +27,17 @@ License (Taken from apache.commons.validator.routines.RegexValidator):
 """
 
 import pytest
+from typing import Optional, Union
 import re
 from src.main.routines.regex_validator import RegexValidator
 
-
+# Constants
 REGEX = "^([abc]*)(?:\\-)([DEF]*)(?:\\-)([123]*)$"
 COMPONENT_1 = "([abc]{3})"
 COMPONENT_2 = "([DEF]{3})"
 COMPONENT_3 = "([123]{3})"
-SEPARATOR_1 = "(?:\-)"
-SEPARATOR_2 = "(?:\s)"
+SEPARATOR_1 = r"(?:\-)"
+SEPARATOR_2 = r"(?:\s)"
 REGEX_1 = f"^{COMPONENT_1}{SEPARATOR_1}{COMPONENT_2}{SEPARATOR_1}{COMPONENT_3}$"
 REGEX_2 = f"^{COMPONENT_1}{SEPARATOR_2}{COMPONENT_2}{SEPARATOR_2}{COMPONENT_3}$"
 REGEX_3 = f"^{COMPONENT_1}{COMPONENT_2}{COMPONENT_3}$"
@@ -48,30 +49,35 @@ MESSAGE_FAILED_REGEX = "Failed to compile "
 MESSAGE_INVALID_TYPE = "Regexs must be a String or a list of Strings."
 
 
-
-# def test_exceptions():
-#     with pytest.raises(re.error):
-#         RegexValidator("^([abCD12]*$")
-
-# def test_get_patterns():
-#     validator = RegexValidator(MULTIPLE_REGEX)
-#     assert validator.patterns[0].pattern == REGEX_1
-#     assert validator.patterns[1].pattern == REGEX_2
-#     assert validator.patterns[2].pattern == REGEX_3
-
 @pytest.mark.parametrize("regex_input, expected_message", [
     (None, MESSAGE_MISSING_REGEX),
     ("", MESSAGE_MISSING_REGEX),
-    ([None], MESSAGE_FAILED_REGEX),
+    ([None], MESSAGE_MISSING_REGEX),
     ([], MESSAGE_MISSING_REGEX),
-    (["ABC", None], MESSAGE_FAILED_REGEX),
+    (["ABC", None], MESSAGE_MISSING_REGEX),
     (["", "ABC"], MESSAGE_MISSING_REGEX),
+    # unclosed bracket causes an error
+    ("^([abCD12]*$", MESSAGE_FAILED_REGEX),
+    # using an integer instead of a string raises an error
+    (34, MESSAGE_INVALID_TYPE)
 ]) 
-def test_init_invalid(regex_input, expected_message):
+def test_init_invalid(regex_input:str, expected_message:str):
     """Tests various invalid inputs for RegexValidator's __init__."""
     with pytest.raises(ValueError) as e:
         RegexValidator(regex_input)
     assert expected_message in str(e.value)
+
+
+@pytest.mark.parametrize("index, expected_pattern", [
+    (0, REGEX_1),
+    (1, REGEX_2),
+    (2, REGEX_3)
+])
+def test_patterns(index:int, expected_pattern:str):
+    """Test that RegexValidator correctly returns stored regex patterns."""
+    validator = RegexValidator(MULTIPLE_REGEX)
+    assert validator.patterns[index].pattern == expected_pattern
+
 
 @pytest.mark.parametrize("regex, value, expected_valid, expected_match, expected_validate", [
     # Valid inputs
@@ -82,12 +88,13 @@ def test_init_invalid(regex_input, expected_message):
     # Invalid input
     (MULTIPLE_REGEX, "AAC*FDE*321", False, None, None)
 ])
-def test_multiple_regex_case_insensitive(regex, value, expected_valid, expected_match, expected_validate):
+def test_multiple_regex_case_insensitive(regex:str, value:str, expected_valid:bool, expected_match:str, expected_validate:list):
     """Test is_valid(), validate(), and match() for various case-insensitive multiple regex validators."""
     validator = RegexValidator(regex, case_sensitive=False)
     assert validator.is_valid(value) == expected_valid
     assert validator.match(value) == expected_match
     assert validator.validate(value) == expected_validate 
+
 
 @pytest.mark.parametrize("regex, value, expected_valid, expected_validate, expected_match", [
     # Valid inputs
@@ -97,14 +104,14 @@ def test_multiple_regex_case_insensitive(regex, value, expected_valid, expected_
     (REGEX_3, "aaC FDE 321", False, None, None),
     # Invalid input
     (MULTIPLE_REGEX, "AAC*FDE*321" , False, None, None)
-    # (RegexValidator(MULTIPLE_REGEX, case_sensitive=False), "AAC*FDE*321", False, None, None)
 ])
-def test_multiple_regex_case_sensitive(regex, value, expected_valid, expected_validate, expected_match):
+def test_multiple_regex_case_sensitive(regex:str, value:str, expected_valid:bool, expected_validate:str, expected_match:list):
     """Test is_valid(), validate(), and match() for various case-sensitive multiple regex validators."""
     validator = RegexValidator(regex, case_sensitive=True)
     assert validator.is_valid(value) == expected_valid
     assert validator.validate(value) == expected_validate 
     assert validator.match(value) == expected_match
+
 
 @pytest.mark.parametrize("regex", [
     # Valid inputs
@@ -114,51 +121,38 @@ def test_multiple_regex_case_sensitive(regex, value, expected_valid, expected_va
     (REGEX_2),
     (REGEX_3),
 ])
-def test_is_none(regex):
+def test_is_none(regex:str):
     """Test is_valid(), validate(), and match() on the input None"""
     validator = RegexValidator(regex)
     assert not validator.is_valid(None)
     assert validator.validate(None) is None
     assert validator.match(None) is None
 
- public void testSingle() {
-        final RegexValidator sensitive = new RegexValidator(REGEX);
-        final RegexValidator insensitive = new RegexValidator(REGEX, false);
-        # // isValid()
-        assertFalse(sensitive.isValid("AB-de-1"), "Sensitive isValid() invalid");
-        assertTrue(insensitive.isValid("AB-de-1"), "Insensitive isValid() valid");
-        assertFalse(insensitive.isValid("ABd-de-1"), "Insensitive isValid() invalid");
-        # // validate()
-        assertNull(sensitive.validate("AB-de-1"), "Sensitive validate() invalid");
-        assertEquals("ABde1", insensitive.validate("AB-de-1"), "Insensitive validate() valid");
-        assertNull(insensitive.validate("ABd-de-1"), "Insensitive validate() invalid");
-        # // match()
-        checkArray("Sensitive match() invalid", null, sensitive.match("AB-de-1"));
-        checkArray("Insensitive match() valid", new String[] { "AB", "de", "1" }, insensitive.match("AB-de-1"));
-        checkArray("Insensitive match() invalid", null, insensitive.match("ABd-de-1"));
-        assertEquals("ABC", new RegexValidator("^([A-Z]*)$").validate("ABC"), "validate one");
-        checkArray("match one", new String[] { "ABC" }, new RegexValidator("^([A-Z]*)$").match("ABC"));
-    }
 
-@pytest.mark.parametrize("sensitive, input, expected_valid, expected_validate, expected_match", [
+@pytest.mark.parametrize("regex, sensitive, value, expected_valid, expected_validate, expected_match", [
     # Valid inputs
-    (True, "ac-DE-1" , True, "acDE1", ["ac", "DE", "1"]),
-    ("AB-de-1", "aac FDE 321", False, None, None),
-    ("ABd-de-1", "aac FDE 321", True, "aacFDE321", ["aac", "FDE", "321"]),
-    (REGEX_3, "aaC FDE 321", False, None, None),
-    # Invalid input
-    (MULTIPLE_REGEX, "AAC*FDE*321" , False, None, None)
-    # (RegexValidator(MULTIPLE_REGEX, case_sensitive=False), "AAC*FDE*321", False, None, None)
+    (REGEX, True, "ac-DE-1" , True, "acDE1", ["ac", "DE", "1"]),
+    (REGEX, True, "AB-de-1", False, None, None), 
+    (REGEX, False, "AB-de-1", True, "ABde1", ["AB", "de", "1"]),
+    (REGEX, False, "ABd-de-1", False, None, None),
+    ("^([A-Z]*)$", None, "ABC", True, "ABC", ["ABC"])
 ])
-def test_single_regex():
+def test_single_regex(regex:str, sensitive:bool, value:str, expected_valid:bool, expected_validate:str, expected_match:list):
     """Test instance methods with single regular expression (case sensitive AND insensitive)."""
-    sensitive = [True, False]
-    for case in sensitive:
+    if sensitive is None:
+        validator = RegexValidator(regex)
+    else:
+        validator = RegexValidator(regex, case_sensitive=sensitive)
+    assert validator.is_valid(value) == expected_valid
+    assert validator.validate(value) == expected_validate
+    assert validator.match(value) == expected_match
 
-    sensitive_regex = RegexValidator(REGEX, case_sensitive=True)
-    insensitive_regex = RegexValidator(REGEX, case_sensitive=False)
 
-
-def test_to_string():
-    validator = RegexValidator(REGEX)
-    assert str(validator) == f"RegexValidator{{{REGEX}}}"
+@pytest.mark.parametrize("regex, expected_string", [
+    (REGEX, ("RegexValidator{" + REGEX + "}")), 
+    ([REGEX, REGEX], ("RegexValidator{" + REGEX + "," + REGEX + "}"))
+])
+def test_str(regex: Union[str, list[str]], expected_string: str):
+    """Test to_string() method."""
+    validator = RegexValidator(regex)
+    assert str(validator) == expected_string

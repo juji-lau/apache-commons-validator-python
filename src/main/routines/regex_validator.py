@@ -55,10 +55,8 @@ License (Taken from apache.commons.validator.routines.RegexValidator):
     limitations under the License.
 Changes:
     - Java uses the package `Pattern` for regular expressions. This Python file uses the `re` package.
-    - Java's implementation is garaunteed to be thread safe. We are unsure about this one.
-    # TODO: Implement/prove thread safety?
     - Removed:
-        - `CASE_SENSITIVE`` 
+        - `CASE_SENSITIVE` 
             It was private constant (so no outside code calling). 
             Instead, we passed `case_sensitive` as an argument to __init__(), setting it to True by default.
         - `toCompileFlags()` 
@@ -82,20 +80,18 @@ Changes:
 
 from re import Pattern, compile, IGNORECASE
 from copy import copy
-from typing import Optional, Union
+from typing import Optional, Union, Final
 
 class RegexValidator:
     """
-    Regular Expression validation using Python's `re` module.
-    
-    This class creates the validator either for a single regular expression or a set (list) of regular expressions. 
-    By default, validation is *case sensitive* but constructors are provided to allow *case-insensitive* validation. 
-    
+    A regular expression validator using Python's `re` module.
+
+    Supports validation against one or multiple regex patterns, with an option for case insensitivity.
+
     Attributes:
-        patterns (list[re.Pattern]): List of `Pattern` objects.
+        patterns (list[Pattern]): Compiled regex patterns.
         serializable (bool): Indicates if the object is serializable.
         cloneable (bool): Indicates if the object can be cloned.
-    
     """
     # Attributes to manage serialization and cloning capabilities
     serializable = True    # class is serializable
@@ -103,42 +99,43 @@ class RegexValidator:
 
     def __init__(self, regexs:Union[str, list[str]], case_sensitive:bool = True):
         """
-        Initializes the RegexValidator with one or more regular expressions.
+        Initializes a RegexValidator with one or more regular expressions.
 
         Args:
-            regexs (Optional([str, list[str]])): A single regular expression or a list of regular expressions to validate against.
-            case_sensitive (bool): If the constructed pattern is case sensitive (default is case sensitive).
+            regexs (Union[str, list[str]]): A regex pattern or a list of patterns.
+            case_sensitive (bool): If `False`, enables case-insensitive matching (default: `True`).
+
+        Raises:
+            ValueError: If `regexs` is empty, `None`, or not a valid type.
         """
         self.__patterns = []
+        
         # Get the correct compile() flags.
         if case_sensitive == True:
             flags = 0
         else:
             flags = IGNORECASE
         
-        # If regexs is empty or invalid
-        if regexs is None or len(regexs) == 0 or regexs == "":
+        # If regexs is None or empty
+        if regexs is None or regexs == "" or (isinstance(regexs, list) and len(regexs) == 0):
             raise ValueError("Regular expressions are missing.")
         
-        # If regexs is a single regular expression
+        # If regex is the wrong type
+        if not isinstance(regexs, (str, list)):
+            raise ValueError("Regexs must be a String or a list of Strings.")
+
         try:
+            # Regexs is a string
             if isinstance(regexs, str):
                 self.__patterns.append(compile(regexs, flags))
-                return
-        
-            # If regexs is a list of regular expressions
-            elif isinstance(regexs, list):
+            # Regexs is a list
+            else:
                 for regex in regexs:
-                    if regex == "":
+                    if regex is None or regex == "":
                         raise ValueError("Regular expressions are missing.")
                     self.__patterns.append(compile(regex, flags))
-                return
-            else:
-                # In all other cases, regexs is an invalid argument
-                raise ValueError("Regexs must be a String or a list of Strings.")
         except Exception as e:
-            raise ValueError(f"Failed to compile {regexs} with error message: {e}")
-        
+            raise ValueError(f"Failed to compile {regexs} with error message: {e}")        
        
 
     @property
@@ -155,7 +152,7 @@ class RegexValidator:
             value (str): The value to validate.
   
         Returns: 
-            True if the value is valid; False otherwise.
+            `True` if any pattern fully matches `value`, else `False`.
         """
         if value is None:
             return False
@@ -170,13 +167,13 @@ class RegexValidator:
     
     def match(self, value:str) -> Optional[list[str]]:
         """
-        Validates a value against the set of regular expressions returning the list of matched groups.
+        Matches the input value against the regex patterns and returns matched groups.
 
         Args:
-            value (str): The value to validate.
+            value (str): The input string to validate.
 
         Returns:
-            A list[str] of the groups matched if valid or None if invalid.
+            list[str] | None: A list of matched groups if valid; otherwise `None`.
         """
         if value is None:
             return None
@@ -185,6 +182,26 @@ class RegexValidator:
             matches = pattern.fullmatch(value)
             if matches is not None:
                 return list(matches.groups())
+        return None
+
+    def validate(self, value:str) -> Optional[str]:
+        """
+        Matches the input value and returns the concatenated matched groups.
+
+        Args:
+            value (str): The input string to validate.
+
+        Returns:
+            str | None: Concatenated matched groups if valid; otherwise `None`.
+        """
+        if value is None:
+            return None
+
+        for pattern in self.__patterns:
+            matches = pattern.fullmatch(value)
+            if matches is not None:
+                groups = matches.groups()
+                return "".join(list(groups))
         return None
 
     def __str__(self) -> str:
@@ -198,23 +215,3 @@ class RegexValidator:
             output_str += pattern.pattern
         output_str += "}"
         return output_str
-
-    def validate(self, value:str) -> Optional[str]:
-        """
-        Validates a value against the set of regular expressions returning a String value of the aggregated groups.
-
-        Args:
-            value (str): The value to validate.
-        
-        Returns:
-            Aggregated string value comprised of the groups matched if valid or None if invalid.
-        """
-        if value is None:
-            return None
-
-        for pattern in self.__patterns:
-            matches = pattern.fullmatch(value)
-            if matches is not None:
-                groups = matches.groups()
-                return "".join(list(groups))
-        return None

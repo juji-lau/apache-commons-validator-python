@@ -24,8 +24,8 @@ __pycache__/
 
 
 # Reference files
-/src/main/examples
-/src/test/examples
+/src/main/example
+# /src/test/example
 
 # # Other system files (optional)
 # Thumbs.db

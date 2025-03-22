@@ -1,0 +1,15 @@
+# macOS system files
+.DS_Store
+
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+
+# VSCode/IDE files
+.vscode/
+*.swp
+
+# # Other system files (optional)
+# Thumbs.db
+# .idea/

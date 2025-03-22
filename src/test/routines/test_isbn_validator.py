@@ -19,9 +19,8 @@ License:
 
 """
 import pytest
-from main.routines.isbn import ISBNValidator
-import re
-
+from src.main.routines.isbn_validator import ISBNValidator
+# import re
 
 valid_isbn10_format = [
     "1234567890", "123456789X", "12345-1234567-123456-X", 

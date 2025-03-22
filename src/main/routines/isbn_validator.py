@@ -30,10 +30,10 @@ Changes:
     TODO: fix isbn10 dependency
 """
 
-from code_validator import CodeValidator
-from checkdigit.checkdigit_exception import CheckDigitException
-from checkdigit.ean13 import EAN13CheckDigit
-from checkdigit.isbn10 import ISBN10CheckDigit
+# from code_validator import CodeValidator
+# from checkdigit.checkdigit_exception import CheckDigitException
+# from checkdigit.ean13 import EAN13CheckDigit
+# from checkdigit.isbn10 import ISBN10CheckDigit
 
 
 class ISBNValidator:

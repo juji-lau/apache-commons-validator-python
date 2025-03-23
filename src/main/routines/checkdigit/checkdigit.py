@@ -39,14 +39,14 @@ License (Taken from apache.commons.validator.routines.checkdigit.CheckDigit.java
     See the License for the specific language governing permissions and
     limitations under the License.
 Changes:
-    Added serializeable and cloneable as abstract attributes
+    Added serializeable and clone as abstract attributes
 
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
-from code_validator import CodeValidator
-from checkdigit_exception import CheckDigitException
+from typing import Union
+# from code_validator import CodeValidator  #circular import
+from src.main.routines.checkdigit.checkdigit_exception import CheckDigitException
 
 class CheckDigit(ABC):
     """
@@ -66,20 +66,21 @@ class CheckDigit(ABC):
     
     Attributes:
         serializable (bool): Indicates if the object is serializable.
-        cloneable (bool): Indicates if the object can be cloned.
+        clone (bool): Indicates if the object can be cloned.
     """
+    # Forces subclasses to define this attribute
     @property
     @abstractmethod
-    def serializable(self):
+    def serializable(self) -> bool:
         pass
     
     @property
     @abstractmethod
-    def cloneable(self):
+    def clone(self) -> bool:
         pass
 
     @abstractmethod
-    def calculate(self, code:str) -> Optional([str, CheckDigitException]):
+    def calculate(self, code: str) -> Union[str, CheckDigitException, None]:
         """
         Calculates the Check Digit for a code.  
 

@@ -28,12 +28,21 @@ License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigit
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
 Changes:
-    Removed singleton method
-    TODO: add serializeable and cloneable, check singletons
+    TODO: Confirm singleton implementation
+    Added a class: classproperty to return singleton instances.
 
 """
-from modulus_checkdigit import ModulusCheckDigit
+from __future__ import annotations
+from typing  import Final
+from src.main.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
+
+class classproperty:
+    def __init__(self, fget):
+        self.fget = fget
+    def __get__(self, instance, owner):
+        return self.fget(owner)
 
 class EAN13CheckDigit(ModulusCheckDigit):
     """
@@ -45,18 +54,61 @@ class EAN13CheckDigit(ModulusCheckDigit):
     on their position.
 
     Attributes:
+        EAN13_CHECK_DIGIT (EAN13CheckDigit): Singleton instance of this class
         POSITION_WEIGHT (list[int]): Weighting given to digits depending on their right position
+        serializable (bool): Indicates if the object is serializable (class attribute).
+        clone (bool): Indicates if the object can be cloned (class attribute).
     """
+    # EAN13_CHECK_DIGIT should be public, but to make implementing singletons easier, I've made it private.
+    # It's fine since it's final
+    EAN13_CHECK_DIGIT:EAN13CheckDigit = None
+    __POSITION_WEIGHT:Final[list] = [3, 1]
 
-    # self._serialVersionUID = 1726347093230424107
-    # EAN13_CHECK_DIGIT
-    POSITION_WEIGHT = [3, 1]
+    # Attributes to manage serialization and cloning capabilities
+    serializable = False   # class is serializable
+    clone = False
+
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
 
     def __init__(self):
+        """Ensure the instance is initialized only once."""
+        pass  # No-op if already instantiated
+
+
+    # def __init__(self):
+    #     """
+    #     Constructs a singleton modulus 10 Check Digit routine for EAN/UPC.
+    #     """
+    #     super.__init__()
+    # @classmethod
+    # def EAN13_CHECK_DIGIT(cls) -> EAN13CheckDigit:
+    #     """ Returns an instance if itself (Singleton). """
+    #     if cls.ean13_checkdigit_instance is None:
+    #         cls.ean13_checkdigit_instance = cls()
+    #     return cls.ean13_checkdigit_instance
+
+
+    # @classproperty
+    # def EAN13_CHECK_DIGIT(cls) -> EAN13CheckDigit:
+    #     if cls._instance is None:
+    #         cls._instance = cls()
+    #     return cls._instance
+
+    @classmethod
+    def get_instance(cls):
         """
-        Constructs a modulus 10 Check Digit routine for EAN/UPC.
+        Gets the singleton instance of this validator.
+
+        :return: A singleton instance of the validator.
         """
-        super().__init__()
+        if cls.__EAN13_CHECK_DIGIT is None:
+            cls.__EAN13_CHECK_DIGIT = EAN13CheckDigit()
+        return cls.__EAN13_CHECK_DIGIT
     
     def _weighted_value(self, char_value:int, left_pos:int, right_pos:int) -> int:
         """
@@ -73,4 +125,7 @@ class EAN13CheckDigit(ModulusCheckDigit):
         Returns:
             The weighted value of the character.
         """
-        return char_value * self.POSITION_WEIGHT[right_pos % 2]
+        return char_value * self.__POSITION_WEIGHT[right_pos % 2]
+
+# Instantiate the singleton explicitly:
+# EAN13CheckDigit.EAN13_CHECK_DIGIT = EAN13CheckDigit()

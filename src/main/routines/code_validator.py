@@ -65,13 +65,12 @@ License (Taken from apache.commons.validator.routines.ISBNValidator):
 Changes:
   - Removed getInstance() which supports singletone behavior for a Java class.  In here, singleton behavior is implicit.
   - Added a setter for self.convert.  getInstance(convert) provided a way to do this, but now that it's removed, this adds a new way.
-  TODO: Implement import dependencies, do serializeable/cloneable
 """
 import logging
-from typing import Optional
-from generic_validator import GenericValidator
-from regex_validator import RegexValidator
-from checkdigit.checkdigit import CheckDigit
+from typing import Optional, Final
+# from generic_validator import GenericValidator
+from src.main.routines.regex_validator import RegexValidator
+from src.main.routines.checkdigit.checkdigit import CheckDigit
 
 
 class CodeValidator:
@@ -91,14 +90,17 @@ class CodeValidator:
         checkdigit (CheckDigit): The check digit validation routine.
         min_length (int): The minimum length of the code.
         max_length (int): The maximum length of the code.
-        serializable (bool): Indicates if the object is serializable.
-        cloneable (bool): Indicates if the object can be cloned.
+        serializable (bool): Indicates if the object is serializable (class attribute).
+        clone (bool): Indicates if the object can be cloned (class attribute).
     """
+    
+    # Attributes to manage serialization and cloning capabilities
+    serializable = True    # class is serializable
+    clone = False          # class is not cloneable
 
     def __init__(self, checkdigit:CheckDigit, regex:str = None, regex_validator:RegexValidator=None, length:int = None, min_length:int = -1, max_length:int = -1):
         """
         Initializes the CodeValidator with default values.
-        Python's version of: org.apache.validator.routines.CodeValidator()
                 
         Args:
             check_digit (CheckDigit): The check digit validation routine.
@@ -108,22 +110,21 @@ class CodeValidator:
             min_length (int, optional): The minimum length of the code (defaults to -1 for no restriction).
             max_length (int, optional): The maximum length of the code (defaults to -1 for no restriction).
         """
-        # self._serialVersionUID = 446960910870938233L
         if regex is None and regex_validator is None:
-            self.__regex_validator = None
+            self.__regex_validator:Final[Optional[RegexValidator]] = None
         elif regex_validator is not None:
             self.__regex_validator = regex_validator
         else:
-            self._regex_validator = RegexValidator(regex)
+            self.__regex_validator = RegexValidator(regex)
 
         if length is None:
-            self.__min_length = min_length
-            self.__max_length = max_length
+            self.__min_length:Final[int] = min_length
+            self.__max_length:Final[int] = max_length
         else:
             self.__min_length = length
             self.__max_length = length
 
-        self.__checkdigit = checkdigit
+        self.__checkdigit:Final[CheckDigit] = checkdigit
 
     
     @property
@@ -144,7 +145,7 @@ class CodeValidator:
     @property
     def regex_validator(self) -> Optional[RegexValidator]:
         """Returns the regex_validator attribute."""
-        return self.regex_validator  
+        return self.__regex_validator  
 
     def is_valid(self, input:str) -> bool:
         """
@@ -153,15 +154,16 @@ class CodeValidator:
         Args:
             input (str): The code to validate and check for validity.
         Returns:
-            False if the return value of validate() is None.
-            True otherwise.
+            `False` if the return value of validate() is None.
+            `True` otherwise.
         """
         return self.validate(input) != None
     
+
     def validate(self, input:str):
         """
         Validate the input returning either the valid input or None if the input is invalid
-        Note: This method trims the input and if self._regex_validator is set, it may also 
+        Note: This method trims the input and if `self.regex_validator` is set, it may also 
             change the input as part of the validation.
 
         Args: 
@@ -169,7 +171,7 @@ class CodeValidator:
         
         Returns: 
             The validated input if the code is valid
-            None if the code is invalid
+            `None` if the code is invalid
         """
         if input is None:
             return None
@@ -180,7 +182,7 @@ class CodeValidator:
             return None
         
         # Validate/reformat using regular expression
-        if self._regex_validator is not None:
+        if self.regex_validator is not None:
             code = self.regex_validator.validate(code)
             if code is None:
                 return None

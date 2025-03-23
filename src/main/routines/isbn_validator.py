@@ -30,10 +30,10 @@ Changes:
     TODO: fix isbn10 dependency
 """
 
-# from code_validator import CodeValidator
-# from checkdigit.checkdigit_exception import CheckDigitException
-# from checkdigit.ean13 import EAN13CheckDigit
-# from checkdigit.isbn10 import ISBN10CheckDigit
+from code_validator import CodeValidator
+from checkdigit.checkdigit_exception import CheckDigitException
+from checkdigit.ean13 import EAN13CheckDigit
+from checkdigit.isbn10 import ISBN10CheckDigit
 
 
 class ISBNValidator:
@@ -48,7 +48,7 @@ class ISBNValidator:
         isbn10_validator (CodeValidator): Validator instance for ISBN-10 codes.
         isbn13_validator (CodeValidator): Validator instance for ISBN-13 codes.
         serializable (bool): Indicates if the object is serializable.
-        cloneable (bool): Indicates if the object can be cloned.
+        clone (bool): Indicates if the object can be cloned.
 
     Constants:
         ISBN_10_LEN (int): The length of an ISBN-10 code.
@@ -59,8 +59,11 @@ class ISBNValidator:
         ISBN10_REGEX (str): Regular expression pattern for ISBN-10 validation.
         ISBN13_REGEX (str): Regular expression pattern for ISBN-13 validation.
     """
+    # Attributes to manage serialization and cloning capabilities
+    serializable = True    # class is serializable
+    clone = False          # class is not cloneable
+    
     # Constants
-    # self._serialVersionUID = 4319515687976420405L
     ISBN_10_LEN = 10
     SEP = "(?:\\-|\\s)"
     GROUP = "(\\d{1,5})"
@@ -90,9 +93,6 @@ class ISBNValidator:
         self.__isbn10_validator = CodeValidator(self.ISBN10_REGEX, 10, ISBN10CheckDigit.ISBN10_CHECK_DIGIT)
         self.__isbn13_validator = CodeValidator(self.ISBN13_REGEX, 13, EAN13CheckDigit.EAN13_CHECK_DIGIT)
         
-        # Attributes to manage serialization and cloning capabilities
-        self.serializable = True    # class is serializable
-        self.clone = False          # class is not cloneable
 
     # TODO: How to do inheritied objects:
       # clone, equals, finalize, getClass, hashCode, notify, notifyAll, wait, wait

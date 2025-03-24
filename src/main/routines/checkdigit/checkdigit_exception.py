@@ -35,10 +35,12 @@ class CheckDigitException(Exception):
         message (str): Explanation of the error.
         cause (Exception, optional): Underlying exception that caused this error.
         serializable (bool): Indicates if the object is serializable.
-        cloneable (bool): Indicates if the object can be cloned.
+        clone (bool): Indicates if the object can be cloned.
     """
-    # constants
-    # serialVersionUID = -3519894732624685477L
+
+    # Attributes to manage serialization and cloning capabilities
+    serializable = True   # class is serializable
+    clone = False
 
     def __init__(self, msg:str = None, cause:Exception = None):
         """
@@ -49,9 +51,5 @@ class CheckDigitException(Exception):
             cause (Exception, optional): The underlying cause of the error.
         """
         super().__init__(msg)
-        if cause:
+        if isinstance(cause, BaseException):
             self.__cause__ = cause
-        
-        # Attributes to manage serialization and cloning capabilities
-        self.serializable = False    # class is not serializable
-        self.clone = False          # class is not cloneable

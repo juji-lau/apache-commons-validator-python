@@ -37,7 +37,7 @@ Changes:
 """
 # from modulus_checkdigit import ModulusCheckDigit
 from abc import abstractmethod
-from typing import Optional, Union
+from typing import Optional, Union, Final
 from src.main.routines.checkdigit.abstract_checkdigit import AbstractCheckDigit
 from src.main.routines.checkdigit.checkdigit_exception import CheckDigitException
 # from src.main.generic_validator import GenericValidator
@@ -61,12 +61,12 @@ class ModulusCheckDigit(AbstractCheckDigit):
     
     # Constants:
     # self._serialVersionUID = 2948962251251528941L
-    MODULUS_10 = 10
-    MODULUS_11 = 11
-            # # Attributes to manage serialization and cloning capabilities
-            # serializable = True    # class is serializable
-            # clone = False          # class is not cloneable
-
+    MODULUS_10:Final[int] = 10
+    MODULUS_11:Final[int] = 11
+    
+    # Attributes to manage serialization and cloning capabilities
+    serializable = True    # class is serializable
+    clone = False          # class is not cloneable
 
     def __init__(self, modulus:int = MODULUS_10):
         """
@@ -76,7 +76,7 @@ class ModulusCheckDigit(AbstractCheckDigit):
             modulus (int): The modulus value to use for the check digit calculation.
         """
         super().__init__()
-        self.__modulus = modulus
+        self.__modulus:Final[int] = modulus
 
     @property
     def modulus(self) -> int:
@@ -87,19 +87,6 @@ class ModulusCheckDigit(AbstractCheckDigit):
     # @modulus.setter
     # def modulus(self):
     #     self.__modulus__ = 10
-
-    # self._serializeable = True
-
-    # @property
-    # @abstractmethod
-    # def serializable(self):
-    #     self.__serializeable
-    
-    # @property
-    # @abstractmethod
-    # def cloneable(self):
-    #     pass
-
     
     # concrete method
     def sum_digits(number:int) -> int:
@@ -155,10 +142,9 @@ class ModulusCheckDigit(AbstractCheckDigit):
         Raises:
             CheckDigitException if an error occurs calculating the modulus for the specified code.
         """
-
         total = 0
         for i in range(0, len(code)):
-            lth = len(code) + int(includes_check_digit)
+            lth = len(code) + int(not includes_check_digit)
             left_pos = i + 1
             right_pos = lth - i
             char_value = self._to_int(code[i], left_pos, right_pos)
@@ -183,7 +169,6 @@ class ModulusCheckDigit(AbstractCheckDigit):
         # TODO: Uncomment once we recieve GenericValidator
         # if GenericValidator.is_blank_or_null(code):
         #     return False
-        
         try:
             modulus_result = self._calculate_modulus(code, True)
             return (modulus_result == 0)
@@ -209,7 +194,7 @@ class ModulusCheckDigit(AbstractCheckDigit):
         if char_value >= 0 and char_value <= 9:
             return str(char_value)
         
-        raise CheckDigitException(f"Invalid Check Digit Value = {char_value}", ValueError)
+        raise CheckDigitException(f"Invalid Check Digit Value = {char_value}", ValueError())
         
     def _to_int(self, character:str, left_pos:int, right_pos:int) -> Union[int, CheckDigitException, None]:
         """
@@ -230,12 +215,12 @@ class ModulusCheckDigit(AbstractCheckDigit):
             CheckDigitException if charcter is non-numeric, or not a string of length 1.
         """
         if len(character) != 1:
-            raise CheckDigitException("Character must be a string of length 1.", ValueError)
+            raise CheckDigitException("Character must be a string of length 1.", ValueError())
         
         if character[0].isdigit():
             return int(character[0])
         
-        raise CheckDigitException(f"Invalid character[{left_pos}] = '{character}'.", ValueError)
+        raise CheckDigitException(f"Invalid character[{left_pos}] = '{character}'.", ValueError())
 
     @abstractmethod
     def _weighted_value(self, char_value:int, left_pos:int, right_pos:int) -> Union[int, CheckDigitException, None]:

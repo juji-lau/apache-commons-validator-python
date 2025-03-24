@@ -38,11 +38,11 @@ from __future__ import annotations
 from typing  import Final
 from src.main.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
 
-class classproperty:
-    def __init__(self, fget):
-        self.fget = fget
-    def __get__(self, instance, owner):
-        return self.fget(owner)
+# class classproperty:
+#     def __init__(self, fget):
+#         self.fget = fget
+#     def __get__(self, instance, owner):
+#         return self.fget(owner)
 
 class EAN13CheckDigit(ModulusCheckDigit):
     """
@@ -61,7 +61,7 @@ class EAN13CheckDigit(ModulusCheckDigit):
     """
     # EAN13_CHECK_DIGIT should be public, but to make implementing singletons easier, I've made it private.
     # It's fine since it's final
-    EAN13_CHECK_DIGIT:EAN13CheckDigit = None
+    __EAN13_CHECK_DIGIT:EAN13CheckDigit = None
     __POSITION_WEIGHT:Final[list] = [3, 1]
 
     # Attributes to manage serialization and cloning capabilities
@@ -69,38 +69,13 @@ class EAN13CheckDigit(ModulusCheckDigit):
     clone = False
 
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-
-
     def __init__(self):
         """Ensure the instance is initialized only once."""
-        pass  # No-op if already instantiated
-
-
-    # def __init__(self):
-    #     """
-    #     Constructs a singleton modulus 10 Check Digit routine for EAN/UPC.
-    #     """
-    #     super.__init__()
-    # @classmethod
-    # def EAN13_CHECK_DIGIT(cls) -> EAN13CheckDigit:
-    #     """ Returns an instance if itself (Singleton). """
-    #     if cls.ean13_checkdigit_instance is None:
-    #         cls.ean13_checkdigit_instance = cls()
-    #     return cls.ean13_checkdigit_instance
-
-
-    # @classproperty
-    # def EAN13_CHECK_DIGIT(cls) -> EAN13CheckDigit:
-    #     if cls._instance is None:
-    #         cls._instance = cls()
-    #     return cls._instance
+        super().__init__()
 
     @classmethod
-    def get_instance(cls):
+    @property
+    def EAN13_CHECK_DIGIT(cls):
         """
         Gets the singleton instance of this validator.
 
@@ -126,6 +101,3 @@ class EAN13CheckDigit(ModulusCheckDigit):
             The weighted value of the character.
         """
         return char_value * self.__POSITION_WEIGHT[right_pos % 2]
-
-# Instantiate the singleton explicitly:
-# EAN13CheckDigit.EAN13_CHECK_DIGIT = EAN13CheckDigit()

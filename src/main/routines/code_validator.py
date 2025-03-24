@@ -98,7 +98,7 @@ class CodeValidator:
     serializable = True    # class is serializable
     clone = False          # class is not cloneable
 
-    def __init__(self, checkdigit:CheckDigit, regex:str = None, regex_validator:RegexValidator=None, length:int = None, min_length:int = -1, max_length:int = -1):
+    def __init__(self, regex:str = None, regex_validator:RegexValidator=None, length:int=None, min_length:int = -1, max_length:int = -1, checkdigit:CheckDigit=None):
         """
         Initializes the CodeValidator with default values.
                 
@@ -160,7 +160,7 @@ class CodeValidator:
         return self.validate(input) != None
     
 
-    def validate(self, input:str):
+    def validate(self, input:str) -> Optional[str]:
         """
         Validate the input returning either the valid input or None if the input is invalid
         Note: This method trims the input and if `self.regex_validator` is set, it may also 
@@ -180,6 +180,7 @@ class CodeValidator:
         code = input.strip()
         if code is None:
             return None
+        print(f"INPUT: {input}, CODE: {code}")
         
         # Validate/reformat using regular expression
         if self.regex_validator is not None:
@@ -191,6 +192,7 @@ class CodeValidator:
         if ((self.min_length >= 0 and len(code) < self.min_length) or
             (self.max_length >= 0 and len(code) > self.max_length)):
             return None
+        print(f"CODE AFTER REGEX: {code}")
 
         # Validate the check digit
         if ((self.checkdigit is not None) and (not self.checkdigit.is_valid(code))):

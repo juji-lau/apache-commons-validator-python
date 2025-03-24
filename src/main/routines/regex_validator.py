@@ -140,7 +140,13 @@ class RegexValidator:
 
     @property
     def patterns(self) -> list[Pattern]:
-        """Returns a shallow copy of the class attribute patterns."""
+        """
+        Returns a shallow copy of the class attribute patterns.
+
+        Note: 
+        Since we return a shallow copy of self.__patterns, when we referecne self.__patterns
+        in this class, we use self.__patterns to avoid making a new shallow copy at each reference.
+        """
         return copy(self.__patterns)
     
 

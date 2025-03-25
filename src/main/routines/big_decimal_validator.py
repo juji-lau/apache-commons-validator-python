@@ -15,22 +15,24 @@
     limitations under the License.
 """
 
-from typing import Final, override
+from typing import override
 from ..routines.abstract_number_validator import AbstractNumberValidator
 
-class ByteValidator(AbstractNumberValidator):
+class BigDecimalValidator(AbstractNumberValidator):
     """
-    Byte Validation and Conversion routines.
+    BigDecimal Validation and Conversion routines.
 
     This validator provides a number of methods for validating/converting a string value
-    to a byte to parse either:
+    to a big decimal to parse either:
         <li>using the default format for the default locale</li>
         <li>using a specified pattern with the default locale</li>
         <li>using the default format for a specified locale</li>
         <li>using a specified pattern with a specified locale</li>
 
     Use the is_valid() method to just validate or one of the validate() methods to
-    validate and receive a converted byte value.
+    validate and receive a converted big decimal value.
+
+    Fraction/decimal values are automatically trimmed to the appropriate length.
 
     Once a value has been successfully converted the following methods can be used 
     to perform minimum, maximum and range checks:
@@ -47,10 +49,8 @@ class ByteValidator(AbstractNumberValidator):
     """
 
     _VALIDATOR = None
-    BYTE_MIN: Final[int] = -128
-    BYTE_MAX: Final[int] = 127
 
-    def __init__(self, strict: bool=True, format_type: int=0):
+    def __init__(self, strict: bool=True, format_type: int=0, allow_fractions: bool=True):
         """
         Construct an instance with the specified strict setting and format type or a strict instance by default.
         The format_type specifies what type of number format is created - valid types are:
@@ -61,7 +61,7 @@ class ByteValidator(AbstractNumberValidator):
         :param strict: True if strict format parsing should be used.
         :param format_type: The number format type to create for validation, default is STANDARD_FORMAT.
         """
-        super().__init__(strict, format_type, False)
+        super().__init__(strict, format_type, allow_fractions)
     
     @classmethod
     def get_instance(cls):
@@ -71,10 +71,10 @@ class ByteValidator(AbstractNumberValidator):
         :return: A singleton instance of the validator.
         """
         if cls._VALIDATOR is None:
-            cls._VALIDATOR = ByteValidator()
+            cls._VALIDATOR = BigDecimalValidator()
         return cls._VALIDATOR
 
-    def is_in_range(self, value: int, min_val: int, max_val: int):
+    def is_in_range(self, value: float, min_val: float, max_val: float):
         """
         Check if the value is within a specified range.
     
@@ -85,7 +85,7 @@ class ByteValidator(AbstractNumberValidator):
         """
         return min_val <= value and value <= max_val
     
-    def max_value(self, value: int, max_val: int):
+    def max_value(self, value: float, max_val: float):
         """
         Check if the value is less than or equal to a maximum.
     
@@ -95,7 +95,7 @@ class ByteValidator(AbstractNumberValidator):
         """
         return value <= max_val
     
-    def min_value(self, value: int, min_val: int):
+    def min_value(self, value: float, min_val: float):
         """
         Check if the value is greater than or equal to a minimum.
     
@@ -115,24 +115,25 @@ class ByteValidator(AbstractNumberValidator):
         :return: The parsed value converted to the appropriate type if valid or None if invalid.
         """
         try:
-            val = formatter(value)
-            if self.is_in_range(val, self.BYTE_MIN, self.BYTE_MAX):
-                return val
+            return formatter(value)
         except ValueError:
             return None
     
     def validate(self, value: str, pattern: str=None, locale=None):
         """
-        Validate/convert a byte using the default locale.
+        Validate/convert a big decimal using the default locale.
     
         :param value: The value validation is being performed on.
         :param pattern: The (optional) regex pattern used to validate the value against, or the default for the locale if None.
         :param locale: The (optional) locale to use for the format, system default if None.
-        :return: The parsed byte (as an int) if valid or None if invalid.
+        :return: The parsed big decimal (as a float) if valid or None if invalid.
         """
         val = self._parse(value, pattern, locale)
         
         if val is None:
+            return val
+
+        if isinstance(val, int):
             return val
         
         scale = self._determine_scale(pattern, locale)

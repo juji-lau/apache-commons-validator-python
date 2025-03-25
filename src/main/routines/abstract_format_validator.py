@@ -16,7 +16,6 @@
 """
 
 from abc import ABC
-import locale as Locale
 
 class AbstractFormatValidator(ABC):
     """
@@ -24,6 +23,8 @@ class AbstractFormatValidator(ABC):
  
     This is a base class for building Date and Number Validators using format parsing.
     """
+    serializable = True
+    clonable = True
 
     def __init__(self, strict: bool):
         """
@@ -31,45 +32,24 @@ class AbstractFormatValidator(ABC):
     
         :param strict: If True, strict format parsing will be used.
         """
-        self._strict = strict
-        self.serializable = True
-        self.clonable = True
+        self.__strict = strict
 
-    def format(self, value, pattern: str=None, locale=None):
+    def format(self, value, pattern: str=None, locale: str=None):
         """
         Format an object into a string using the specified pattern or locale.
     
         :param value: The value validation is being performed on.
-        :param pattern: The (optional) pattern used to format the value.
+        :param pattern: The (optional) string format to use for the format.
         :param locale: The (optional) locale to use for the format.
         :return: The value formatted as a string.
         """
-        if pattern is None:
-            try:
-                locale = "" if locale is None else locale
-                Locale.setlocale(Locale.LC_NUMERIC, locale)
-                return Locale.format_string("%f", value, grouping=True) # TODO: change rounding
-            except Locale.Error:
-                return None
-        
-        formatter = self._get_format(pattern, locale) # TODO: change
-        return self._format(value, formatter)
+        raise NotImplementedError("Subclasses must implement this method")
     
-    def _format(self, value, formatter):
-        """
-        Format an object into a string using the specified format.
-    
-        :param value: The value validation is being performed on.
-        :param formatter: The format to use.
-        :return: The value formatted as a string.
-        """
-        return str(formatter(value)) # TODO: Check!!!
-    
-    def _get_format(self, pattern: str=None, locale=None):
+    def _get_format(self, pattern: str=None, locale: str=None):
         """
         Returns a format for the specified pattern and/or locale.
 
-        :param pattern: The pattern used to validate the value against or None to use the default for the locale.
+        :param pattern: The regex pattern used to validate the value against or None to use the default for the locale.
         :param locale: The locale to use for currency format, system default if None.
         :return: The format to use.
         """
@@ -82,15 +62,15 @@ class AbstractFormatValidator(ABC):
 
         :return: True if strict format parsing should be used.
         """
-        return self._strict
+        return self.__strict
     
-    def is_valid(self, value: str, pattern: str=None, locale=None):
+    def is_valid(self, value: str, pattern: str=None, locale: str=None):
         """
         Validate using the specified pattern and/or locale or the default if no pattern and/or locale is given.
 
         :param value: The value validation is being performed on.
-        :param pattern: The (optional) pattern used to validate the value against.
-        :param locale: The (optional) locale to use for the format, defaults to the default.
+        :param pattern: The (optional) regex pattern used to validate the value against.
+        :param locale: The (optional) locale to use for the format, defaults to the system default.
         :return: True if the value is valid.
         """
         raise NotImplementedError("Subclasses must implement this method")
@@ -103,13 +83,15 @@ class AbstractFormatValidator(ABC):
         :param formatter: The format to parse the value with.
         :return: The parsed value if valid or None if invalid.
         """
+        if formatter is None:
+            return None
+
         try:
             parsed_value = formatter(value)
         except ValueError:
             return None
-        
-        if parsed_value is None or (self.strict and len(value) != len(str(parsed_value))):
-            return None
+
+        # TODO: I don't know how to handle strict
         
         if parsed_value is not None:
             parsed_value = self._process_parsed_value(value, formatter)

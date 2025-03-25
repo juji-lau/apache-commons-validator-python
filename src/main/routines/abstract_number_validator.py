@@ -17,9 +17,9 @@
 
 from typing import Final, override
 import locale as Locale
+import re
 from ..routines.abstract_format_validator import AbstractFormatValidator
 # from ..GenericValidator import GenericValidator
-# from ..util.Locale import Locale
 
 class AbstractNumberValidator(AbstractFormatValidator):
     """
@@ -28,39 +28,92 @@ class AbstractNumberValidator(AbstractFormatValidator):
     This is a base class for building Number Validators using format parsing.
     """
 
-    STANDARD_FORMAT: Final[int] = 0 # Standard NumberFormat type
-    CURRENCY_FORMAT: Final[int] = 1 # Currency NumberFormat type
-    PERCENT_FORMAT:  Final[int] = 2 # Percent NumberFormat type
+    STANDARD_FORMAT: Final[int] = 0 # Standard type
+    CURRENCY_FORMAT: Final[int] = 1 # Currency type
+    PERCENT_FORMAT:  Final[int] = 2 # Percent type
 
     def __init__(self, strict: bool, format_type: int, allow_fractions: bool):
         """
         Constructs an instance with specified strict and decimal parameters.
     
-        :param strict: True if strict Format parsing should be used.
-        :param format_type: The NumberFormat type to create for validation, default is STANDARD_FORMAT.
+        :param strict: True if strict format parsing should be used.
+        :param format_type: The format type to create for validation, default is STANDARD_FORMAT.
         :param allow_fractions: True if fractions are allowed or False if integers only.
         """
         super().__init__(strict)
-        self._format_type = format_type
-        self._allow_fractions = allow_fractions
+        self.__format_type = format_type
+        self.__allow_fractions = allow_fractions
 
-    def _determine_scale(self): # TODO: need to finish this
+    @override
+    def format(self, value, pattern: str=None, locale: str=None):
         """
-        Returns the multiplier of the NumberFormat.
+        Format an object into a string using the specified pattern or locale.
     
-        :param format: The NumberFormat to determine the multiplier of.
-        :return: The multiplying factor for the format.
+        :param value: The value validation is being performed on.
+        :param pattern: The (optional) string format to use for the format.
+        :param locale: The (optional) locale to use for the format.
+        :return: The value formatted as a string.
+        """
+        try:
+            locale = "" if locale is None else locale
+            Locale.setlocale(Locale.LC_ALL, locale)
+        except Locale.Error:
+            return None
+        
+        if pattern is None:
+        # if GenericValidator.is_blank_or_null(pattern):
+            if self.format_type == self.PERCENT_FORMAT:
+                pattern = "%.2f%" if self.allow_fractions else "%d%"
+            elif self.format_type == self.STANDARD_FORMAT:
+                pattern = "%.2f" if self.allow_fractions else "%d" # TODO: maybe change pattern to allow more decimal places
+        
+        if self.format_type == self.CURRENCY_FORMAT:
+            return Locale.currency(value, grouping=True)
+        elif self.format_type == self.PERCENT_FORMAT:
+            return Locale.format_string(pattern, value*100, grouping=True)
+        else:   # should be STANDARD_FORMAT
+            return Locale.format_string(pattern, value, grouping=True)
+        
+
+    def _determine_scale(self, pattern: str, locale: str):
+        """
+        Returns the multiplier based on the regex pattern and locale.
+    
+        :param pattern: The pattern used to determine the number of decimal places.
+        :param locale: The locale used to determine the number of decimal places.
+        :return: The number of decimal places for the format.
         """
         if not self.strict:
             return -1
-        if not self.allow_fractions: # or format is integer only
+        if not self.allow_fractions:
             return 0
-        # if minimum fraction != maximum fraction, return -1
+        
+        try:
+            locale = "" if locale is None else locale
+            Locale.setlocale(Locale.LC_ALL, locale)
+        except Locale.Error:
+            return None
+        
+        locale_info = Locale.localeconv()
+        
+        if pattern is None:
+        # if GenericValidator.is_blank_or_null(pattern):
+            if self.format_type == self.CURRENCY_FORMAT:
+                return locale_info['frac_digits']
+            elif self.format_type == self.STANDARD_FORMAT:
+                return -1
+            else:
+                return 2
+
+        decimal_place = locale_info['decimal_point']
+        return len(pattern.split(decimal_place)[1].replace('\\', '')) # TODO: support differrent regex patterns
     
-    def _get_format_locale(self, locale):
+    @override
+    def _get_format(self, pattern: str, locale: str):
         """
         Returns a function used to format for the specified locale.
     
+        :param pattern: The regex pattern to use for the format.
         :param locale: The locale to use for the format, system default if None.
         :return: The function to use for formatting.
         """
@@ -69,33 +122,18 @@ class AbstractNumberValidator(AbstractFormatValidator):
             Locale.setlocale(Locale.LC_NUMERIC, locale)
         except Locale.Error:
             return None
-
-        if self.format_type == self.CURRENCY_FORMAT:
-            return Locale.atof                                          # TODO: this won't work as is
-        elif self.format_type == self.PERCENT_FORMAT:
-            return Locale.atof if self.allow_fractions else Locale.atoi # TODO: this won't work as is
-        else:   # should be STANDARD_FORMAT
-            return Locale.atof if self.allow_fractions else Locale.atoi
-    
-    @override
-    def _get_format(self, pattern: str, locale):
-        # use_pattern = not GenericValidator.is_blank_or_null(pattern)
-        use_pattern = False
-        if not use_pattern:
-            return self._get_format_locale(locale)
-        elif locale is None:
-            return # TODO
-        else:
-            return # TODO
+        
+        return Locale.atof if self.allow_fractions else Locale.atoi
     
     @property
     def format_type(self):
         """
-        Indicates the type of NumberFormat created by this validator instance.
+        Indicates the type of format created by this validator instance.
+        The three types are STANDARD_FORMAT, CURRENCY_FORMAT, and PERCENT_FORMAT.
     
         :return: The format type created.
         """
-        return self._format_type
+        return self.__format_type
     
     @property
     def allow_fractions(self):
@@ -104,7 +142,7 @@ class AbstractNumberValidator(AbstractFormatValidator):
     
         :return: True if decimals are allowed or False if the number is an integer.
         """
-        return self._allow_fractions
+        return self.__allow_fractions
     
     def is_in_range(self, value, min_val, max_val):
         """
@@ -118,13 +156,13 @@ class AbstractNumberValidator(AbstractFormatValidator):
         return min_val <= value and value <= max_val
     
     @override
-    def is_valid(self, value: str, pattern: str=None, locale=None):
+    def is_valid(self, value: str, pattern: str=None, locale: str=None):
         """
         Validate using the specified locale.
     
         :param value: The value validation is being performed on.
-        :param pattern: The pattern used to validate the value against, or the default for the locale if None.
-        :param locale: The locale to use for the date format, system default if null.
+        :param pattern: The regex pattern used to validate the value against, or the default for the locale if None.
+        :param locale: The locale to use for the format, system default if null.
         :return: True if the value is valid.
         """
         return self._parse(value, pattern, locale) is not None
@@ -149,19 +187,49 @@ class AbstractNumberValidator(AbstractFormatValidator):
         """
         return value >= min_val
     
-    def _parse(self, value: str, pattern: str, locale):
+    def _check_pattern(self, value: str, pattern: str, locale: str=None):
         """
-        Parse the value with the specified patter.
+        Check if the value follows the specified pattern.
+
+        :param value: The value validation is being performed on.
+        :param pattern: The regex pattern used to validate the value against.
+        :param locale: The locale to use for the format.
+        :return: True if the value follows the specified pattern.
+        """
+        match = re.search(pattern, value)
+        if not bool(match):
+            return None
+        try:
+            locale = "" if locale is None else locale
+            Locale.setlocale(Locale.LC_NUMERIC, locale)
+        except Locale.Error:
+            return None
+        
+        # check that partial match is valid
+        locale_info = Locale.localeconv()
+        decimal_point = locale_info["decimal_point"]
+        if len(match.group(0).split(decimal_point)[0]) == len(value.split(decimal_point)[0]):
+            return value.replace(locale_info['thousands_sep'], '')
+        return None
+     
+    def _parse(self, value: str, pattern: str, locale: str):
+        """
+        Parse the value with the specified pattern.
     
         :param value: The value to be parsed.
-        :param pattern: The pattern used to validate the value against, or the default for the Locale if None.
-        :param locale: The locale to use for the date format, system default if None.
+        :param pattern: The regex pattern used to validate the value against, or the default for the locale if None.
+        :param locale: The locale to use for the format, system default if None.
         :return: The parsed value if valid or None if invalid.
         """
         value = value.strip() if value is not None else None
-        if value is None or value == "":
+        if value is None or value == '':
         # if GenericValidator.is_blank_or_null(value):
             return None
+        if pattern is not None and value != '':
+        # if not GenericValidator.is_blank_or_null(pattern):
+            value = self._check_pattern(value, pattern, locale)
+            if value is None:
+                return None
         formatter = self._get_format(pattern, locale)
         return super()._parse(value, formatter)
     

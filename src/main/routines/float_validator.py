@@ -23,7 +23,7 @@ class FloatValidator(AbstractNumberValidator):
     Float Validation and Conversion routines.
 
     This validator provides a number of methods for validating/converting a string value
-    to a float using NumberFormat to parse either:
+    to a float to parse either:
         <li>using the default format for the default locale</li>
         <li>using a specified pattern with the default locale</li>
         <li>using the default format for a specified locale</li>
@@ -48,22 +48,20 @@ class FloatValidator(AbstractNumberValidator):
 
     _VALIDATOR = None
     FLOAT_MAX: Final[float] = 3.402823466E+38 # 32 bit floating point max value
-    FLOAT_MIN: Final[float] = 1.175494351E-38 # 32 bit floating point max value
+    FLOAT_MIN: Final[float] = 1.175494351E-38 # 32 bit floating point min value
 
     def __init__(self, strict: bool=True, format_type: int=0):
         """
         Construct an instance with the specified strict setting and format type or a strict instance by default.
-        The format_type specifies what type of NumberFormat is created - valid types are:
+        The format_type specifies what type of number format is created - valid types are:
             <li>AbstractNumberValidator.STANDARD_FORMAT - to create standard number formats (the default).</li>
             <li>AbstractNumberValidator.CURRENCY_FORMAT - to create currency number formats.</li>
             <li>AbstractNumberValidator.PERCENT_FORMAT  - to create percent number formats.</li>
 
         :param strict: True if strict format parsing should be used.
-        :param format_type: The NumberFormat type to create for validation, default is STANDARD_FORMAT.
+        :param format_type: The number format type to create for validation, default is STANDARD_FORMAT.
         """
         super().__init__(strict, format_type, True)
-        self.serializable = True
-        self.clonable = True
     
     @classmethod
     def get_instance(cls):
@@ -118,7 +116,8 @@ class FloatValidator(AbstractNumberValidator):
         """
         try:
             val = formatter(value)
-            if self.is_in_range(val, self.FLOAT_MIN, self.FLOAT_MAX):
+            pos_val = val * -1 if val < 0 else val
+            if self.is_in_range(pos_val, self.FLOAT_MIN, self.FLOAT_MAX):
                 return val
         except ValueError:
             return None
@@ -128,6 +127,17 @@ class FloatValidator(AbstractNumberValidator):
         Validate/convert a float using the default locale.
     
         :param value: The value validation is being performed on.
+        :param pattern: The (optional) regex pattern used to validate the value against, or the default for the locale if None.
+        :param locale: The (optional) locale to use for the format, system default if None.
         :return: The parsed float (as a float) if valid or None if invalid.
         """
-        return super()._parse(value, pattern, locale)
+        val = self._parse(value, pattern, locale)
+        
+        if val is None:
+            return val
+        
+        scale = self._determine_scale(pattern, locale)
+        if scale >= 0:
+            val = round(val, scale)
+
+        return val

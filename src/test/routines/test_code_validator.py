@@ -33,12 +33,8 @@ from src.main.routines.code_validator import CodeValidator
 from src.main.routines.regex_validator import RegexValidator
 from src.main.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
 
-# Constants
+# Checkdigit constructor
 EAN13_CHECKDIGIT = EAN13CheckDigit.EAN13_CHECK_DIGIT
-
-CONSTRUCTOR_REGEX_STR = "^[0-9]*$"
-CONSTRUCTOR_REGEX = RegexValidator(CONSTRUCTOR_REGEX_STR)
-
 
 # Test CheckDigit is null
 @pytest.mark.parametrize(
@@ -86,6 +82,9 @@ def test_init_checkdigit_ean13(input:str, is_valid:bool, expected_validate:Optio
     assert validator.validate(input) == expected_validate
 
 
+# Regex constructor
+CONSTRUCTOR_REGEX_STR = "^[0-9]*$"
+CONSTRUCTOR_REGEX = RegexValidator(CONSTRUCTOR_REGEX_STR)
 @pytest.mark.parametrize(
     "regex, length, min_length, max_length, expected_min, expected_max",
     [
@@ -97,7 +96,7 @@ def test_init_checkdigit_ean13(input:str, is_valid:bool, expected_validate:Optio
         (CONSTRUCTOR_REGEX_STR, None, 10, 20, 10, 20),
     ]
 )
-def test_code_validator_constructors(regex:Union[str, RegexValidator], length:int, min_length:int, max_length:int, expected_min:int, expected_max:int):
+def test_init_regex(regex:Union[str, RegexValidator], length:int, min_length:int, max_length:int, expected_min:int, expected_max:int):
     """ Test regex with different constructors. """
     if isinstance(regex, RegexValidator):
         validator = CodeValidator(regex_validator=regex, length=length, min_length=min_length, max_length=max_length, checkdigit=EAN13_CHECKDIGIT)
@@ -110,136 +109,102 @@ def test_code_validator_constructors(regex:Union[str, RegexValidator], length:in
     assert validator.checkdigit == EAN13_CHECKDIGIT
 
 
+# Test length validation
+LEN_10 = "1234567890"
+LEN_11 = "12345678901"
+LEN_12 = "123456789012"
+LEN_20 = "12345678901234567890"
+LEN_21 = "123456789012345678901"
+LEN_22 = "1234567890123456789012"
 @pytest.mark.parametrize(
-    "min_length, max_length, input, expected_validate",
+    "min_length, max_length, input, validate_not_none",
     [
-        (-1, -1, "1234567890", None),
-        # (11, -1, "12345678901", None),
-        # (-1, 21, "123456789012", None),
-        # ("12345678901234567890", None, -1, -1, -1, -1),
-        # ("123456789012345678901", 13, -1, -1, 13, 13,),
-        # ("1234567890123456789012", None, 10, 20, 10, 20),
+        # Valid min and max lengths
+        (-1, -1, LEN_10, True),
+        (-1, -1, LEN_11, True),
+        (-1, -1, LEN_12, True),
+        (-1, -1, LEN_20, True),
+        (-1, -1, LEN_21, True),
+        (-1, -1, LEN_22, True),
+
+        (11, -1, LEN_10, False), 
+        (11, -1, LEN_11, True), 
+        (11, -1, LEN_12, True),
+        (11, -1, LEN_20, True),
+        (11, -1, LEN_21, True),
+        (11, -1, LEN_22, True),
+
+        (-1, 21, LEN_10, True), 
+        (-1, 21, LEN_11, True),
+        (-1, 21, LEN_12, True),
+        (-1, 21, LEN_20, True),
+        (-1, 21, LEN_21, True),
+        (-1, 21, LEN_22, False),
+
+        (11, 21, LEN_10, False),
+        (11, 21, LEN_11, True),
+        (11, 21, LEN_12, True),
+        (11, 21, LEN_20, True),
+        (11, 21, LEN_21, True),
+        (11, 21, LEN_22, False),
+
+        (11, 11, LEN_10, False), 
+        (11, 11, LEN_11, True), 
+        (11, 11, LEN_12, False),
+
+        # Invalid min and max lengths
+        (-1, 0, None, False), 
+        (0, -1, None, False)
     ]
 )
-def test_validate_length(min_length:int, max_length:int, input:str, expected_validate:Optional[bool]):
+def test_validate_length(min_length:int, max_length:int, input:str, validate_not_none:bool):
     """Tests that CodeValidator validates based on the min_length and max_lengths."""
     validator = CodeValidator(min_length=min_length, max_length=max_length)
-    assert validator.validate(input) is expected_validate
-
-    
-# # Constants
-# REGEX = "^([abc]*)(?:\\-)([DEF]*)(?:\\-)([123]*)$"
-
-# # Error messages
-# MESSAGE_MISSING_REGEX = "Regular expressions are missing."
-# MESSAGE_FAILED_REGEX = "Failed to compile "
-# MESSAGE_INVALID_TYPE = "Regexs must be a String or a list of Strings."
+    assert validator.min_length == min_length
+    assert validator.max_length == max_length
+    if validate_not_none:
+        assert validator.validate(input) == input
+    else:
+        assert validator.validate(input) is None
 
 
-# @pytest.mark.parametrize("regex_input, expected_message", [
-#     (None, MESSAGE_MISSING_REGEX),
-#     ("", MESSAGE_MISSING_REGEX),
-#     ([None], MESSAGE_MISSING_REGEX),
-#     ([], MESSAGE_MISSING_REGEX),
-#     (["ABC", None], MESSAGE_MISSING_REGEX),
-#     (["", "ABC"], MESSAGE_MISSING_REGEX),
-#     # unclosed bracket causes an error
-#     ("^([abCD12]*$", MESSAGE_FAILED_REGEX),
-#     # using an integer instead of a string raises an error
-#     (34, MESSAGE_INVALID_TYPE)
-# ]) 
-# def test_init_validator(regex_input:str, expected_message:str):
-#     """Tests various invalid inputs for RegexValidator's __init__."""
-#     with pytest.raises(ValueError) as e:
-#         RegexValidator(regex_input)
-#     assert expected_message in str(e.value)
+def test_regex():
+    """Tests CodeValidator.regex.""" 
+    REGEX_1 = "^([0-9]{3,4})$"
+    REGEX_2 = r"^([0-9]{3})(?:[-\s])([0-9]{3})$"
+    REGEX_3 = r"^(?:([0-9]{3})(?:[-\s])([0-9]{3}))|([0-9]{6})$" 
+    # No Regular Expression
+    # Need generic validator to work
+    validator = CodeValidator()
+    assert validator.regex_validator is None, "No Regex"
+    assert validator.validate(None) == None
+    # assert validator.validate("") == None
+    # assert validator.validate("   ") == None
+    # assert validator.validate(" A  ") == "A"    
+    # assert validator.validate("12") == "12", "No Regex 2"
+    # assert validator.validate("123") == "123", "No Regex 3"
+    # assert validator.validate("1234") == "1234", "No Regex 4"
+    # assert validator.validate("12345") == "12345", "No Regex 5"
+    # assert validator.validate("12a4") == "12a4", "No Regex invalid"
 
+    # Regular Expression
+    validator = CodeValidator(regex=REGEX_1)
+    assert validator.regex_validator is not None, "Regex should not be None"
+    assert validator.validate("12") is None, "Regex 2"
+    assert validator.validate("123") == "123", "Regex 3"
+    assert validator.validate("1234") == "1234", "Regex 4"
+    assert validator.validate("12345") is None, "Regex 5"
+    assert validator.validate("12a4") is None, "Regex invalid"
 
-# @pytest.mark.parametrize("index, expected_pattern", [
-#     (0, REGEX_1),
-#     (1, REGEX_2),
-#     (2, REGEX_3)
-# ])
-# def test_patterns(index:int, expected_pattern:str):
-#     """Test that RegexValidator correctly returns stored regex patterns."""
-#     validator = RegexValidator(MULTIPLE_REGEX)
-#     assert validator.patterns[index].pattern == expected_pattern
+    # Reformatted
+    validator = CodeValidator(regex_validator = RegexValidator(REGEX_2), length=6)
+    assert validator.validate("123-456") == "123456", "Reformat 123-456"
+    assert validator.validate("123 456") == "123456", "Reformat 123 456"
+    assert validator.validate("123456") is None, "Reformat 123456"
+    assert validator.validate("123.456") is None, "Reformat 123.456"
 
-
-# @pytest.mark.parametrize("regex, value, expected_valid, expected_match, expected_validate", [
-#     # Valid inputs
-#     (MULTIPLE_REGEX, "AAC FDE 321", True, ["AAC", "FDE", "321"], "AACFDE321"),
-#     (REGEX_1, "AAC FDE 321", False, None, None),
-#     (REGEX_2, "AAC FDE 321", True, ["AAC", "FDE", "321"], "AACFDE321"),
-#     (REGEX_3, "AAC FDE 321", False, None, None),
-#     # Invalid input
-#     (MULTIPLE_REGEX, "AAC*FDE*321", False, None, None)
-# ])
-# def test_multiple_regex_case_insensitive(regex:str, value:str, expected_valid:bool, expected_match:str, expected_validate:list):
-#     """Test is_valid(), validate(), and match() for various case-insensitive multiple regex validators."""
-#     validator = RegexValidator(regex, case_sensitive=False)
-#     assert validator.is_valid(value) == expected_valid
-#     assert validator.match(value) == expected_match
-#     assert validator.validate(value) == expected_validate 
-
-
-# @pytest.mark.parametrize("regex, value, expected_valid, expected_validate, expected_match", [
-#     # Valid inputs
-#     (MULTIPLE_REGEX, "aac FDE 321" , True, "aacFDE321", ["aac", "FDE", "321"]),
-#     (REGEX_1, "aac FDE 321", False, None, None),
-#     (REGEX_2, "aac FDE 321", True, "aacFDE321", ["aac", "FDE", "321"]),
-#     (REGEX_3, "aaC FDE 321", False, None, None),
-#     # Invalid input
-#     (MULTIPLE_REGEX, "AAC*FDE*321" , False, None, None)
-# ])
-# def test_multiple_regex_case_sensitive(regex:str, value:str, expected_valid:bool, expected_validate:str, expected_match:list):
-#     """Test is_valid(), validate(), and match() for various case-sensitive multiple regex validators."""
-#     validator = RegexValidator(regex, case_sensitive=True)
-#     assert validator.is_valid(value) == expected_valid
-#     assert validator.validate(value) == expected_validate 
-#     assert validator.match(value) == expected_match
-
-
-# @pytest.mark.parametrize("regex", [
-#     # Valid inputs
-#     (REGEX),
-#     (MULTIPLE_REGEX),
-#     (REGEX_1),
-#     (REGEX_2),
-#     (REGEX_3),
-# ])
-# def test_is_none(regex:str):
-#     """Test is_valid(), validate(), and match() on the input None"""
-#     validator = RegexValidator(regex)
-#     assert not validator.is_valid(None)
-#     assert validator.validate(None) is None
-#     assert validator.match(None) is None
-
-
-# @pytest.mark.parametrize("regex, sensitive, value, expected_valid, expected_validate, expected_match", [
-#     # Valid inputs
-#     (REGEX, True, "ac-DE-1" , True, "acDE1", ["ac", "DE", "1"]),
-#     (REGEX, True, "AB-de-1", False, None, None), 
-#     (REGEX, False, "AB-de-1", True, "ABde1", ["AB", "de", "1"]),
-#     (REGEX, False, "ABd-de-1", False, None, None),
-#     ("^([A-Z]*)$", None, "ABC", True, "ABC", ["ABC"])
-# ])
-# def test_single_regex(regex:str, sensitive:bool, value:str, expected_valid:bool, expected_validate:str, expected_match:list):
-#     """Test instance methods with single regular expression (case sensitive AND insensitive)."""
-#     if sensitive is None:
-#         validator = RegexValidator(regex)
-#     else:
-#         validator = RegexValidator(regex, case_sensitive=sensitive)
-#     assert validator.is_valid(value) == expected_valid
-#     assert validator.validate(value) == expected_validate
-#     assert validator.match(value) == expected_match
-
-
-# @pytest.mark.parametrize("regex, expected_string", [
-#     (REGEX, ("RegexValidator{" + REGEX + "}")), 
-#     ([REGEX, REGEX], ("RegexValidator{" + REGEX + "," + REGEX + "}"))
-# ])
-# def test_str(regex: Union[str, list[str]], expected_string: str):
-#     """Test to_string() method."""
-#     validator = RegexValidator(regex)
-#     assert str(validator) == expected_string
+    validator = CodeValidator(regex_validator = RegexValidator(REGEX_3), length=6)
+    assert str(validator.regex_validator) == f"RegexValidator{{{REGEX_3}}}", "Reformat 2 Regex"
+    assert validator.validate("123-456") == "123456", "Reformat 2 123-456"
+    assert validator.validate("123 456") == "123456", "Reformat 2 123 456"
+    assert validator.validate("123456") == "123456", "Reformat 2 123456"

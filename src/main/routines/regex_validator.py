@@ -207,7 +207,7 @@ class RegexValidator:
             matches = pattern.fullmatch(value)
             if matches is not None:
                 groups = matches.groups()
-                return "".join(list(groups))
+                return "".join(filter(None, groups))
         return None
 
     def __str__(self) -> str:

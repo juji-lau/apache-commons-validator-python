@@ -24,10 +24,7 @@ _LONG_FLAG: Final[int] = 1
 _LONG_FLAG_2: Final[int] = 2
 _INT_FLAG: Final[int] = 4
 
-class FlagsTest:
-
-    def __init__(self):
-        pass
+class TestFlags:
 
     def test_get_flags(self):
         f: Final[Flags] = Flags(45)
@@ -94,15 +91,3 @@ class FlagsTest:
         f: Final[Flags] = Flags(4)
         c: Final[Flags] = copy.copy(f)
         assert (f == c) is True
-
-t = FlagsTest()
-t.test_get_flags()
-t.test_clear()
-t.test_hash_code()
-t.test_is_on_is_false_when_not_all_flags_are_one()
-t.test_is_on_is_true_when_high_order_bit_is_set_and_queried()
-t.test_is_on_off()
-t.test_string()
-t.test_turn_off_all()
-t.test_turn_on_all()
-t.test_copy_and_eq()

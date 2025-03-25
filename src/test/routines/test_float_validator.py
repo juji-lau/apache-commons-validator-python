@@ -132,15 +132,3 @@ class TestFloatValidator:
         # Test thousands with pattern
         assert validator.validate(pattern_val, pattern=pattern) == expected
         assert validator.validate(pattern_val, pattern=pattern, locale=locale_us) == expected
-
-
-        # locale.setlocale(locale.LC_NUMERIC, locale_fr)
-        # locale.atof(fr_val)
-        # locale.setlocale(locale.LC_NUMERIC, locale_fr)
-        # val = locale.format_string("%.3f", expected, grouping=True)
-        # print(val)  #print ascii, len
-        # val = locale.atof(val)
-        # print(val)
-
-t = TestFloatValidator()
-t.test_float_validator_methods()

@@ -97,6 +97,7 @@ class AbstractNumberValidator(AbstractFormatValidator):
         locale_info = Locale.localeconv()
         
         if pattern is None:
+        # if GenericValidator.is_blank_or_null(pattern):
             if self.format_type == self.CURRENCY_FORMAT:
                 return locale_info['frac_digits']
             elif self.format_type == self.STANDARD_FORMAT:
@@ -105,27 +106,7 @@ class AbstractNumberValidator(AbstractFormatValidator):
                 return 2
 
         decimal_place = locale_info['decimal_point']
-        return len(pattern.split(decimal_place)[1].replace('\\', '')) # TODO: support differren
-    
-    def _get_format_locale(self, locale: str): # UNUSED
-        """
-        Returns a function used to format for the specified locale.
-    
-        :param locale: The locale to use for the format, system default if None.
-        :return: The function to use for formatting.
-        """
-        try:
-            locale = "" if locale is None else locale
-            Locale.setlocale(Locale.LC_NUMERIC, locale)
-        except Locale.Error:
-            return None
-
-        if self.format_type == self.CURRENCY_FORMAT:
-            return Locale.atof
-        elif self.format_type == self.PERCENT_FORMAT:
-            return Locale.atof if self.allow_fractions else Locale.atoi
-        else:   # should be STANDARD_FORMAT
-            return Locale.atof if self.allow_fractions else Locale.atoi
+        return len(pattern.split(decimal_place)[1].replace('\\', '')) # TODO: support differrent regex patterns
     
     @override
     def _get_format(self, pattern: str, locale: str):
@@ -142,7 +123,7 @@ class AbstractNumberValidator(AbstractFormatValidator):
         except Locale.Error:
             return None
         
-        Locale.atoi
+        return Locale.atof if self.allow_fractions else Locale.atoi
     
     @property
     def format_type(self):

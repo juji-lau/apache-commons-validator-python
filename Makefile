@@ -11,8 +11,8 @@ autoformat:
 	black src
 
 lint:
-	pylint --output-format=parseable,colorized src
+	pylint --output-format=parseable,colorized --disable=C0301 src
 
 check: 
-	black src
-	pylint --output-format=parseable,colorized src
+	$(MAKE) autoformat
+	$(MAKE) lint

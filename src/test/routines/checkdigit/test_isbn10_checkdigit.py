@@ -1,14 +1,14 @@
 """ 
-Module Name: test_ean13_checkdigit.py
+Module Name: test_isbn10_checkdigit.py
 Description:
-    This file tests the implementation of EAN13CheckDigit using ModulusCheckDigit.  
+    This file tests the implementation of ISBN10CheckDigit using ModulusCheckDigit.  
     This file contains:
         Test cases from: 
-            test.java.org.apache.commons.validator.routines.checkdigit.EAN13CheckDigitTest.java
-            (https://github.com/apache/commons-validator/blob/master/src/test/java/org/apache/commons/validator/routines/checkdigit/EAN13CheckDigitTest.java)
+            test.java.org.apache.commons.validator.routines.checkdigit.ISBN10CheckDigitTest.java
+            (https://github.com/apache/commons-validator/blob/master/src/test/java/org/apache/commons/validator/routines/checkdigit/ISBN10CheckDigitTest.java)
         Additional test cases
 Author: Juji Lau
-License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigit.java):
+License (Taken from apache.commons.validator.routines.checkdigit.ISBN10CheckDigitTest.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements. See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -25,13 +25,12 @@ License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigit
     limitations under the License.
 """
 
-from src.main.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
+from src.main.routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
 from src.test.routines.checkdigit.test_abstract_checkdigit import AbstractCheckDigitTest
 
 
-class TestEAN13CheckDigit(AbstractCheckDigitTest):
-    """EAN-13 Check Digit Test."""
+class TestISBN10CheckDigit(AbstractCheckDigitTest):
+    """ISBN-10 Check Digit Test."""
     def setup_method(self):
-        """ Sets up routine & valid codes."""
-        self._routine = EAN13CheckDigit.EAN13_CHECK_DIGIT
-        self._valid = ["9780072129519", "9780764558313", "4025515373438", "0095673400332"]
+        self._routine = ISBN10CheckDigit.ISBN10_CHECK_DIGIT
+        self._valid = ["1930110995", "020163385X", "1932394354", "1590596277"]

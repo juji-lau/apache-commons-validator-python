@@ -1,3 +1,11 @@
+"""
+TODO: 
+    - set up file description
+    - setup logging and change functions to match
+    - put constants into class
+    - document class and class attributes
+"""
+
 import pytest
 import logging
 from typing import Final, Optional, Union
@@ -46,7 +54,9 @@ class AbstractCheckDigitTest:
                 CheckDigit.isValid(expects a string including checkdigit) which is expected to return False.
         zero_sum (str): Code value which sums to zero.
         missing_message(str): Prefix for error messages.
-
+        serializable (bool): Indicates if the object is serializable (class attribute).
+        clone (bool): Indicates if the object can be cloned (class attribute).
+ 
     Constants:
         POSSIBLE_CHECK_DIGITS (str): 
 
@@ -59,7 +69,21 @@ class AbstractCheckDigitTest:
     _zero_sum:str = "0000000000"
     _missing_message:str = "Code is missing"
 
-    # Helper methods
+    # Attributes to manage serialization and cloning capabilities
+    serializable = False   
+    clone = False
+
+    def setup_method(self) -> None:
+        """ Sets up routine & valid codes."""
+        pass
+
+    def teardown_method(self) -> None:
+        """Clears routine and valid codes."""
+        self._valid = None
+        self._routine = None
+
+
+    # Internal helper methods
     def _checkdigit(self, code: str) -> str:
         """
         Returns the check digit (i.e. last character) for a code.
@@ -110,12 +134,6 @@ class AbstractCheckDigitTest:
         if code is None or len(code) <= self._checkdigit_len:
             return None
         return code[:len(code)-self._checkdigit_len]
-
-
-    # Teardown (clears routine and valid codes)
-    def teardown_method(self, method):
-        self._valid = None
-        self._routine = None
     
 
     def test_calculate_invalid(self):
@@ -212,24 +230,6 @@ class AbstractCheckDigitTest:
         with pytest.raises(Exception) as e:
             self._routine.calculate(self._zero_sum)
         assert str(e.value) == "Invalid code, sum is zero", "is_valid() Zero Sum"
-
-
-# Now we create specific test classes for each routine.
-# The setup_method is analogous to Java's @BeforeEach.
-class TestEAN13CheckDigit(AbstractCheckDigitTest):
-    def setup_method(self, method):
-        # Set up the routine and valid codes for EAN-13.
-        self._routine = EAN13CheckDigit.EAN13_CHECK_DIGIT
-        self._valid = ["9780072129519", "9780764558313", "4025515373438", "0095673400332"]
-        logger.debug("Setup for EAN13CheckDigitTest")
-
-
-# class TestISBN10CheckDigit(AbstractCheckDigitTest):
-#     def setup_method(self, method):
-#         # Set up the routine and valid codes for ISBN-10.
-#         self._routine = ISBN10CheckDigit.ISBN10_CHECK_DIGIT
-#         self._valid = ["1930110995", "020163385X", "1932394354", "1590596277"]
-#         logger.debug("Setup for ISBN10CheckDigitTest")
 
 
 

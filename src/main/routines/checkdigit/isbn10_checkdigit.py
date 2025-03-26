@@ -1,6 +1,6 @@
 
 """ 
-Module Name: isbn10.py
+Module Name: isbn10_checkdigit.py
 Description: Translates apache.commons.validator.routines.checkdigit.ISBN10CheckDigit.java
 Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/checkdigit/ISBN10CheckDigit.java 
 Parapphrased from apache.commons.validator.routines.checkdigit.ISBN10CheckDigit.java:
@@ -37,12 +37,9 @@ License (Taken from apache.commons.validator.routines.checkdigit.ISBN10CheckDigi
     limitations under the License.
 
 Changes:
-    Removed singleton method
-    TODO: add serializeable and cloneable, check singletons
-
 """
-
-from typing import Optional, Union
+from __future__ import annotations
+from typing import Union
 from src.main.routines.checkdigit.checkdigit_exception import CheckDigitException
 from src.main.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
 
@@ -56,19 +53,33 @@ class ISBN10CheckDigit(ModulusCheckDigit):
     If the check digit is calculated as "10" it is converted to "X".
 
     Attributes:
-        POSITION_WEIGHT (list[int]): Weighting given to digits depending on their right position
+        serializable (bool): Inherited from ModulusCheckDigit (True)
+        clone (bool):  Inherited from ModulusCheckDigit (False)
+
+    Constants:
+        ISBN10_CHECK_DIGIT (ISBN10CheckDigit): Singleton instance of this class.
     """
-
-    # self.__serialVersionUID = 8000855044504864964L
-    # ISBN10_CHECK_DIGIT
-
-    # POSITION_WEIGHT = [3, 1]
+    # ISBN10_CHECK_DIGIT should be public, but to make implementing singletons easier, I've made it private.
+    __ISBN10_CHECK_DIGIT:ISBN10CheckDigit = None
 
     def __init__(self):
         """
         Constructs a modulus 11 Check Digit routine for ISBN-10.
         """
         super().__init__(ModulusCheckDigit.MODULUS_11)
+    
+    @classmethod
+    @property
+    def ISBN10_CHECK_DIGIT(cls):
+        """
+        Enforces singleton behavior and returns the singleton instance of this validator.
+
+        Returns:
+            A singleton instance of the validator.
+        """
+        if cls.__ISBN10_CHECK_DIGIT is None:
+            cls.__ISBN10_CHECK_DIGIT = ISBN10CheckDigit()
+        return cls.__ISBN10_CHECK_DIGIT
     
     def _to_check_digit(self, char_value: int) -> Union[str, CheckDigitException]:
         """

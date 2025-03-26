@@ -46,26 +46,29 @@ class EAN13CheckDigit(ModulusCheckDigit):
     on their position.
 
     Attributes:
-        EAN13_CHECK_DIGIT (EAN13CheckDigit): Singleton instance of this class
-        POSITION_WEIGHT (list[int]): Weighting given to digits depending on their right position
         serializable (bool): Inherited from ModulusCheckDigit (True)
         clone (bool):  Inherited from ModulusCheckDigit (False)
+    
+    Constants:
+        EAN13_CHECK_DIGIT (EAN13CheckDigit): Singleton instance of this class.
+        POSITION_WEIGHT (list[int]): Weighting given to digits depending on their right position
     """
     # EAN13_CHECK_DIGIT should be public, but to make implementing singletons easier, I've made it private.
     __EAN13_CHECK_DIGIT:EAN13CheckDigit = None
     __POSITION_WEIGHT:Final[list] = [3, 1]
 
     def __init__(self):
-        """Ensure the instance is initialized only once."""
+        """Constructs a Check Digit routine for EAN-13."""
         super().__init__()
 
     @classmethod
     @property
     def EAN13_CHECK_DIGIT(cls):
         """
-        Gets the singleton instance of this validator.
+        Enforces singleton behavior and returns the singleton instance of this validator.
 
-        :return: A singleton instance of the validator.
+        Returns:
+            A singleton instance of the validator.
         """
         if cls.__EAN13_CHECK_DIGIT is None:
             cls.__EAN13_CHECK_DIGIT = EAN13CheckDigit()

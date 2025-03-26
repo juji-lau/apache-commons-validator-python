@@ -30,19 +30,11 @@ License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigit
     limitations under the License.
 
 Changes:
-    TODO: Confirm singleton implementation
-    Added a class: classproperty to return singleton instances.
-
 """
 from __future__ import annotations
 from typing  import Final
 from src.main.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
 
-# class classproperty:
-#     def __init__(self, fget):
-#         self.fget = fget
-#     def __get__(self, instance, owner):
-#         return self.fget(owner)
 
 class EAN13CheckDigit(ModulusCheckDigit):
     """
@@ -56,18 +48,12 @@ class EAN13CheckDigit(ModulusCheckDigit):
     Attributes:
         EAN13_CHECK_DIGIT (EAN13CheckDigit): Singleton instance of this class
         POSITION_WEIGHT (list[int]): Weighting given to digits depending on their right position
-        serializable (bool): Indicates if the object is serializable (class attribute).
-        clone (bool): Indicates if the object can be cloned (class attribute).
+        serializable (bool): Inherited from ModulusCheckDigit (True)
+        clone (bool):  Inherited from ModulusCheckDigit (False)
     """
     # EAN13_CHECK_DIGIT should be public, but to make implementing singletons easier, I've made it private.
-    # It's fine since it's final
     __EAN13_CHECK_DIGIT:EAN13CheckDigit = None
     __POSITION_WEIGHT:Final[list] = [3, 1]
-
-    # Attributes to manage serialization and cloning capabilities
-    serializable = False   # class is serializable
-    clone = False
-
 
     def __init__(self):
         """Ensure the instance is initialized only once."""

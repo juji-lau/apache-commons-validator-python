@@ -42,9 +42,9 @@ Changes:
 
 """
 
-from typing import Optional
-from checkdigit_exception import CheckDigitException
-from modulus_checkdigit import ModulusCheckDigit
+from typing import Optional, Union
+from src.main.routines.checkdigit.checkdigit_exception import CheckDigitException
+from src.main.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
 
 class ISBN10CheckDigit(ModulusCheckDigit):
     """
@@ -70,7 +70,7 @@ class ISBN10CheckDigit(ModulusCheckDigit):
         """
         super().__init__(ModulusCheckDigit.MODULUS_11)
     
-    def _to_check_digit(self, char_value: int) -> Optional([str, CheckDigitException]):
+    def _to_check_digit(self, char_value: int) -> Union[str, CheckDigitException]:
         """
         Convert an integer value to a character at a specified position.
         If the value is 10 for the check digit (position 1), it is converted
@@ -89,7 +89,7 @@ class ISBN10CheckDigit(ModulusCheckDigit):
             return "X"   
         return super()._to_check_digit(char_value)
     
-    def _to_int(self, character:str, left_pos:int, right_pos:int) -> Optional([int, CheckDigitException]):
+    def _to_int(self, character:str, left_pos:int, right_pos:int) -> Union[str, CheckDigitException]:
         """
         Convert a character at a specified position to an integer value.
         If the character is 'X' at the check digit position (position 1), it is converted to 10.        

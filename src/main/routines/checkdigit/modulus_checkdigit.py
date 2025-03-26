@@ -60,7 +60,6 @@ class ModulusCheckDigit(AbstractCheckDigit):
     """
     
     # Constants:
-    # self._serialVersionUID = 2948962251251528941L
     MODULUS_10:Final[int] = 10
     MODULUS_11:Final[int] = 11
     
@@ -122,8 +121,13 @@ class ModulusCheckDigit(AbstractCheckDigit):
         """
         # TODO: uncomment when you have access to this class
         # if GenericValidator.is_blank_or_null(code):
-        #     raise CheckDigitException("Code is missing", ValueError)
-        
+        #     raise CheckDigitException("Code is missing", ValueError())
+        if code is None or code == "":
+            raise CheckDigitException("Code is missing", ValueError())
+        # TODO: end
+        if code is None or code == "":
+            return False
+        # TODO: end
         modulus_result = self._calculate_modulus(code, False)
         char_value = (self.modulus - modulus_result) % self.modulus
         return self._to_check_digit(char_value)
@@ -151,7 +155,7 @@ class ModulusCheckDigit(AbstractCheckDigit):
             total += self._weighted_value(char_value, left_pos, right_pos)
 
         if total == 0:
-            raise CheckDigitException("Invalid code, sum is zero.", ValueError)
+            raise CheckDigitException("Invalid code, sum is zero", ValueError)
         
         return total % self.modulus
 
@@ -169,11 +173,15 @@ class ModulusCheckDigit(AbstractCheckDigit):
         # TODO: Uncomment once we recieve GenericValidator
         # if GenericValidator.is_blank_or_null(code):
         #     return False
+        if code is None or code == "":
+            return False
+        # TODO: end
         try:
             modulus_result = self._calculate_modulus(code, True)
             return (modulus_result == 0)
         except CheckDigitException as e:
             return False
+
     
     def _to_check_digit(self, char_value:int) -> Union[str, CheckDigitException, None]:
         """

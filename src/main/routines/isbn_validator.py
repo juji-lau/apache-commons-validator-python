@@ -32,8 +32,8 @@ Changes:
 
 from code_validator import CodeValidator
 from checkdigit.checkdigit_exception import CheckDigitException
-from checkdigit.ean13 import EAN13CheckDigit
-from checkdigit.isbn10 import ISBN10CheckDigit
+from checkdigit.ean13_checkdigit import EAN13CheckDigit
+from checkdigit.isbn10_checkdigit import ISBN10CheckDigit
 
 
 class ISBNValidator:
@@ -65,18 +65,18 @@ class ISBNValidator:
     
     # Constants
     ISBN_10_LEN = 10
-    SEP = "(?:\\-|\\s)"
-    GROUP = "(\\d{1,5})"
-    PUBLISHER = "(\\d{1,7})"
-    TITLE = "(\\d{1,6})"
+    SEP = r"(?:\-|\s)"
+    GROUP = r"(\d{1,5})"
+    PUBLISHER = r"(\d{1,7})"
+    TITLE = r"(\d{1,6})"
     
     # ISBN-10 consists of 4 groups of numbers separated by either dashes (-) or spaces.  
     # The first group is 1-5 characters, second 1-7, third 1-6, and fourth is 1 digit or an X.
-    ISBN10_REGEX = "^(?:(\\d{9}[0-9X])|(?:" + GROUP + SEP + PUBLISHER + SEP + TITLE + SEP + "([0-9X])))$"
+    ISBN10_REGEX = r"^(?:(\d{9}[0-9X])|(?:" + GROUP + SEP + PUBLISHER + SEP + TITLE + SEP + "([0-9X])))$"
     
     # ISBN-13 consists of 5 groups of numbers separated by either dashes (-) or spaces.  
     # The first group is 978 or 979, the second group is 1-5 characters, third 1-7, fourth 1-6, and fifth is 1 digit.
-    ISBN13_REGEX = "^(978|979)(?:(\\d{10})|(?:" + SEP + GROUP + SEP + PUBLISHER + SEP + TITLE + SEP + "([0-9])))$"
+    ISBN13_REGEX = r"^(978|979)(?:(\d{10})|(?:" + SEP + GROUP + SEP + PUBLISHER + SEP + TITLE + SEP + "([0-9])))$"
 
 
     def __init__(self, convert:bool = True):

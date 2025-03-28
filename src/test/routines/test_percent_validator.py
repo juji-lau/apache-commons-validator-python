@@ -43,17 +43,17 @@ class TestPercentValidator:
         hundred = 1.00
         frac = 0.125
 
-        assert validator.validate("12%") == expected, f"FAILED: validate('12%') expected {expected} but got {validator.validate("12%")}"
-        assert validator.validate("-12%") == negative, f"FAILED: validate('-12%') expected {negative} but got {validator.validate("-12%")}"
-        assert validator.validate("100%") == hundred, f"FAILED: validate('100%') expected {hundred} but got {validator.validate("100%")}"
-        assert validator.validate("12.5%") == frac, f"FAILED: validate('12.5%') expected {frac} but got {validator.validate("12.5%")}"
+        assert validator.validate("12%") == expected, f"FAILED: validate('12%') expected {expected} but got {validator.validate('12%')}"
+        assert validator.validate("-12%") == negative, f"FAILED: validate('-12%') expected {negative} but got {validator.validate('-12%')}"
+        assert validator.validate("100%") == hundred, f"FAILED: validate('100%') expected {hundred} but got {validator.validate('100%')}"
+        assert validator.validate("12.5%") == frac, f"FAILED: validate('12.5%') expected {frac} but got {validator.validate('12.5%')}"
 
         # Valid UK
-        assert validator.validate("12%", locale="en_GB") == expected, f"FAILED: validate('12%', locale='en_GB') expected {expected} but got {validator.validate("12%", locale="en_GB")}"
-        assert validator.validate("-12%", locale="en_GB") == negative, f"FAILED: validate('-12%', locale='en_GB') expected {negative} but got {validator.validate("-12%", locale="en_GB")}"
-        assert validator.validate("12", locale="en_GB") == expected, f"FAILED: validate('100%', locale='en_GB') expected {hundred} but got {validator.validate("100%", locale="en_GB")}"
+        assert validator.validate("12%", locale="en_GB") == expected, f"FAILED: validate('12%', locale='en_GB') expected {expected} but got {validator.validate('12%', locale='en_GB')}"
+        assert validator.validate("-12%", locale="en_GB") == negative, f"FAILED: validate('-12%', locale='en_GB') expected {negative} but got {validator.validate('-12%', locale='en_GB')}"
+        assert validator.validate("12", locale="en_GB") == expected, f"FAILED: validate('100%', locale='en_GB') expected {hundred} but got {validator.validate('100%', locale='en_US')}"
 
         # Valid US
-        assert validator.validate("12%", locale="en_US") == expected, f"FAILED: validate('12%', locale='en_US') expected {expected} but got {validator.validate("12%", locale="en_US")}"
-        assert validator.validate("-12%", locale="en_US") == negative, f"FAILED: validate('-12%', locale='en_US') expected {negative} but got {validator.validate("-12%", locale="en_US")}"
-        assert validator.validate("12", locale="en_US") == expected, f"FAILED: validate('100%', locale='en_US') expected {hundred} but got {validator.validate("100%", locale="en_US")}"
+        assert validator.validate("12%", locale="en_US") == expected, f"FAILED: validate('12%', locale='en_US') expected {expected} but got {validator.validate('12%', locale='en_US')}"
+        assert validator.validate("-12%", locale="en_US") == negative, f"FAILED: validate('-12%', locale='en_US') expected {negative} but got {validator.validate('-12%', locale='en_US')}"
+        assert validator.validate("12", locale="en_US") == expected, f"FAILED: validate('100%', locale='en_US') expected {hundred} but got {validator.validate('100%', locale='en_US')}"

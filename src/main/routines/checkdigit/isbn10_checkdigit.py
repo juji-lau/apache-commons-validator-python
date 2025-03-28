@@ -66,7 +66,7 @@ class ISBN10CheckDigit(ModulusCheckDigit):
         """
         Constructs a modulus 11 Check Digit routine for ISBN-10.
         """
-        super().__init__(ModulusCheckDigit.MODULUS_11)
+        super().__init__(modulus = ModulusCheckDigit.MODULUS_11)
     
     @classmethod
     @property

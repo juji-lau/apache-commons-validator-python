@@ -27,13 +27,14 @@ Changes:
     - Removed `getInstance()` method, which supports singleton behavior in the Java version. Singleton behavior is implicit in this Python version.
     - Added a setter for the `convert` property. In the original Java version, `getInstance(convert)` provided a way to configure this, but it has been replaced with a direct attribute.
     - removed ISBN_VALIDATOR and ISBN_VALIDATOR_NO_CONVERT from the java version (idk how to implement)
-    TODO: fix isbn10 dependency
 """
+from __future__ import annotations
+from typing import Final, Optional
 
-from code_validator import CodeValidator
-from checkdigit.checkdigit_exception import CheckDigitException
-from checkdigit.ean13_checkdigit import EAN13CheckDigit
-from checkdigit.isbn10_checkdigit import ISBN10CheckDigit
+from src.main.routines.code_validator import CodeValidator
+from src.main.routines.checkdigit.checkdigit_exception import CheckDigitException
+from src.main.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
+from src.main.routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
 
 
 class ISBNValidator:
@@ -59,25 +60,31 @@ class ISBNValidator:
         ISBN10_REGEX (str): Regular expression pattern for ISBN-10 validation.
         ISBN13_REGEX (str): Regular expression pattern for ISBN-13 validation.
     """
+
     # Attributes to manage serialization and cloning capabilities
     serializable = True    # class is serializable
     clone = False          # class is not cloneable
     
     # Constants
-    ISBN_10_LEN = 10
-    SEP = r"(?:\-|\s)"
-    GROUP = r"(\d{1,5})"
-    PUBLISHER = r"(\d{1,7})"
-    TITLE = r"(\d{1,6})"
+    __ISBN_10_LEN = 10
+    __SEP = r"(?:\-|\s)"
+    __GROUP = r"(\d{1,5})"
+    __PUBLISHER = r"(\d{1,7})"
+    __TITLE = r"(\d{1,6})"
     
     # ISBN-10 consists of 4 groups of numbers separated by either dashes (-) or spaces.  
     # The first group is 1-5 characters, second 1-7, third 1-6, and fourth is 1 digit or an X.
-    ISBN10_REGEX = r"^(?:(\d{9}[0-9X])|(?:" + GROUP + SEP + PUBLISHER + SEP + TITLE + SEP + "([0-9X])))$"
+    ISBN10_REGEX = r"^(?:(\d{9}[0-9X])|(?:" + __GROUP + __SEP + __PUBLISHER + __SEP + __TITLE + __SEP + "([0-9X])))$"
     
     # ISBN-13 consists of 5 groups of numbers separated by either dashes (-) or spaces.  
     # The first group is 978 or 979, the second group is 1-5 characters, third 1-7, fourth 1-6, and fifth is 1 digit.
-    ISBN13_REGEX = r"^(978|979)(?:(\d{10})|(?:" + SEP + GROUP + SEP + PUBLISHER + SEP + TITLE + SEP + "([0-9])))$"
+    ISBN13_REGEX = r"^(978|979)(?:(\d{10})|(?:" + __SEP + __GROUP + __SEP + __PUBLISHER + __SEP + __TITLE + __SEP + "([0-9])))$"
 
+    # ISBN Code Validator (which converts ISBN-10 codes to ISBN-13
+    __ISBN_VALIDATOR:Final[ISBNValidator] = None
+
+    # ISBN Code Validator (which converts ISBN-10 codes to ISBN-13
+    __ISBN_VALIDATOR_NO_CONVERT:Final[ISBNValidator] = None
 
     def __init__(self, convert:bool = True):
         """
@@ -89,23 +96,37 @@ class ISBNValidator:
             convert (bool): If True, enables the conversion of ISBN-10 codes to ISBN-13.
 
         """
-        self.__convert = convert       # Read only after instantiation 
-        self.__isbn10_validator = CodeValidator(self.ISBN10_REGEX, 10, ISBN10CheckDigit.ISBN10_CHECK_DIGIT)
-        self.__isbn13_validator = CodeValidator(self.ISBN13_REGEX, 13, EAN13CheckDigit.EAN13_CHECK_DIGIT)
+        self.__convert:Final[bool] = convert       # Read only after instantiation 
+        self.__isbn10_validator = CodeValidator(regex = self.ISBN10_REGEX, length = 10, checkdigit = ISBN10CheckDigit.ISBN10_CHECK_DIGIT)
+        self.__isbn13_validator = CodeValidator(regex = self.ISBN13_REGEX, length = 13, checkdigit = EAN13CheckDigit.EAN13_CHECK_DIGIT)
         
+   
+    @classmethod
+    def get_instance(cls, convert:bool = True):
+        """
+        Gets the singleton instance of the ISBN validator specifying whether ISBN-10 codes should be converted to ISBN-13.
 
-    # TODO: How to do inheritied objects:
-      # clone, equals, finalize, getClass, hashCode, notify, notifyAll, wait, wait
+        Args:
+            convert (bool): 
+                `True` if valid ISBN-10 codes should be converted to ISBN-13 codes.
+                `False` if valid ISBN-10 codes should be returned unchanged.
+            
+        Returns:
+            A singleton instance of the ISBN validator.
+        """
+        if convert:
+            if cls.__ISBN_VALIDATOR is None:
+                cls.__ISBN_VALIDATOR = ISBNValidator()
+            return cls.__ISBN_VALIDATOR
+
+        if cls.__ISBN_VALIDATOR_NO_CONVERT is None:
+            cls.__ISBN_VALIDATOR_NO_CONVERT = ISBNValidator(convert=False)
+        return cls.__ISBN_VALIDATOR_NO_CONVERT
     
     @property
     def convert(self):
         """Returns the convert attribute."""
         return self.__convert
-    
-    @convert.setter
-    def convert(self, convert: bool) -> None:
-        """ Sets the convert attribute."""
-        self.__convert = convert
     
     @property
     def isbn10_validator(self):
@@ -116,6 +137,7 @@ class ISBNValidator:
     def isbn13_validator(self):
         """Returns the isbn13_validator attribute."""
         return self.__isbn13_validator
+
       
     def convert_to_isbn13(self, isbn10:str) -> str:
         """
@@ -133,21 +155,21 @@ class ISBNValidator:
         """
         # check for validity
         if isbn10 is None:
-          return None
+            return None
 
         # Remove leading and trailing spaces
         isbn10 = isbn10.strip()
-        if len(isbn10) != self.ISBN_10_LEN:
-          raise ValueError(f"Invalid length for {len(isbn10)} for '{isbn10}'")
+        if len(isbn10) != self.__ISBN_10_LEN:
+            raise ValueError(f"Invalid length for {len(isbn10)} for '{isbn10}'")
         
         # Calculate the new ISBN-13 code (drop the original checkdigit)
         isbn13 = "978" + isbn10[:-1]
         try:
-          checkDigit = self.isbn13_validator.get_check_digit().calculate(isbn13)
-          isbn13 += checkDigit
-          return isbn13
+            check_digit = self.isbn13_validator.checkdigit.calculate(isbn13)
+            isbn13 += check_digit
+            return isbn13
         except CheckDigitException as e:
-          raise ValueError(f"Check digit error for '{input}' - {e}")
+            raise ValueError(f"Check digit error for '{input}' - {e}")
 
     # TODO: Circular dependency
     def is_valid(self, code:str) -> bool:
@@ -201,9 +223,9 @@ class ISBNValidator:
         """
         result = self.validate_isbn13(code)
         if result is None:
-          result = self.validate_isbn10(code)  
-          if result != None and self.convert == True:
-            result = self.convert_to_isbn13(result)
+            result = self.validate_isbn10(code)  
+            if result != None and self.convert == True:
+                result = self.convert_to_isbn13(result)
         return result
 
     def validate_isbn10(self, code:str) -> str:
@@ -219,7 +241,7 @@ class ISBNValidator:
         """
         result = self.isbn10_validator.validate(code)
         if result is not None:
-          return str(result)     
+            return str(result)     
         return None
 
     def validate_isbn13(self, code:str) -> str:
@@ -235,7 +257,7 @@ class ISBNValidator:
         """
         # check for validity
         if self.is_valid_isbn13(code):
-          result = self.isbn13_validator.validate(code)
-          if result is not None:
-            return str(result)
+            result = self.isbn13_validator.validate(code)
+            if result is not None:
+                return str(result)
         return None

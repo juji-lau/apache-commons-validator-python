@@ -5,7 +5,7 @@ Description:
         - Go to: apache-commons-validator-python/src/
         - In the terminal, type: pytest
     This file contains:
-        - Test cases from test.java.org.apache.commons.validator.routines.RegexValidator.java
+        - Test cases from test.java.org.apache.commons.validator.routines.RegexValidatorTest.java
             Link: https://github.com/apache/commons-validator/blob/master/src/test/java/org/apache/commons/validator/routines/CodeValidatorTest.java
         - Additional test cases, supported by online ean13 validators
             Link: https://eancheck.com/

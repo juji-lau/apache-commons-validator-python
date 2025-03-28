@@ -98,17 +98,18 @@ class CodeValidator:
     serializable = True    # class is serializable
     clone = False          # class is not cloneable
 
-    def __init__(self, regex:str = None, regex_validator:RegexValidator=None, length:int=None, min_length:int = -1, max_length:int = -1, checkdigit:CheckDigit=None):
+    def __init__(self, *, regex:str = None, regex_validator:RegexValidator=None, length:int=None, min_length:int = -1, max_length:int = -1, checkdigit:CheckDigit=None):
         """
         Initializes the CodeValidator with default values.
                 
         Args:
-            check_digit (CheckDigit): The check digit validation routine.
             regex (str, optional): The regular expression for validating the code format.
             regex_validator (RegexValidator, optional): An existing RegexValidator object.
             length (int, optional): The length of the code (default -1). Sets the attribute min_length and max_length to the same value
             min_length (int, optional): The minimum length of the code (defaults to -1 for no restriction).
             max_length (int, optional): The maximum length of the code (defaults to -1 for no restriction).
+            check_digit (CheckDigit): The check digit validation routine.
+
         """
         if regex is None and regex_validator is None:
             self.__regex_validator:Final[Optional[RegexValidator]] = None
@@ -126,7 +127,6 @@ class CodeValidator:
 
         self.__checkdigit:Final[CheckDigit] = checkdigit
 
-    
     @property
     def checkdigit(self) -> CheckDigit:
         """Returns the checkdigit attribute."""
@@ -180,7 +180,6 @@ class CodeValidator:
         code = input.strip()
         if code is None:
             return None
-        print(f"INPUT: {input}, CODE: {code}")
         
         # Validate/reformat using regular expression
         if self.regex_validator is not None:
@@ -192,7 +191,6 @@ class CodeValidator:
         if ((self.min_length >= 0 and len(code) < self.min_length) or
             (self.max_length >= 0 and len(code) > self.max_length)):
             return None
-        print(f"CODE AFTER REGEX: {code}")
 
         # Validate the check digit
         if ((self.checkdigit is not None) and (not self.checkdigit.is_valid(code))):

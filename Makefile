@@ -6,3 +6,13 @@ docs: clean
 
 clean:
 	rm -rf docs/_build
+
+autoformat:
+	black src
+
+lint:
+	pylint --output-format=parseable,colorized --disable=C0301 src
+
+check: 
+	$(MAKE) autoformat
+	$(MAKE) lint

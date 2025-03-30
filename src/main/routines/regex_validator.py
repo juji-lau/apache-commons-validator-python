@@ -78,9 +78,11 @@ Changes:
         `java.lang.Object.clone()`  ->      `copy.copy()`       For shallow copies
 """
 
-from re import Pattern, compile, IGNORECASE
+from re import Pattern
 from copy import copy
 from typing import Optional, Union, Final
+
+from src.main.util.regex import Regex, compile
 
 class RegexValidator:
     """
@@ -114,7 +116,7 @@ class RegexValidator:
         if case_sensitive == True:
             flags = 0
         else:
-            flags = IGNORECASE
+            flags = Regex.CASE_INSENSITIVE
         
         # If regexs is None or empty
         if regexs is None or regexs == "" or (isinstance(regexs, list) and len(regexs) == 0):
@@ -164,10 +166,7 @@ class RegexValidator:
             return False
         
         for pattern in self.__patterns:
-            # Python's re.Pattern.fullmatch() matches the entire `value` against the pattern, 
-            # and returns the `re.Match` object, or None if the value doesn't match.
-            match = pattern.fullmatch(value)
-            if match is not None:             # No match for this pattern
+            if Regex.pattern_matches(pattern, value):
                 return True
         return False
     
@@ -207,7 +206,7 @@ class RegexValidator:
             matches = pattern.fullmatch(value)
             if matches is not None:
                 groups = matches.groups()
-                return "".join(list(groups))
+                return "".join(filter(None, groups))
         return None
 
     def __str__(self) -> str:

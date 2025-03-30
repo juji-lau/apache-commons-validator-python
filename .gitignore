@@ -1,15 +1,35 @@
 # macOS system files
 .DS_Store
 
-# Python bytecode files
-__pycache__/
-*.pyc
-*.pyo
+# pytest cache
+.pytest_cache/
+
+# Sphinx build files
+docs/_build/
 
 # VSCode/IDE files
 .vscode/
 *.swp
 
+# Git directory
+.git/
+
+# Node.js modules
+node_modules/
+
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.cpython-*
+
+
+
+# Reference files
+/src/example
+*.txt
+# /src/test/example
+
 # # Other system files (optional)
 # Thumbs.db
-# .idea/
+# .idea/a

@@ -17,6 +17,7 @@ lint:
 
 coverage:
 	coverage run --branch -m pytest $(TEST)
+	coverage report -m >> htmlcov/coverage_report.txt
 	coverage html
 	open htmlcov/index.html
 

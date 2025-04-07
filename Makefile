@@ -7,7 +7,8 @@ docs: clean
 
 clean:
 	rm -rf docs/_build
-
+	rm -rf .coverage htmlcov
+	
 autoformat:
 	black src
 
@@ -15,10 +16,11 @@ lint:
 	pylint --output-format=parseable,colorized --disable=C0301 src
 
 coverage:
-	coverage run -m pytest $(TEST)
+	coverage run --branch -m pytest $(TEST)
 	coverage html
 	open htmlcov/index.html
 
 check: 
 	$(MAKE) autoformat
 	$(MAKE) lint
+	$(MAKE) coverage

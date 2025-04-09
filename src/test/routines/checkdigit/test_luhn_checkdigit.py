@@ -23,3 +23,20 @@ License (Taken from apache.commons.validator.routines.checkdigit.ISBN10CheckDigi
     See the License for the specific language governing permissions and
     limitations under the License.
 """
+
+from src.main.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
+from src.test.routines.checkdigit.test_abstract_checkdigit import AbstractCheckDigitTest
+
+
+class TestLuhnCheckDigit(AbstractCheckDigitTest):
+    """Luhn Check Digit Test."""
+    def setup_method(self):
+        self._routine = LuhnCheckDigit.LUHN_CHECK_DIGIT
+        self._valid = [
+            "4417123456789113",   # VALID_VISA
+            "4222222222222",      # VALID_SHORT_VISA
+            "378282246310005",    # VALID_AMEX
+            "5105105105105100",   # VALID_MASTERCARD
+            "6011000990139424",   # VALID_DISCOVER
+            "30569309025904"      # VALID_DINERS
+        ]

@@ -205,6 +205,30 @@ class CreditCardValidator:
                 return result
         return None
     
+    @classmethod
+    def generic_credit_card_validator(cls) -> CreditCardValidator:
+        """
+        Creates a validator that only checks for numeric card numbers
+        with Luhn validation, using the default min and max length.
+        """
+        return cls.generic_credit_card_validator_with_range(cls.MIN_CC_LENGTH, cls.MAX_CC_LENGTH)
+
+    @classmethod
+    def generic_credit_card_validator_with_exact_length(cls, length: int) -> CreditCardValidator:
+        """
+        Creates a validator for a specific length, e.g., 16-digit cards.
+        """
+        return cls.generic_credit_card_validator_with_range(length, length)
+
+    @classmethod
+    def generic_credit_card_validator_with_range(cls, min_len: int, max_len: int) -> CreditCardValidator:
+        """
+        Creates a validator that only ensures the card is numeric,
+        within a given length range, and passes the Luhn check.
+        """
+        generic_validator = CodeValidator(regex=r"^\d+$", min_length=min_len, max_length=max_len, checkdigit=cls.LUHN_VALIDATOR)
+        return CreditCardValidator(credit_card_validators=[generic_validator])
+    
     def create_range_validator(self, ranges: list[CreditCardRange], check_digit) -> CodeValidator:
         """
         Creates a custom validator that uses a numeric pattern and checks

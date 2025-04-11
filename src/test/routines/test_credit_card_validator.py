@@ -572,3 +572,198 @@ def test_mastercard_validator() -> None:
         assert rev.is_valid(card), f"Expected prefix {i} to be valid Mastercard"
 
     assert not rev.is_valid("272100" + pad), "Prefix 272100 should be invalid (outside Mastercard range)"
+
+def test_range_generator() -> None:
+    """
+    Combines standard validators with additional custom range-based validators.
+    """
+    # Built-in validators for AMEX, VISA, MASTERCARD, DISCOVER
+    validators: Final[list[CodeValidator]] = [
+        CreditCardValidator.AMEX_VALIDATOR,
+        CreditCardValidator.VISA_VALIDATOR,
+        CreditCardValidator.MASTERCARD_VALIDATOR,
+        CreditCardValidator.DISCOVER_VALIDATOR
+    ]
+
+    # Range-based validators for Diners (not part of above list)
+    ranges: Final[list[CreditCardValidator.CreditCardRange]] = [
+        CreditCardValidator.CreditCardRange("300", "305", 14, 14),
+        CreditCardValidator.CreditCardRange("3095", None, 14, 14),
+        CreditCardValidator.CreditCardRange("36", None, 14, 14),
+        CreditCardValidator.CreditCardRange("38", "39", 14, 14),
+    ]
+
+    ccv: Final[CreditCardValidator] = CreditCardValidator(
+        credit_card_validators=validators,
+        credit_card_ranges=ranges
+    )
+
+    # Valid cards should pass
+    for card in _VALID_CARDS:
+        assert ccv.is_valid(card), f"Expected valid card: {card}"
+
+    # Error cards should fail
+    for card in _ERROR_CARDS:
+        assert not ccv.is_valid(card), f"Expected invalid card: {card}"
+
+
+def test_range_generator_no_luhn() -> None:
+    """
+    Tests prefix + length range validator without any Luhn check.
+    """
+    # Create validator that accepts:
+    # - Prefixes starting with "1", length 6 or 7
+    # - Prefixes 644–65, length 8
+    ranges: Final[list[CreditCardValidator.CreditCardRange]] = [
+        CreditCardValidator.CreditCardRange("1", None, 6, 7),
+        CreditCardValidator.CreditCardRange("644", "65", 8, 8),
+    ]
+
+    validator: Final[CreditCardValidator] = CreditCardValidator.create_range_validator(
+        CreditCardValidator,
+        ranges=ranges,
+        check_digit=None
+    )
+
+    # Prefix "1", length 6 or 7
+    assert validator.is_valid("1990000"), "1990000 should be valid (prefix 1, len 7)"
+    assert validator.is_valid("199000"), "199000 should be valid (prefix 1, len 6)"
+    assert not validator.is_valid("000000"), "Prefix 0 should be invalid"
+    assert not validator.is_valid("099999"), "Prefix 0 should be invalid"
+    assert not validator.is_valid("200000"), "Prefix 2 should be invalid"
+
+    # Prefix 644–65, length 8
+    assert not validator.is_valid("64399999"), "643 prefix below range"
+    assert validator.is_valid("64400000"), "644 prefix valid"
+    assert validator.is_valid("64900000"), "649 prefix valid"
+    assert validator.is_valid("65000000"), "650 prefix valid"
+    assert validator.is_valid("65999999"), "659 prefix valid"
+    assert not validator.is_valid("66000000"), "660 prefix above range"
+
+
+def test_valid_length() -> None:
+    """
+    Unit test for validLength() static method.
+    Checks both min/max and specific length list variants.
+    """
+    # --- Single length: 14 ---
+    range_14: Final = CreditCardValidator.CreditCardRange("", "", 14, 14)
+    assert CreditCardValidator.valid_length(14, range_14), "14 should be valid for [14,14]"
+    assert not CreditCardValidator.valid_length(15, range_14), "15 should not be valid for [14,14]"
+    assert not CreditCardValidator.valid_length(13, range_14), "13 should not be valid for [14,14]"
+
+    # --- Range: 15–17 ---
+    range_15_17: Final = CreditCardValidator.CreditCardRange("", "", 15, 17)
+    assert not CreditCardValidator.valid_length(14, range_15_17), "14 should not be valid for [15–17]"
+    assert CreditCardValidator.valid_length(15, range_15_17), "15 should be valid for [15–17]"
+    assert CreditCardValidator.valid_length(16, range_15_17), "16 should be valid for [15–17]"
+    assert CreditCardValidator.valid_length(17, range_15_17), "17 should be valid for [15–17]"
+    assert not CreditCardValidator.valid_length(18, range_15_17), "18 should not be valid for [15–17]"
+
+    # --- Explicit list: [15, 17] ---
+    range_explicit: Final = CreditCardValidator.CreditCardRange("", "", lengths=[15, 17])
+    assert not CreditCardValidator.valid_length(14, range_explicit), "14 should not be valid for [15,17]"
+    assert CreditCardValidator.valid_length(15, range_explicit), "15 should be valid for [15,17]"
+    assert not CreditCardValidator.valid_length(16, range_explicit), "16 should not be valid for [15,17]"
+    assert CreditCardValidator.valid_length(17, range_explicit), "17 should be valid for [15,17]"
+    assert not CreditCardValidator.valid_length(18, range_explicit), "18 should not be valid for [15,17]"
+
+
+def test_visa_option() -> None:
+    """
+    Tests CreditCardValidator with only the VISA flag enabled.
+    """
+    validator: Final[CreditCardValidator] = CreditCardValidator(options=CreditCardValidator.VISA)
+
+    assert not validator.is_valid(_ERROR_VISA), f"{_ERROR_VISA} should be invalid"
+    assert not validator.is_valid(_ERROR_SHORT_VISA), f"{_ERROR_SHORT_VISA} should be invalid (check digit)"
+    assert validator.validate(_ERROR_VISA) is None, f"validate() should return None for {_ERROR_VISA}"
+
+    assert validator.validate(_VALID_VISA) == _VALID_VISA, "Valid VISA should pass validate()"
+    assert validator.validate(_VALID_SHORT_VISA) == _VALID_SHORT_VISA, "Valid short VISA should pass validate()"
+
+    assert not validator.is_valid(_VALID_AMEX), "AMEX should not be valid for VISA-only validator"
+    assert not validator.is_valid(_VALID_DINERS), "DINERS should not be valid"
+    assert not validator.is_valid(_VALID_DISCOVER), "DISCOVER should not be valid"
+    assert not validator.is_valid(_VALID_MASTERCARD), "MASTERCARD should not be valid"
+
+    assert validator.is_valid(_VALID_VISA), "VISA should be valid"
+    assert validator.is_valid(_VALID_SHORT_VISA), "Short VISA should be valid"
+
+def test_visa_validator() -> None:
+    """
+    Tests the VISA CodeValidator (regex + Luhn).
+    """
+    validator: Final[CodeValidator] = CreditCardValidator.VISA_VALIDATOR
+    regex: Final[RegexValidator] = validator.get_regex_validator()
+
+    # --- Length checks ---
+    assert not regex.is_valid("423456789012"), "Too short (12)"
+    assert regex.is_valid("4234567890123"), "Valid length (13)"
+    assert not regex.is_valid("42345678901234"), "Invalid length (14)"
+    assert not regex.is_valid("423456789012345"), "Invalid length (15)"
+    assert regex.is_valid("4234567890123456"), "Valid length (16)"
+    assert not regex.is_valid("42345678901234567"), "Too long (17)"
+    assert not regex.is_valid("423456789012345678"), "Too long (18)"
+
+    # --- Invalid prefixes and characters ---
+    assert not regex.is_valid("3234567890123"), "Invalid prefix (32)"
+    assert not regex.is_valid("3234567890123456"), "Invalid prefix (32)"
+    assert not regex.is_valid("4234567x90123"), "Invalid character in short VISA"
+    assert not regex.is_valid("4234567x90123456"), "Invalid character in long VISA"
+
+    # --- Validator behavior ---
+    assert regex.is_valid(_ERROR_VISA), "Regex should match ERROR_VISA"
+    assert regex.is_valid(_ERROR_SHORT_VISA), "Regex should match ERROR_SHORT_VISA"
+    assert not validator.is_valid(_ERROR_VISA), "Invalid check digit - ERROR_VISA"
+    assert not validator.is_valid(_ERROR_SHORT_VISA), "Invalid check digit - ERROR_SHORT_VISA"
+    assert validator.validate(_ERROR_VISA) is None, "validate() should return None for ERROR_VISA"
+    
+    assert validator.validate(_VALID_VISA) == _VALID_VISA, "validate() should return original VISA"
+    assert validator.validate(_VALID_SHORT_VISA) == _VALID_SHORT_VISA, "validate() should return original short VISA"
+
+    # --- Card type exclusions ---
+    for label, card in [
+        ("AMEX", _VALID_AMEX),
+        ("DINERS", _VALID_DINERS),
+        ("DISCOVER", _VALID_DISCOVER),
+        ("MASTERCARD", _VALID_MASTERCARD)
+    ]:
+        assert not validator.is_valid(card), f"{label} should not be valid with VISA validator"
+
+    # --- Should accept valid VISA numbers ---
+    valid_visas: Final[list[str]] = [
+        "4111111111111111",  # A
+        "4543059999999982",  # C
+        "4462000000000003",  # B
+        "4508750000000009",  # D (Electron)
+        "4012888888881881",  # E
+    ]
+    for card in valid_visas:
+        assert validator.is_valid(card), f"Expected valid VISA: {card}"
+
+def test_vpay_option() -> None:
+    """
+    Tests the VPAY-specific CreditCardValidator option.
+    """
+    validator: Final[CreditCardValidator] = CreditCardValidator(options=CreditCardValidator.VPAY)
+
+    assert validator.is_valid(_VALID_VPAY), "Expected VALID_VPAY to be valid"
+    assert validator.is_valid(_VALID_VPAY2), "Expected VALID_VPAY2 to be valid"
+    assert not validator.is_valid(_ERROR_VPAY), "Expected ERROR_VPAY to be invalid"
+
+    assert validator.validate(_VALID_VPAY) == _VALID_VPAY, "validate() should return original VALID_VPAY"
+    assert validator.validate(_VALID_VPAY2) == _VALID_VPAY2, "validate() should return original VALID_VPAY2"
+
+    # Other cards should not validate
+    for label, card in [
+        ("AMEX", _VALID_AMEX),
+        ("DINERS", _VALID_DINERS),
+        ("DISCOVER", _VALID_DISCOVER),
+        ("MASTERCARD", _VALID_MASTERCARD),
+    ]:
+        assert not validator.is_valid(card), f"{label} should not pass with VPAY-only validator"
+
+    # Note: VPAY regex accepts a subset of VISA patterns, so VISA cards may still pass
+    assert validator.is_valid(_VALID_VISA), "VISA may be accepted by VPAY validator (shared prefix)"
+    assert validator.is_valid(_VALID_SHORT_VISA), "Short VISA may be accepted by VPAY validator (shared prefix)"

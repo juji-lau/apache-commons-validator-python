@@ -57,6 +57,8 @@ class CreditCardValidator:
             self.max_len: Final[int] = max_len
             self.lengths: Final[Optional[list[int]]] = lengths.copy() if lengths is not None else None
 
+         
+
     
     # Constants for card type flags
     #int instead of long
@@ -82,7 +84,7 @@ class CreditCardValidator:
      <li>37xxxx (15)</li>
      </ul>
      """
-    AMEX_VALIDATOR: Final = CodeValidator(r"^(3[47]\d{13})$", LUHN_VALIDATOR)
+    AMEX_VALIDATOR: Final = CodeValidator(regex=r"^(3[47]\d{13})$", checkdigit=LUHN_VALIDATOR)
 
     """
      Diners Card Validator
@@ -94,7 +96,7 @@ class CreditCardValidator:
      <li>39xxxx (14)</li>
      </ul>
     """
-    DINERS_VALIDATOR: Final = CodeValidator(r"^(30[0-5]\d{11}|3095\d{10}|36\d{12}|3[8-9]\d{12})$", LUHN_VALIDATOR)
+    DINERS_VALIDATOR: Final = CodeValidator(regex=r"^(30[0-5]\d{11}|3095\d{10}|36\d{12}|3[8-9]\d{12})$", checkdigit=LUHN_VALIDATOR)
 
     """
     Discover Card regular expressions
@@ -103,15 +105,15 @@ class CreditCardValidator:
      <li>644xxx - 65xxxx (16)</li>
      </ul> 
     """
-    DISCOVER_REGEX: Final = RegexValidator(
-        r"^(6011\d{12,13})$",
-        r"^(64[4-9]\d{13})$",
-        r"^(65\d{14})$",
-        r"^(62[2-8]\d{13})$"
-    )
-    DISCOVER_VALIDATOR: Final = CodeValidator(DISCOVER_REGEX, LUHN_VALIDATOR)
+    DISCOVER_REGEX: Final = [
+    r"^(6011\d{12,13})$",
+    r"^(64[4-9]\d{13})$",
+    r"^(65\d{14})$",
+    r"^(62[2-8]\d{13})$"
+    ]
+    DISCOVER_VALIDATOR: Final = CodeValidator(regex=DISCOVER_REGEX, checkdigit=LUHN_VALIDATOR)
 
-    MASTERCARD_REGEX: Final = RegexValidator(
+    MASTERCARD_REGEX: Final = [
         r"^(5[1-5]\d{14})$",      # Pre-Oct 2016
         r"^(2221\d{12})$",        # 222100–222199
         r"^(222[2-9]\d{12})$",    # 222200 - 222999
@@ -119,42 +121,38 @@ class CreditCardValidator:
         r"^(2[3-6]\d{14})$",
         r"^(27[01]\d{13})$",
         r"^(2720\d{12})$"
-    )
-    MASTERCARD_VALIDATOR: Final = CodeValidator(MASTERCARD_REGEX, LUHN_VALIDATOR)
+    ]
+    MASTERCARD_VALIDATOR: Final = CodeValidator(regex=MASTERCARD_REGEX, checkdigit=LUHN_VALIDATOR)
 
     """
      Mastercard Card Validator (pre Oct 2016)
      @deprecated for use until Oct 2016 only
     """
-    MASTERCARD_VALIDATOR_PRE_OCT2016: Final = CodeValidator(r"^(5[1-5]\d{14})$", LUHN_VALIDATOR)
+    MASTERCARD_VALIDATOR_PRE_OCT2016: Final = CodeValidator(regex=r"^(5[1-5]\d{14})$", checkdigit=LUHN_VALIDATOR)
 
-    VISA_VALIDATOR: Final = CodeValidator(r"^(4)(\d{12}|\d{15})$", LUHN_VALIDATOR)
-    VPAY_VALIDATOR: Final = CodeValidator(r"^(4)(\d{12,18})$", LUHN_VALIDATOR)
+    VISA_VALIDATOR: Final = CodeValidator(regex=r"^(4)(\d{12}|\d{15})$", checkdigit=LUHN_VALIDATOR)
+    VPAY_VALIDATOR: Final = CodeValidator(regex=r"^(4)(\d{12,18})$", checkdigit=LUHN_VALIDATOR)
 
 
-    def __init__(self, options: int = AMEX | VISA | MASTERCARD | DISCOVER,
-                 credit_card_validators: Optional[list[CodeValidator]] = None,
-                 credit_card_ranges: Optional[list[CreditCardRange]] = None):
+    def __init__(
+    self,
+    options: int = AMEX | VISA | MASTERCARD | DISCOVER,
+    credit_card_validators: Optional[list[CodeValidator]] = None,
+    credit_card_ranges: Optional[list["CreditCardValidator"]] = None,
+    ):
         """
-        Initializes the validator with either:
-         1) default card types instead of  "this(AMEX + VISA + MASTERCARD + DISCOVER)"
-         2) specific validators list instead of "public CreditCardValidator(final CodeValidator[] creditCardValidators) { ... }", or 
-         3) a set of numeric prefix ranges instead of "public CreditCardValidator(final CreditCardRange[] creditCardRanges) { ... }".
-         
-         4) Allows combining both validators and range-based validators instead of "public CreditCardValidator(final CodeValidator[] validators, final CreditCardRange[] ranges) { ... }"
-         5) use bitmask "options: int = AMEX | VISA | MASTERCARD | DISCOVER" instead of "public CreditCardValidator(final long options) { ... }"
+        Initializes the CreditCardValidator.
+
+        Supports:
+        1. Bitmask options to select built-in validators (default)
+        2. Custom list of CodeValidators
+        3. Custom range-based validators
+        4. Any combination of the above
         """
         self.card_types: list[CodeValidator] = []
 
-        if credit_card_validators is not None:
-            self.card_types.extend(credit_card_validators)
-
-        if credit_card_ranges is not None:
-            # Allow additional custom ranges via range-based validator
-            self.card_types.append(self.create_range_validator(credit_card_ranges, self.LUHN_VALIDATOR))
-
-        elif credit_card_validators is None:
-            # Use built-in validators depending on the selected bitmask options
+        # Built-in bitmask validators (used if no explicit validators given)
+        if credit_card_validators is None and credit_card_ranges is None:
             if self.is_on(options, self.VISA):
                 self.card_types.append(self.VISA_VALIDATOR)
             if self.is_on(options, self.VPAY):
@@ -169,6 +167,15 @@ class CreditCardValidator:
                 self.card_types.append(self.DISCOVER_VALIDATOR)
             if self.is_on(options, self.DINERS):
                 self.card_types.append(self.DINERS_VALIDATOR)
+
+        # Add custom validators (if provided)
+        if credit_card_validators is not None:
+            self.card_types.extend(credit_card_validators)
+
+        # Add range-based validator (if provided)
+        if credit_card_ranges is not None:
+            self.card_types.append(self.create_range_validator(credit_card_ranges, self.LUHN_VALIDATOR))
+
 
     @staticmethod
     def valid_length(value_length: int, range: CreditCardRange) -> bool:
@@ -206,7 +213,7 @@ class CreditCardValidator:
         return None
     
     @classmethod
-    def generic_credit_card_validator(cls) -> CreditCardValidator:
+    def generic_credit_card_validator(cls) -> "CreditCardValidator":
         """
         Creates a validator that only checks for numeric card numbers
         with Luhn validation, using the default min and max length.
@@ -214,19 +221,19 @@ class CreditCardValidator:
         return cls.generic_credit_card_validator_with_range(cls.MIN_CC_LENGTH, cls.MAX_CC_LENGTH)
 
     @classmethod
-    def generic_credit_card_validator_with_exact_length(cls, length: int) -> CreditCardValidator:
+    def generic_credit_card_validator_with_exact_length(cls, length: int) -> "CreditCardValidator":
         """
         Creates a validator for a specific length, e.g., 16-digit cards.
         """
         return cls.generic_credit_card_validator_with_range(length, length)
 
     @classmethod
-    def generic_credit_card_validator_with_range(cls, min_len: int, max_len: int) -> CreditCardValidator:
+    def generic_credit_card_validator_with_range(cls, min_len: int, max_len: int) -> "CreditCardValidator":
         """
         Creates a validator that only ensures the card is numeric,
         within a given length range, and passes the Luhn check.
         """
-        generic_validator = CodeValidator(regex=r"^\d+$", min_length=min_len, max_length=max_len, checkdigit=cls.LUHN_VALIDATOR)
+        generic_validator = CodeValidator(regex=r"^(\d+)$", min_length=min_len, max_length=max_len, length=None, checkdigit=cls.LUHN_VALIDATOR)
         return CreditCardValidator(credit_card_validators=[generic_validator])
     
     def create_range_validator(self, ranges: list[CreditCardRange], check_digit) -> CodeValidator:
@@ -244,18 +251,38 @@ class CreditCardValidator:
                 return [result] if result else None
 
             def validate(self, value: str):
-                if super().match(value):
-                    for range in ranges:
-                        if CreditCardValidator.valid_length(len(value), range):
-                            if not range.high:
-                                if value.startswith(range.low):
-                                    return value
-                            elif (range.low <= value and
-                                  value.startswith(range.low) and
-                                  value[:len(range.high)] <= range.high):
-                                return value
+                if super().match(value) is None:
+                    # super().match(value) returns [] because no groups are captured
+                    # if regex pattern no () → no groups → .groups() is empty
+                    print(f"[REJECT] Regex mismatch: {value} (using patterns {[p.pattern for p in self.patterns]})")
+                    return None
+                
+
+                for range in ranges:
+                    print(f"\n[CHECKING RANGE] low={range.low}, high={range.high}, value={value}")
+
+                    if not CreditCardValidator.valid_length(len(value), range):
+                        print(f"[SKIP] Length {len(value)} not in {range.lengths or (range.min_len, range.max_len)}")
+                        continue
+
+                    if range.high is None:
+                        if value.startswith(range.low):
+                            print(f"[MATCH] value starts with {range.low}")
+                            return value
+                    else:
+                        print(f"  Comparing: {range.low} <= {value} ? {range.low <= value}")
+                        prefix_high = value[:len(range.high)]
+                        prefix_low= value[:len(range.low)]
+
+                        if range.low <= prefix_low and prefix_high <= range.high:
+                            print(f"[MATCH] Range match successful")
+                            return value
+
+                print(f"[FAIL] No range matched for {value}")
                 return None
 
-        return CodeValidator(RangeRegexValidator(r"\d+"), check_digit)
+
+
+        return CodeValidator(regex_validator=RangeRegexValidator(r"\d+$"), checkdigit=check_digit)
     
     

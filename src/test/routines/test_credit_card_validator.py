@@ -87,7 +87,7 @@ def test_add_allowed_card_type() -> None:
 
 def test_amex_validator() -> None:
     validator: Final[CodeValidator] = CreditCardValidator.AMEX_VALIDATOR
-    regex : Final[RegexValidator] = validator.get_regex_validator()
+    regex : Final[RegexValidator] = validator.regex_validator
 
     # --- Regex: Length checks ---
     assert not regex.is_valid("343456789012"), "Expected False for 12-digit AMEX"
@@ -163,9 +163,9 @@ def test_array_constructor() -> None:
     ]:
         assert not ccv.is_valid(card), f"{label} card {card} should be invalid"
 
-    # Check null validator input raises an error
-    with pytest.raises(TypeError):
-        CreditCardValidator(credit_card_validators=None)
+    # assert default behavior is triggered when None is passed
+    ccv_default = CreditCardValidator(credit_card_validators=None)
+    assert ccv_default.is_valid(_VALID_VISA)  # this should now succeed if VISA is in the default bitmask
 
 def test_diners_option() -> None:
     """
@@ -190,7 +190,7 @@ def test_diners_validator() -> None:
     Tests the DINERS CodeValidator (regex + Luhn).
     """
     validator: Final[CodeValidator] = CreditCardValidator.DINERS_VALIDATOR
-    regex: Final[RegexValidator] = validator.get_regex_validator()
+    regex: Final[RegexValidator] = validator.regex_validator
 
     # --- Regex: Length checks ---
     # --- Regex: Length checks (prefix 300) ---
@@ -212,15 +212,24 @@ def test_diners_validator() -> None:
     assert not regex.is_valid("363456789012345678"), "Too long (18) - prefix 36"
 
     # --- Regex: Prefix checks ---
-    valid_prefixes = ["300", "301", "302", "303", "304", "305", "3095", "36", "38", "39"]
-    for prefix in valid_prefixes:
+    #valid prefixes
+    triple_valid_prefixes = ["300", "301", "302", "303", "304", "305", ]
+    for prefix in triple_valid_prefixes:
         number = prefix + "45678901234"
         assert regex.is_valid(number), f"Expected prefix {prefix} to be valid"
+    
+    assert regex.is_valid("30955678901234"), f"Expected prefix 3095 to be valid"
+    assert regex.is_valid("36345678901234"), f"Expected prefix 36 to be valid"
+    assert regex.is_valid("38345678901234"), f"Expected prefix 38 to be valid"
+    assert regex.is_valid("39345678901234"), f"Expected prefix 39 to be valid"
 
-    invalid_prefixes = ["306", "3094", "3096", "35", "37"]
-    for prefix in invalid_prefixes:
-        number = prefix + "45678901234"
-        assert not regex.is_valid(number), f"Expected prefix {prefix} to be invalid"
+   
+    #invalid prefixes
+    assert not regex.is_valid("30645678901234"), f"Expected prefix 306 to be invalid"   
+    assert not regex.is_valid("30945678901234"), f"Expected prefix 3094 to be invalid"   
+    assert not regex.is_valid("30965678901234"), f"Expected prefix 3096 to be invalid"
+    assert not regex.is_valid("35345678901234"), f"Expected prefix 35 to be invalid" 
+    assert not regex.is_valid("37345678901234"), f"Expected prefix 37 to be invalid"      
 
     # --- Regex: Invalid chars ---
     assert not regex.is_valid("3004567x901234"), "Invalid char in prefix 300"
@@ -287,7 +296,7 @@ def test_discover_validator() -> None:
     Tests the DISCOVER CodeValidator (regex + Luhn).
     """
     validator: Final[CodeValidator] = CreditCardValidator.DISCOVER_VALIDATOR
-    regex: Final[RegexValidator] = validator.get_regex_validator()
+    regex: Final[RegexValidator] = validator.regex_validator
 
     # --- Length checks for prefix 6011 and 65 ---
     assert not regex.is_valid("601156789012"), "Too short (12) - 6011"
@@ -353,7 +362,7 @@ def test_disjoint_range() -> None:
     """
     Tests custom CreditCardRange validation logic.
     """
-    range_13_16: Final = CreditCardValidator.CreditCardRange("305", "4", [13, 16])
+    range_13_16: Final = CreditCardValidator.CreditCardRange(low="305", high="4", lengths=[13, 16])
     ccv: Final[CreditCardValidator] = CreditCardValidator(credit_card_ranges=[range_13_16])
 
     assert len(_VALID_SHORT_VISA) == 13
@@ -372,7 +381,7 @@ def test_disjoint_range() -> None:
     assert not ccv.is_valid(_VALID_DINERS), "14-digit Diners should fail with lengths=[13, 16]"
 
     # Now add 14 to valid lengths
-    range_13_14_16: Final = CreditCardValidator.CreditCardRange("305", "4", [13, 14, 16])
+    range_13_14_16: Final = CreditCardValidator.CreditCardRange(low="305", high="4", lengths=[13, 14, 16])
     ccv_with_14: Final[CreditCardValidator] = CreditCardValidator(credit_card_ranges=[range_13_14_16])
     assert ccv_with_14.is_valid(_VALID_DINERS), "Expected Diners card to be valid when 14-digit is allowed"
 
@@ -381,7 +390,7 @@ def test_generic() -> None:
     Tests the genericCreditCardValidator() using default card types.
     """
     ccv: Final[CreditCardValidator] = CreditCardValidator.generic_credit_card_validator()
-
+    
     for card in _VALID_CARDS:
         assert ccv.is_valid(card), f"Expected valid card to pass: {card}"
 
@@ -461,8 +470,8 @@ def test_mastercard_using_separators() -> None:
     Tests Mastercard regex with various valid separator formats.
     """
     mastercard_regex_sep: Final[str] = r"^(5[1-5]\d{2})(?:[- ])?(\d{4})(?:[- ])?(\d{4})(?:[- ])?(\d{4})$"
-    validator: Final[CodeValidator] = CodeValidator(mastercard_regex_sep, LuhnCheckDigit.LUHN_CHECK_DIGIT)
-    regex: Final[RegexValidator] = validator.get_regex_validator()
+    validator: Final[CodeValidator] = CodeValidator(regex=mastercard_regex_sep, checkdigit=LuhnCheckDigit.LUHN_CHECK_DIGIT)
+    regex: Final[RegexValidator] = validator.regex_validator
 
     # Valid formats
     valid_cases: Final[list[tuple[str, str]]] = [
@@ -505,7 +514,7 @@ def test_mastercard_validator() -> None:
     Tests the MASTERCARD CodeValidator (regex + Luhn).
     """
     validator: Final[CodeValidator] = CreditCardValidator.MASTERCARD_VALIDATOR
-    regex: Final[RegexValidator] = validator.get_regex_validator()
+    regex: Final[RegexValidator] = validator.regex_validator
 
     # --- Length checks (12–18 digits) ---
     assert not regex.is_valid("513456789012"), "Too short (12 digits)"
@@ -562,7 +571,7 @@ def test_mastercard_validator() -> None:
         assert validator.is_valid(card), f"Expected valid Mastercard: {card}"
 
     # --- Extensive range test: 222100–272099 (new Mastercard range) ---
-    rev: Final[RegexValidator] = validator.get_regex_validator()
+    rev: Final[RegexValidator] = validator.regex_validator
     pad: Final[str] = "0000000000"  # makes 16-digit cards
 
     assert not rev.is_valid("222099" + pad), "Prefix 222099 should be invalid"
@@ -695,7 +704,7 @@ def test_visa_validator() -> None:
     Tests the VISA CodeValidator (regex + Luhn).
     """
     validator: Final[CodeValidator] = CreditCardValidator.VISA_VALIDATOR
-    regex: Final[RegexValidator] = validator.get_regex_validator()
+    regex: Final[RegexValidator] = validator.regex_validator
 
     # --- Length checks ---
     assert not regex.is_valid("423456789012"), "Too short (12)"

@@ -25,7 +25,6 @@ Changes:
 import pytest
 from src.main.util.regex import Regex
 from src.main.routines.isbn_validator import ISBNValidator
-import re
 
 # Constants
 valid_isbn10_format = [

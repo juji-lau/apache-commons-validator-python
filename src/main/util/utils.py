@@ -1,7 +1,45 @@
 # holds translation from apache.commons.validator.utils.ValidatorUtils class
 import copy
-from placeholders import Var, Arg, Msg
+from typing import Callable, Optional, Union
 
+# Generic utility functions
+def integer_compare(a:int, b:int) -> int:
+    """
+    Compares a, and b.
+
+    Args:
+        a (int): The first value to compare
+        b (int): The second value to compare
+
+    Returns:
+        0 if a == b.
+        -1 if a < b. 
+        1 if a > b.
+    """
+    if a == b:
+        return 0
+    elif a > b:
+        return 1
+    return -1
+
+def to_lower(s:str) -> Optional[str]:
+    """
+    Returns s with all letters lowercased, and leading and trailing whitespaces removed.
+
+    Args:
+        s (str): The string to process
+    
+    Returns:
+        s with the leading and trailing whitespaces removed, and all letters lowercased.
+        None if s is an invalid argument.
+    """
+    try:
+        return s.strip().strip('_').lower()
+    except Exception as e:
+        print(f"Invalid argument: {s} with error: {e}") 
+        return None
+
+# Utility functions for Validators
 class ValidatorUtils:
     def __init__(self):
         self.serializable = False

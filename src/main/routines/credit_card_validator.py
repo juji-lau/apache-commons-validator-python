@@ -35,8 +35,15 @@ from src.main.routines.checkdigit.checkdigit import CheckDigit
 from src.main.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
 
 class CreditCardValidator:
+    """
+    TODO: Insert documentation
+
+    Attributes:
+        serializeable (bool): TODO
+        cloneable (bool): TODO
+    """
     serializable = True    # class is serializable
-    clone = False          # class is not cloneable
+    cloneable = False      # class is not cloneable
     
     class CreditCardRange:
         """

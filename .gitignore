@@ -29,6 +29,7 @@ __pycache__/
 /src/example
 *.txt
 # /src/test/example
+/src/test/routines/compiler.java
 
 # # Other system files (optional)
 # Thumbs.db

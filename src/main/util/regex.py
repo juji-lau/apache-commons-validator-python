@@ -30,7 +30,7 @@ Substitutions:
 """
 import re
 from re import Pattern, compile, IGNORECASE
-from typing import Optional, override
+from typing import Optional
 
 class Regex:
     """

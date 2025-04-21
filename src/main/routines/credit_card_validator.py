@@ -6,7 +6,7 @@ Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/
  
 Author: Alicia Chu
 
-License (Taken from apache.commons.validator.routines.AbstractCalendarValidator.java):
+License (Taken from apache.commons.validator.routines.CreditCardValidator.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements. See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -40,7 +40,19 @@ class CreditCardValidator:
     
     class CreditCardRange:
         """
-        Represents a credit card number range with IIN prefix and length validation.
+        Represents a credit card number range for validating issuer prefix (IIN)
+        and permissible card number lengths.
+
+        Attributes:
+            low (str): The starting IIN prefix of the range (inclusive).
+            high (Optional[str]): The ending IIN prefix of the range (inclusive). If None, only 'low' is used.
+            min_len (int): Minimum card number length. Ignored if 'lengths' is provided.
+            max_len (int): Maximum card number length. Ignored if 'lengths' is provided.
+            lengths (Optional[list[int]]): Explicit list of valid lengths. If provided, overrides min_len/max_len.
+
+        Used to define card validation logic for ranges like:
+        - '400000' to '499999' for Visa
+        - '510000' to '559999' for older MasterCard prefixes
         """
 
         def __init__(
@@ -141,13 +153,27 @@ class CreditCardValidator:
     credit_card_ranges: Optional[list["CreditCardValidator"]] = None,
     ):
         """
-        Initializes the CreditCardValidator.
+        Initializes a CreditCardValidator instance with built-in or custom validators.
 
-        Supports:
-        1. Bitmask options to select built-in validators (default)
-        2. Custom list of CodeValidators
-        3. Custom range-based validators
-        4. Any combination of the above
+        Args:
+            options (int, optional): Bitmask flags indicating which built-in card types 
+                to include (e.g., VISA, AMEX, etc.). Defaults to a combination of
+                AMEX, VISA, MASTERCARD, and DISCOVER. Ignored if `credit_card_validators`
+                or `credit_card_ranges` is provided.
+            
+            credit_card_validators (Optional[list[CodeValidator]]): A custom list of 
+                `CodeValidator` instances. Each validator defines its own regex and 
+                check digit logic. Appended to the list of active validators.
+            
+            credit_card_ranges (Optional[list[CreditCardRange]]): A list of credit card
+                ranges to validate against, using IIN prefix and length rules. Combined 
+                into a single range-based validator with Luhn check digit logic.
+
+        Notes:
+            - If neither `credit_card_validators` nor `credit_card_ranges` is provided,
+            the constructor will fall back to using the bitmask `options` to configure
+            a default set of built-in card validators.
+            - All validators are stored in `self.card_types` and checked in order.
         """
         self.card_types: list[CodeValidator] = []
 

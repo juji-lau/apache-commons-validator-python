@@ -596,9 +596,13 @@ class TestInetAddressValidator:
         Inet6Address may also contain a scope id.
         """
         validator = InetAddressValidator()
-        valid = ["2001:0000:1234:0000:0000:C1C0:ABCD:0876", "2001:0000:1234:0000:0000:C1C0:ABCD:0876/123",
-                "2001:0000:1234:0000:0000:C1C0:ABCD:0876/0", "2001:0000:1234:0000:0000:C1C0:ABCD:0876%0", "2001:0000:1234:0000:0000:C1C0:ABCD:0876%abcdefgh"]
-        invalid = ["2001:0000:1234:0000:0000:C1C0:ABCD:0876/129",   # too big
+        valid = ["2001:0000:1234:0000:0000:C1C0:ABCD:0876",
+                "2001:0000:1234:0000:0000:C1C0:ABCD:0876/123",
+                "2001:0000:1234:0000:0000:C1C0:ABCD:0876/0",
+                "2001:0000:1234:0000:0000:C1C0:ABCD:0876%0",
+                "2001:0000:1234:0000:0000:C1C0:ABCD:0876%abcdefgh"]
+        
+        invalid = ["2001:0000:1234:0000:0000:C1C0:ABCD:0876/129",    # too big
                 "2001:0000:1234:0000:0000:C1C0:ABCD:0876/-0",        # sign not allowed
                 "2001:0000:1234:0000:0000:C1C0:ABCD:0876/+0",        # sign not allowed
                 "2001:0000:1234:0000:0000:C1C0:ABCD:0876/10O",       # non-digit

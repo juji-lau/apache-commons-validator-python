@@ -56,6 +56,7 @@ class UrlValidator:
     Uniform Resource Identifiers (URI): Generic Syntax
     """
     serializable = True
+    cloneable    = False
 
     __MAX_UNSIGNED_16_BIT_INT: Final[int] = 0xFFFF
     
@@ -83,11 +84,10 @@ class UrlValidator:
     __AUTHORITY_REGEX = r"(?:\[((::FFFF:(?:\d{1,3}\.){3}\d{1,3})|([0-9a-fA-F:]+))\]|(?:(?:[a-zA-Z0-9%\-._~!$&'()*+,;=]+(?::[a-zA-Z0-9%\-._~!$&'()*+,;=]*)?@)?([A-Za-z0-9\-\.]*)))(?::(\d*))?(.*)?"
     __AUTHORITY_PATTERN = re.compile(__AUTHORITY_REGEX)
 
-    __PARSE_AUTHORITY_IPV6: Final[int] = 1
+    __PARSE_AUTHORITY_IPV6: Final[int]    = 1
     __PARSE_AUTHORITY_HOST_IP: Final[int] = 4
-    __PARSE_AUTHORITY_PORT: Final[int] = 5
-
-    __PARSE_AUTHORITY_EXTRA: Final[int] = 6
+    __PARSE_AUTHORITY_PORT: Final[int]    = 5
+    __PARSE_AUTHORITY_EXTRA: Final[int]   = 6
     """Should always be empty. The code currently allows spaces."""
 
     __PATH_REGEX: Final[str] = r"^(/[-\w:@&?=+,.!/~*'%$_;\(\)]*)?$"
@@ -112,14 +112,15 @@ class UrlValidator:
             cls.__DEFAULT_URL_VALIDATOR = UrlValidator()
         return cls.__DEFAULT_URL_VALIDATOR
     
-    def __init__(self, schemes: list[str]=None, authority_validator: RegexValidator=None, options: int=0, domain_validator: DomainValidator=None):
+    def __init__(self, schemes: list[str]=None, authority_validator: RegexValidator=None, options: int=0,
+                 domain_validator: DomainValidator=None):
         """
         Constructs a new instance with the given validation options.
 
         :param schemes: The list of valid schemes. Ignored if the ALLOW_ALL_SCHEMES option is set.
         :param authority_validator: Regular expression validator used to validate the authority part.
-        :param options: Validation options. Set using the public constants of this class. To set multiple options, simply add them together:
-        ALLOW_2_SLASHES + NO_FRAGMENTS enables both of those options.
+        :param options: Validation options. Set using the public constants of this class.
+        To set multiple options, simply add them together: ALLOW_2_SLASHES + NO_FRAGMENTS enables both of those options.
         :param domain_validator: The DomainValidator to use; must agree with ALLOW_LOCAL_URLS setting.
         """
         self.__options = options

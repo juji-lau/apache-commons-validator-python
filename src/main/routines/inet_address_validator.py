@@ -26,9 +26,10 @@ class InetAddressValidator:
 
     This class provides methods to validate a candidate IP address.
 
-    This class is a Singleton; you can retrieve the instance via the {@link #getInstance()} method.
+    This class is a Singleton; you can retrieve the instance via the getInstance() method.
     """
     serializable = True
+    cloneable    = False
 
     __MAX_BYTE: Final[int] = 128
     __IPV4_MAX_OCTET_VALUE: Final[int] = 255
@@ -63,7 +64,7 @@ class InetAddressValidator:
     
     def __init__(self):
         """
-        Constructs a new instanse.
+        Constructs a new instance.
         """
         pass
 
@@ -145,12 +146,10 @@ class InetAddressValidator:
         
         octets = inet6_address.split(':')
         if contains_compressed_zeroes:
-            octet_list = list(octets)
             if ends_with_compressed:
-                octet_list = octet_list[:-1]
-            if starts_with_compressed and octet_list:
-                octet_list.pop(0)
-            octets = octet_list
+                octets = octets[:-1]
+            if starts_with_compressed and octets:
+                octets.pop(0)
         
         if len(octets) > self.__IPV6_MAX_HEX_GROUPS:
             return False

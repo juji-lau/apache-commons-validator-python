@@ -20,7 +20,8 @@ author = 'Sanjana Nandi, Juji Lau, Alicia Chu, Jessica Breuhaus'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon'
+    'sphinx.ext.napoleon',
+    'sphinx.ext.autosummary'
 ]
 
 templates_path = ['_templates']

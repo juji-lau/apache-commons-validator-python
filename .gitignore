@@ -1,4 +1,19 @@
+# macOS system files
 .DS_Store
-src/__pycache__/
-src/main/__pycache__/
-src/test/__pycache__/
+
+# pytest cache
+.pytest_cache/
+
+# Sphinx build files
+docs/_build/
+
+# VSCode/IDE files
+.vscode/
+*.swp
+
+# # Other system files (optional)
+# Thumbs.db
+# .idea/
+.coverage
+
+.pytest_cache/

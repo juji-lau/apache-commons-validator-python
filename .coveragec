@@ -1,0 +1,7 @@
+[run]
+source = src/main
+
+[report]
+omit =
+    src/test/*
+    */__init__.py

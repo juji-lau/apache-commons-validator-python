@@ -1,10 +1,13 @@
 # Define placeholder Arg, Var, Msg classes for copymap in utils.py
 
+
 class Arg:
-  pass
+    pass
+
 
 class Var:
-  pass
+    pass
+
 
 class Msg:
-  pass
+    pass

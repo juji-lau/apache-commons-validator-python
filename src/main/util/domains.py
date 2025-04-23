@@ -1,4 +1,12 @@
 """
+Module Name: domains.py
+
+Description: Contains the lists of TLDs from apache.commons.validator.routines.DomainValidator.java
+Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/DomainValidator.java
+
+Author: Jessica Breuhaus
+
+License (Taken from apache.commons.validator.routines.DomainValidator.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements.  See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -18,6 +26,13 @@ from typing import Final
 
 class Domains:
     """
+    Contains lists of Infrastructure TLDs, Generic TLDs, Country Code TLDs, and Local TLDs.
+
+    Attributes:
+        <li>INFRASTRUCTURE_TLDS (list[str]): List of Infrastructure TLDs (eg. 'arpa').</li>
+        <li>GENERIC_TLDS (list[str]): List of Generic TLDs (eg. 'com').</li>
+        <li>COUNTRY_CODE_TLDS (list[str]): List of Country Code TLDs (eg. 'us').</li>
+        <li>LOCAL_TLDS (list[str]): List of Local TLDs (eg. 'localhost').</li>
     """
 
     INFRASTRUCTURE_TLDS: Final[list] = [

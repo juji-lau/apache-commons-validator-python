@@ -1,4 +1,12 @@
 """
+Module Name: email_validator.py
+
+Description: Translates apache.commons.validator.routines.EmailValidator.java
+Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/EmailValidator.java
+
+Author: Jessica Breuhaus
+
+License (Taken from apache.commons.validator.routines.EmailValidator.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements.  See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -27,6 +35,10 @@ class EmailValidator:
     Based on a script by Sandeep V. Tamhankar (https://javascript.internet.com)
 
     This implementation is not guaranteed to catch all possible errors in an email address.
+
+    Attributes:
+        <li>serializable (bool): Indicates if the object is serializable.</li>
+        <li>cloneable (bool): Indicates if the object can be cloned.</li>
     """
 
     serializable = True

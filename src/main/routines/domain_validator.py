@@ -1,4 +1,12 @@
 """
+Module Name: domain_validator.py
+
+Description: Translates apache.commons.validator.routines.DomainValidator.java
+Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/DomainValidator.java
+
+Author: Jessica Breuhaus
+
+License (Taken from apache.commons.validator.routines.DomainValidator.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements.  See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -41,33 +49,39 @@ class DomainValidator:
 
     (<strong>NOTE</strong>: This class does not provide IP address lookup for domain names or
     methods to ensure that a given domain name matches a specific IP; see inet_address_validator.py for that functionality.)
+
+    Attributes:
+        <li>serializable (bool): Indicates if the object is serializable.</li>
+        <li>cloneable (bool): Indicates if the object can be cloned.</li>
     """
     serializable = True
     cloneable    = False
 
     class ArrayType(Enum):
         """
-        Enum used by update_tld_override(ArrayType, list[str]) to determine which override list to update / fetch/
+        Enum used by update_tld_override(ArrayType, list[str]) to determine which override list to update/fetch.
+
+        Attributes:
+            <li>GENERIC_PLUS: Update (or get a copy of) the GENERIC_TLDS_PLUS table containing additional generic TLDs.</li>
+            <li>GENERIC_MINUS: Update (or get a copy of) the GENERIC_TLDS_MINUS table containing deleted generic TLDs.</li>
+            <li>COUNTRY_CODE_PLUS: Update (or get a copy of) the COUNTRY_code_tlds_PLUS table containing additional country code TLDs.</li>
+            <li>COUNTRY_CODE_MINUS: Update (or get a copy of) the COUNTRY_code_tlds_MINUS table containing deleted country code TLDs.</li>
+            <li>GENERIC_RO: Gets a copy of the generic TLDS table.</li>
+            <li>COUNTRY_CODE_RO: Gets a copy of the country code table.</li>
+            <li>INFRASTRUCTURE_RO: Gets a copy of the infrastructure table.</li>
+            <li>LOCAL_RO: Gets a copy of the local table</li>
+            <li>LOCAL_PLUS: Update (or get a copy of) the LOCAL_TLDS_PLUS table containing additional local TLDs.</li>
+            <li>LOCAL_MINUS: Update (or get a copy of) the LOCAL_TLDS_MINUS table containing deleted local TLDs.</li>
         """
-        # Update (or get a copy of) the GENERIC_TLDS_PLUS table containing additional generic TLDs
         GENERIC_PLUS = 1
-        # Update (or get a copy of) the GENERIC_TLDS_MINUS table containing deleted generic TLDs
         GENERIC_MINUS = 2
-        # Update (or get a copy of) the COUNTRY_code_tlds_PLUS table containing additional country code TLDs
         COUNTRY_CODE_PLUS = 3
-        # Update (or get a copy of) the COUNTRY_code_tlds_MINUS table containing deleted country code TLDs
         COUNTRY_CODE_MINUS = 4
-        # Gets a copy of the generic TLDS table
         GENERIC_RO = 5
-        # Gets a copy of the country code table
         COUNTRY_CODE_RO = 6
-        # Gets a copy of the infrastructure table
         INFRASTRUCTURE_RO = 7
-        # Gets a copy of the local table
         LOCAL_RO = 8
-        # Update (or get a copy of) the LOCAL_TLDS_PLUS table containing additional local TLDs
         LOCAL_PLUS = 9
-        # Update (or get a copy of) the LOCAL_TLDS_MINUS table containing deleted local TLDs
         LOCAL_MINUS = 10
 
     __MAX_DOMAIN_LENGTH: Final[int] = 253 # Maximum allowable length of a domain name
@@ -81,9 +95,6 @@ class DomainValidator:
     # Max 63 characters
     __TOP_LABEL_REGEX: Final[str] = r"[a-zA-Z](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
 
-    # The above instances must only be returned via the getInstance() methods.
-    # This is to ensure that the override data arrays are properly protected.
-
     # RFC2396 hostname = *( domainlabel "." ) toplabel [ "." ]
     # Note that the regex currently requires both a domain label and a top level label, whereas
     # the RFC does not. This is because the regex is used to detect if a TLD is present.
@@ -92,10 +103,9 @@ class DomainValidator:
     __DOMAIN_NAME_REGEX: Final[str] = r"^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+([a-zA-Z](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)\.?$"
     __UNEXPECTED_ENUM_VALUE: Final[str] = "Unexpected enum value: "
 
-    # These arrays are mutable.
-    # They can only be updated by the updateTLDOverride method, and readers must first get an instance
-    # using the getInstance methods which are all (now) synchronized.
-    # The only other access is via getTLDEntries which is now synchronized.
+    # These can only be updated by the update_tld_override method, and readers must first get an instance
+    # using the get_instance method which is synchronized.
+    # The only other access is via get_tld_entries which is synchronized.
     __country_code_tlds_plus  = __EMPTY_STRING_ARRAY
     __generic_tlds_plus       = __EMPTY_STRING_ARRAY
     __country_code_tlds_minus = __EMPTY_STRING_ARRAY
@@ -103,10 +113,11 @@ class DomainValidator:
     __local_tlds_minus        = __EMPTY_STRING_ARRAY
     __local_tlds_plus         = __EMPTY_STRING_ARRAY
 
-    # The constructors are deliberately private to avoid possible problems with unsafe publication.
-    # It is vital that the static override arrays are not mutable once they have been used in an instance
-    # The arrays could be copied into the instance variables, however if the static array were changed it could
-    # result in different settings for the shared default instances
+    # The constructor is deliberately private to avoid possible problems with unsafe publication.
+    # It is vital that the override lists are not mutable once they have been used in an instance
+    # The lists could be copied into the instance variables, however if the lists were changed it could
+    # result in different settings for the shared default instances.
+
     __local_tlds_minus = __EMPTY_STRING_ARRAY
     __local_tlds_plus  = __EMPTY_STRING_ARRAY
 
@@ -144,7 +155,6 @@ class DomainValidator:
             self.type = type
             self.values = values
     
-    # Regular expression strings for hostnames (derived from RFC2396 and RFC 1123)
     def __new__(cls, *args, **kwargs):
         raise RuntimeError("Use get_instance() instead")
 
@@ -315,7 +325,7 @@ class DomainValidator:
         # https://data.iana.org/TLD/tlds-alpha-by-domain.txt
 
         # Note that the above list is in UPPER case.
-        # The code currently converts strings to lower case (as per the tables below)
+        # The code currently converts strings to lower case (as per the tables below).
 
         # IANA also provide an HTML list at http://www.iana.org/domains/root/db
         # Note that this contains several country code entries which are NOT in

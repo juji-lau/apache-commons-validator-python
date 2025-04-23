@@ -1,4 +1,12 @@
 """
+Module Name: inet_address_validator.py
+
+Description: Translates apache.commons.validator.routines.InetAddressValidator.java
+Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/InetAddressValidator.java
+
+Author: Jessica Breuhaus
+
+License (Taken from apache.commons.validator.routines.InetAddressValidator.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements.  See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -22,11 +30,15 @@ from ..routines.regex_validator import RegexValidator
 
 class InetAddressValidator:
     """
-    InetAddress validation and conversion routines.
+    Inet Address validation and conversion routines.
 
     This class provides methods to validate a candidate IP address.
 
     This class is a Singleton; you can retrieve the instance via the getInstance() method.
+
+    Attributes:
+        <li>serializable (bool): Indicates if the object is serializable.</li>
+        <li>cloneable (bool): Indicates if the object can be cloned.</li>
     """
     serializable = True
     cloneable    = False

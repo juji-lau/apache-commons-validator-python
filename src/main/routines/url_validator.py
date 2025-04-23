@@ -1,4 +1,12 @@
 """
+Module Name: url_validator.py
+
+Description: Translates apache.commons.validator.routines.UrlValidator.java
+Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/UrlValidator.java
+
+Author: Jessica Breuhaus
+
+License (Taken from apache.commons.validator.routines.UrlValidator.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements.  See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -54,6 +62,14 @@ class UrlValidator:
 
     See "http://www.ietf.org/rfc/rfc2396.txt"
     Uniform Resource Identifiers (URI): Generic Syntax
+
+    Attributes:
+        <li>serializable (bool): Indicates if the object is serializable.</li>
+        <li>cloneable (bool): Indicates if the object can be cloned.</li>
+        <li>ALLOW_ALL_SCHEMES (int): Allow all validly formatted schemes to pass validation instead of supplying a set of valid schemes.</li>
+        <li>ALLOW_2_SLASHES (int): Allow two slashes in the path component of the URL.</li>
+        <li>NO_FRAGMENTS (int): Disallow any URL fragments.</li>
+        <li>ALLOW_LOCAL_URLS (int): Allow local URLs, enabling a broad-brush check.</li>
     """
     serializable = True
     cloneable    = False
@@ -69,7 +85,7 @@ class UrlValidator:
     NO_FRAGMENTS: Final[int] = 1 << 2
     """Enabling this options disallows any URL fragments."""
 
-    ALLOW_LOCAL_URLS = 1 << 3
+    ALLOW_LOCAL_URLS: Final[int] = 1 << 3
     """
     Allow local URLs, such as https://localhost/ or https://machine/ .
     This enables a broad-brush check, for complex local machine name

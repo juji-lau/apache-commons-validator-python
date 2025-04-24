@@ -98,8 +98,8 @@ class CalendarValidator(AbstractCalendarValidator):
     """
     __VALIDATOR:CalendarValidator = None
     # Attributes to manage serialization and cloning capabilities
-    serializable = True    # class is serializable
-    cloneable = False      # class is not cloneable
+    serializable = True    # Class extends AbstracCalendarvalidator which is serializable
+    cloneable = False      # Class extends AbstracCalendarvalidator which is not cloneable
 
     def __init__(self, *, strict:bool = True, date_style:int = 3):
         """
@@ -269,7 +269,7 @@ class CalendarValidator(AbstractCalendarValidator):
             The parsed `datetime` if valid or ``None`` if invalid.
         """
         if pattern is None:
-            return self._parse(value=value)
+            return self._parse(value=value, time_zone)
         
         if locale is None:
             dt = self._parse(value=value)

@@ -9,6 +9,8 @@ from typing import Optional, Final, Union
 import re
 from zoneinfo import ZoneInfo
 
+def debug(d1:datetime, d2:datetime) -> str:
+    return f"Assert failed; \n Expected: {d1} and time {date_get_time(d1)}, and tzinfo: {d1.tzinfo} \n EST Input: {d2} and time: {date_get_time(d2)} and tzinfo: {d2.tzinfo}"
 
 def date_get_time(dt:datetime) -> float:
     """ 
@@ -173,7 +175,8 @@ def update_tz(dt:datetime, tz:tzinfo) -> datetime:
         # return dt.astimezone(tz=tz)
 
 locale_reg2dp_dict = {
-    'en_US' : 'en-001'
+    'en_US' : 'en-001',
+    'en-GB' : 'en-150'
 }
 def locale_reg2dp(locale:str) -> str:
     """
@@ -189,7 +192,7 @@ def get_default_tzinfo() -> tzinfo:
     """
     return datetime.now().astimezone().tzinfo
 
-#
+# def safe_parse()
 
 #         Attributes:
             # YEAR (int): The year.

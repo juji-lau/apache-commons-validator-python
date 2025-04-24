@@ -72,21 +72,22 @@ class TestAbstractCalendarValidator:
 
 
     @classmethod
-    def _create_date(cls, zone:timezone, date:int, time:int) -> datetime:
+    def _create_date(cls, zone:tzinfo, date:int, time:int) -> datetime:
         """
         Create a datetime instance for a specified time zone, date and time. 
-       
-        Note: 
-        Since Java's `Date` tracks the time elapsed since the epoch, we return a datetime to incorporate 
-        time-information rather than a `date`.
 
         Args:
-            zone (TimeZone): The time zone.
+            zone (tzinfo): The time zone.
             date (int): The date in yyyyMMdd format.
             time (int): The time in HH:mm:ss format.
         
         Returns:
             The new datetime instance.
+        
+        Changes from Java:
+            Since Java's `Date` tracks the time elapsed since the epoch.
+            Python's ``datetime.date`` does not track any unit of time less than a day.
+            To match the functionality in Java's Validator, we return a datetime to incorporate time-information.
         """
         calendar = cls._create_calendar(zone, date, time)
         return calendar
@@ -170,6 +171,7 @@ class TestAbstractCalendarValidator:
 
     def teardown_method(self) -> None:
         """Clears the calendar."""
+        print(f"Calling teardown: abstract")
         self._validator = None
 
     def test_format(self) -> None:

@@ -23,15 +23,21 @@ License (Taken from apache.commons.validator.routines.CalendarValidatorTest.java
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
+
+Changes:
+    - Moved specific tests from TestAbstractCalendarValidator into this file (to avoid initialization errors)
+    - Hardcoded several test cases (instead of using language libraries to derive it) 
+        for readability, simplicity, and because Python does not have a ``DateFormat`` equivalent.
+    - Moved commonly used values and objects into fixtures to leverage Pytest functionality.
+
+
 """
 import pytest
-import locale
-
 from datetime import tzinfo, datetime
 from typing import Final, Optional
 from zoneinfo import ZoneInfo
 
-from src.main.util.datetime_helpers import J2PyLocale, date_get_time, timezone_has_same_rules
+from src.main.util.datetime_helpers import J2PyLocale, date_get_time, timezone_has_same_rules, debug
 from src.main.util.Locale import Locale
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
 from src.main.routines.calendar_validator import CalendarValidator
@@ -158,11 +164,12 @@ class TestCalendarValidator(TestAbstractCalendarValidator):
         # Don't rely on specific German format - it varies between JVMs
         output_dt = CalendarValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale)
         if assert_type == "dt":
-            assert expected_dt.date() == output_dt.date(), assert_msg
+            assert date_get_time(expected_dt) == date_get_time(output_dt), assert_msg
+            # assert False, debug(expected_dt, output_dt)
         else:
             assert output_dt is None, assert_msg
 
-   
+    
     @pytest.mark.parametrize (
         "input_val, input_pattern, input_locale, assert_msg", [
             (defaultVal, None, default_locale,  "validate(C) default"),
@@ -175,11 +182,23 @@ class TestCalendarValidator(TestAbstractCalendarValidator):
         """
         Test `CalendarValidator.is_valid()`method with a different timezone.  
         # Also includes test cases in `test`AbstractCalendarValidatorTest.java`.
+
+        expected_zone: a different dt timezone from system default
         """
         # Want to check the timezone differences; can't use .time() because that's time-zone naive. 
         # Can't use .date() because that's in-sensitive to hours.
+        # Ensure our system default datetime, is differnt from our EST datetime.
         assert expected_dt.tzinfo != expected_zone.tzinfo, "default/EET same"
-        assert expected_zone.date() == CalendarValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone).date(), assert_msg
+        assert date_get_time(expected_zone) != date_get_time(expected_dt), f"Expected: {expected_dt} and time {date_get_time(expected_dt)}, EST Input: {expected_dt} and time: {date_get_time(expected_zone)}"
+        # assert False, debug(expected_dt, expected_zone)
+
+        # CORRECT:
+        input_dt = CalendarValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone)
+        input_time = date_get_time(input_dt)
+        assert date_get_time(expected_zone) == input_time, debug(expected_zone, input_dt)
+        # WORKS: 
+        # assert expected_zone == CalendarValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone), assert_msg
+        # assert date_get_time(expected_zone) == date_get_time(CalendarValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone)), assert_msg
 
 
     @pytest.mark.parametrize (
@@ -191,7 +210,9 @@ class TestCalendarValidator(TestAbstractCalendarValidator):
             (False, xxxx, None, default_locale, "is_valid(B) default"),
             (False, xxxx, None, locale, "is_valid(B) locale "),
             (False, xxxx, pattern, default_locale, "is_valid(B) pattern"),
-            (False, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "is_valid(B) both")
+            (False, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "is_valid(B) both"),
+            # (False, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "is_valid(B) both")
+
         ]
     )
     def test_is_valid(self, assert_type:bool, input_val:str, input_pattern:str, input_locale:str, assert_msg:str) -> None:

@@ -21,7 +21,9 @@ License (Taken from apache.commons.validator.routines.DateValidatorTest):
     See the License for the specific language governing permissions and limitations under the License.
 
 Changes:
-    - separate testCompare into different test functions for better readability.
+    - Moved specific tests from TestAbstractCalendarValidator into this file (to avoid initialization errors)
+    - Separated test_compare() into different test functions for better readability.
+    - Moved commonly used values and objects into fixtures to leverage Pytest functionality.
 """
 import pytest
 from datetime import datetime, tzinfo
@@ -31,7 +33,6 @@ from src.main.routines.date_validator import DateValidator
 from src.main.util.datetime_helpers import J2PyLocale
 from src.test.routines.test_abstract_calendar_validator import TestAbstractCalendarValidator
 from src.test.util.test_timezones import TestTimeZones
-from src.main.util.Locale import Locale
 
 class TestDateValidator(TestAbstractCalendarValidator):
     """
@@ -53,7 +54,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
         """ Returns this instance's date_validator."""
         return self.__date_validator
 
-    # Constants for the next few test cases
+    # Constants for the test Compare methods.
     same_time = 124522
     test_date = 20050823
     
@@ -63,6 +64,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
         same_time = 124522
         test_date = 20050823 
         return self._create_date(self.tz, test_date, same_time)
+    
     tz_gmt = gettz("GMT")
     tz_est = TestTimeZones.EST
     date20050824 = TestAbstractCalendarValidator._create_date(tz_gmt, 20050824, same_time)

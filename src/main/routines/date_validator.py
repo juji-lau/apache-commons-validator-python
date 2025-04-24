@@ -38,7 +38,7 @@ class DateValidator(AbstractCalendarValidator):
     Date validation and conversion utilities.
 
     This module provides methods to validate and convert string representations
-    of dates into `datetime.date` objects using various parsing formats and locales.
+    of dates into timezone naive `datetime.datetime` objects using various parsing formats and locales.
 
     Supported conversions:
     - Default format for the default locale
@@ -54,11 +54,11 @@ class DateValidator(AbstractCalendarValidator):
     - `validate()`: Returns a converted `date` object if valid.
 
     Date comparison methods:
-    - `compare_dates(d1, d2)`: Compares day, month, year.
-    - `compare_weeks(d1, d2)`: Compares week and year.
-    - `compare_months(d1, d2)`: Compares month and year.
-    - `compare_quarters(d1, d2)`: Compares quarter and year.
-    - `compare_years(d1, d2)`: Compares years.
+    - `compare_dates(d1, d2)`: Compares day, month, year of two dates.
+    - `compare_weeks(d1, d2)`: Compares week and year of two dates.
+    - `compare_months(d1, d2)`: Compares month and year of two dates.
+    - `compare_quarters(d1, d2)`: Compares quarter and year of two dates.
+    - `compare_years(d1, d2)`: Compares years of two dates.
 
     Formatting methods mirror parsing options and support:
     - Specified pattern
@@ -70,8 +70,8 @@ class DateValidator(AbstractCalendarValidator):
         cloneable (bool): Indicates if the object can be cloned.
         VALIDATOR (DateValidator): The singleton instance of this class
     """
-    serializable = False   # class is not serializable
-    cloneable = False      # class is not cloneable
+    serializable = True   # class extends AbstracCalendarvalidator which is serializable
+    cloneable = False      # class extends AbstracCalendarvalidator which is not cloneable
 
     __VALIDATOR: Optional[DateValidator] = None  # Singleton instance
 

@@ -23,13 +23,16 @@ class Locale:
     @classmethod
     def getdefaultlocale(cls):
         """ Mimics Java's Locale.getDefault() """
-        lang, encoding = locale.getdefaultlocale()
+
+        locale.setlocale(locale.LC_CTYPE, None)
+        lang, _ = locale.getlocale()
+        encoding = locale.getencoding()
         if lang:
             return Locale(lang)
         else:
             return Locale("en_US")
 
-    def __init__(self, locale_str=None, language=None, country="", variant=""):
+    def __init__(self, locale_str=None, language=None, country="" , variant=""):
         """ Parses a Java-style locale string like 'en_US_POSIX'"""
         if locale_str is not None and language is None and country == "" and variant == "":
             parts = locale_str.split('_')
@@ -113,6 +116,8 @@ class Locale:
         """ Returns the locale in Java's format (e.g., 'en_US_POSIX') """
         parts = [self._language, self._country, self._variant]
         return '_'.join(filter(None, parts))
+        # THis appears to be Python formatted.
+        # TODO: Verify documentation.
 
 
 # ---- Example Usage ----

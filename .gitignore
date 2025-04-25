@@ -11,6 +11,26 @@ docs/_build/
 .vscode/
 *.swp
 
+# Git directory
+.git/
+
+# Node.js modules
+node_modules/
+
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+*.cpython-*
+
+
+
+# Reference files
+/src/example
+*.txt
+# /src/test/example
+/src/test/routines/compiler.java
+
 # # Other system files (optional)
 # Thumbs.db
 # .idea/

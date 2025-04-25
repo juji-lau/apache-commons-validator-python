@@ -8,7 +8,7 @@ Description:
             (https://github.com/apache/commons-validator/blob/master/src/test/java/org/apache/commons/validator/routines/checkdigit/EAN13CheckDigitTest.java)
         Additional test cases
 Author: Juji Lau
-License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigit.java):
+License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigitTest.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements. See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.

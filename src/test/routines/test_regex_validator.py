@@ -28,7 +28,6 @@ License (Taken from apache.commons.validator.routines.RegexValidator):
 
 import pytest
 from typing import Optional, Union
-
 from src.main.routines.regex_validator import RegexValidator
 
 # Constants

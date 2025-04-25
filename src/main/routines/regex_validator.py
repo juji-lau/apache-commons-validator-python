@@ -4,7 +4,7 @@ Description: Translates apache.commons.validator.routines.RegexValidator.java
     Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/RegexValidator.java
     Paraphrased from apache.commons.validator.routines.RegexValidator:
     
-    Regular Expression validation (using Python's built-in `re` module).
+    Regular Expression validation (using Python's built-in ``re`` module).
     
     Constructs the validator either for a single regular expression or a set (list) of regular expressions. 
     By default, validation is *case sensitive* but constructors are provided to allow *case-insensitive* validation. 
@@ -16,7 +16,7 @@ Description: Translates apache.commons.validator.routines.RegexValidator.java
             validator = RegexValidator(regexs, case_sensitive=False)
             ```
 
-        Validate returning a boolean (`True` or `False`):
+        Validate returning a boolean (``True`` or ``False``):
             ```
             valid = validator.is_valid(some_value)
             ```
@@ -54,28 +54,28 @@ License (Taken from apache.commons.validator.routines.RegexValidator):
     See the License for the specific language governing permissions and
     limitations under the License.
 Changes:
-    - Java uses the package `Pattern` for regular expressions. This Python file uses the `re` package.
+    - Java uses the package ``Pattern`` for regular expressions. This Python file uses the ``re`` package.
     - Removed:
-        - `CASE_SENSITIVE` 
+        - ``CASE_SENSITIVE`` 
             It was private constant (so no outside code calling). 
-            Instead, we passed `case_sensitive` as an argument to __init__(), setting it to True by default.
-        - `toCompileFlags()` 
-            We only have one flag to keep track of (`re.IGNORECASE`).
+            Instead, we passed ``case_sensitive`` as an argument to __init__(), setting it to True by default.
+        - ``toCompileFlags()`` 
+            We only have one flag to keep track of (``re.IGNORECASE``).
     - Substitutions (Java -> Python):
-        `java.util.regex`           ->  `re`                    Regex package
-        `regex.compile()`           ->  `re.compile()`          Compiles a Pattern
-        `regex.Pattern`             ->  `re.Pattern`
-        `Pattern.CASE_INSENSITIVE`  ->  `re.INGORECASE`         Flag to ignore case when pattern matching.
-        `Pattern.pattern`           ->  `Pattern.pattern`       Field that represents the pattern regex as a string.
-        `Pattern.matcher(value).matches()`  ->  `Pattern.fullmatch(value)`        Matches the entire value against the pattern.   
+        ``java.util.regex``           ->  ``re``                    Regex package
+        ``regex.compile()``           ->  ``re.compile()``          Compiles a Pattern
+        ``regex.Pattern``             ->  ``re.Pattern``
+        ``Pattern.CASE_INSENSITIVE``  ->  ``re.INGORECASE``         Flag to ignore case when pattern matching.
+        ``Pattern.pattern``           ->  ``Pattern.pattern``       Field that represents the pattern regex as a string.
+        ``Pattern.matcher(value).matches()``  ->  ``Pattern.fullmatch(value)``        Matches the entire value against the pattern.   
             Java: 
-                `Pattern.matcher(value)`    Creates a `Matcher` object that matches the entire value against the pattern.
-                `matches()`                 Returns True iff the entire value matches the regex pattern. 
+                ``Pattern.matcher(value)``    Creates a ``Matcher`` object that matches the entire value against the pattern.
+                ``matches()``                 Returns ``True`` iff the entire value matches the regex pattern. 
             Python: 
-                `Pattern.fullmatch()`       Creates a `Match` object that matches the entire value against the pattern. None if there is no match.
-        `regex.Matcher`             ->      `re.Match`          Object created by calling method(s) on `Pattern`.
-        `Matcher.groups()`          ->      `Match.groups()`    List of all the matches in the string to the pattern regex.
-        `java.lang.Object.clone()`  ->      `copy.copy()`       For shallow copies
+                ``Pattern.fullmatch()``       Creates a ``Match``   object that matches the entire value against the pattern. None if there is no match.
+        ``regex.Matcher``             ->      ``re.Match``          Object created by calling method(s) on ``Pattern``.
+        ``Matcher.groups()``          ->      ``Match.groups()``    List of all the matches in the string to the pattern regex.
+        ``java.lang.Object.clone()``  ->      ``copy.copy()``       For shallow copies
 """
 
 from re import Pattern
@@ -97,7 +97,7 @@ class RegexValidator:
     """
     # Attributes to manage serialization and cloning capabilities
     serializable = True    # class is serializable
-    clone = False          # class is not cloneable
+    cloneable = False      # class is not cloneable
 
     def __init__(self, regexs:Union[str, list[str]], case_sensitive:bool = True):
         """
@@ -105,10 +105,10 @@ class RegexValidator:
 
         Args:
             regexs (Union[str, list[str]]): A regex pattern or a list of patterns.
-            case_sensitive (bool): If `False`, enables case-insensitive matching (default: `True`).
+            case_sensitive (bool): If ``False``, enables case-insensitive matching (default: ``True``).
 
         Raises:
-            ValueError: If `regexs` is empty, `None`, or not a valid type.
+            ValueError: If `regexs` is empty, ``None``, or not a valid type.
         """
         self.__patterns = []
         
@@ -160,7 +160,7 @@ class RegexValidator:
             value (str): The value to validate.
   
         Returns: 
-            `True` if any pattern fully matches `value`, else `False`.
+            ``True`` if any pattern fully matches ``value``, else ``False``.
         """
         if value is None:
             return False
@@ -178,7 +178,7 @@ class RegexValidator:
             value (str): The input string to validate.
 
         Returns:
-            list[str] | None: A list of matched groups if valid; otherwise `None`.
+            list[str] | None: A list of matched groups if valid; otherwise ``None``.
         """
         if value is None:
             return None
@@ -197,7 +197,7 @@ class RegexValidator:
             value (str): The input string to validate.
 
         Returns:
-            str | None: Concatenated matched groups if valid; otherwise `None`.
+            str | None: Concatenated matched groups if valid; otherwise ``None``.
         """
         if value is None:
             return None

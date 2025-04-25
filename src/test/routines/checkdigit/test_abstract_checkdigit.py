@@ -55,7 +55,7 @@ class AbstractCheckDigitTest:
         zero_sum (str): Code value which sums to zero.
         missing_message(str): Prefix for error messages.
         serializable (bool): Indicates if the object is serializable (class attribute).
-        clone (bool): Indicates if the object can be cloned (class attribute).
+        cloneable (bool): Indicates if the object can be cloned (class attribute).
  
     Constants:
         POSSIBLE_CHECK_DIGITS (str): 
@@ -71,7 +71,7 @@ class AbstractCheckDigitTest:
 
     # Attributes to manage serialization and cloning capabilities
     serializable = False   
-    clone = False
+    cloneable = False
 
     def setup_method(self) -> None:
         """ Sets up routine & valid codes."""
@@ -136,7 +136,7 @@ class AbstractCheckDigitTest:
         return code[:len(code)-self._checkdigit_len]
     
 
-    def test_calculate_invalid(self):
+    def test_calculate_invalid(self) -> None:
         """ Tests calculate() for invalid values."""
         # self._log.debug("test_calculate_invalid() for %s", self._routine.getclass.name)
         
@@ -158,7 +158,7 @@ class AbstractCheckDigitTest:
     
 
     # Test: calculate() returns the expected check digit for valid codes
-    def test_calculate_valid(self):
+    def test_calculate_valid(self) -> None:
         """ Tests calculate() for valid values."""
         # self._log.debug("test_calculate_valid() for %s", self._routine.getclass.name())
          
@@ -176,7 +176,7 @@ class AbstractCheckDigitTest:
                 # print(f"valid[{i}]={valid_code} threw {str(e)}")
 
 
-    def test_is_valid_false(self):
+    def test_is_valid_false(self) -> None:
         """Tests is_valid() for invalid values."""
         # self._log.debug("test_is_valid_false() for %s", self_routine.getclass.getname())
 
@@ -192,7 +192,7 @@ class AbstractCheckDigitTest:
             assert not self._routine.is_valid(invalid_checkdigit), f"invalid[{i}]: {invalid_checkdigit}"
         
        
-    def test_is_valid_true(self):
+    def test_is_valid_true(self) -> None:
         """Tests is_valid() for valid values."""
         # self._log.debug("test_is_valid_true() for %s", self_routine.getclass.getname())
 
@@ -202,7 +202,7 @@ class AbstractCheckDigitTest:
             assert self._routine.is_valid(code), f"valid[{i}]: {code}"
 
 
-    def test_missing_code(self):
+    def test_missing_code(self) -> None:
         """Test missing code."""
         # is_valid() None
         assert self._routine.is_valid(None) == False, f"is_valid() None"
@@ -224,21 +224,14 @@ class AbstractCheckDigitTest:
         assert str(e.value) == self._missing_message, f"calculate() Zero Length"
 
 
-    def test_zero_sum(self):
+    def test_zero_sum(self) -> None:
         """Test zero sum"""
         assert not self._routine.is_valid(self._zero_sum), "is_valid() Zero Sum"
         with pytest.raises(Exception) as e:
             self._routine.calculate(self._zero_sum)
         assert str(e.value) == "Invalid code, sum is zero", "is_valid() Zero Sum"
 
-
-
-    # # Test: serialization (using pickle)
-    # def test_serialization(self):
-    #     # Assume that the routine is pickle-serializable.
-    #     try:
-    #         serialized = pickle.dumps(self.routine)
-    #         deserialized = pickle.loads(serialized)
-    #         assert deserialized is not None
-    #     except Exception as e:
-    #         pytest.fail(f"{self.routine.__class__.__name__} error during serialization/deserialization: {e}")
+    
+    # def test_serialization(self) -> None:
+    #     """ Test validator serialization"""
+    #     pass

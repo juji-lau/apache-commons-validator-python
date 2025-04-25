@@ -94,6 +94,7 @@ class FormSet:
             name (str): The constant name.
             value (str): The constant value.
         """
+        print("Adding FormSet constant")
         if name in self.__constants:
             self._get_log().error(
                 "Constant %s already exists in FormSet - ignoring.", name
@@ -242,7 +243,7 @@ class FormSet:
             global_constants (Dict[str, str]): Global constants to be used during processing.
         """
         for f in self.__forms.values():
-            f.process(global_constants, self.__constants, self.__forms)
+            f._process(global_constants, self.__constants, self.__forms)
         self.__processed = True
 
     @country.setter

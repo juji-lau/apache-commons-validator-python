@@ -17,8 +17,8 @@ limitations under the License.
 
 import logging
 from typing import Optional
+
 from src.main.form_set import FormSet
-from src.main.validator_resources import ValidatorResources
 
 
 class FormSetFactory:
@@ -36,11 +36,11 @@ class FormSetFactory:
 
     def create_form_set(
         self,
-        resources: ValidatorResources,
+        resources: 'ValidatorResources',
         language: Optional[str],
         country: Optional[str],
         variant: Optional[str],
-    ) -> FormSet:
+    ) -> 'FormSet':
         """
         Creates or retrieves a FormSet based on the locale attributes.
 
@@ -55,17 +55,20 @@ class FormSetFactory:
         """
 
         # Retrieve existing FormSet for the given locale
-        form_set = resources.get_form_set(language, country, variant)
+        key = resources.build_locale(language, country, variant)
+        form_set = resources._get_form_sets().get(key)
         if form_set:
             if self.__get_log().isEnabledFor(logging.DEBUG):
                 self.__get_log().debug(f"FormSet[{form_set.display_key()}] found - merging.")
             return form_set
 
         # Create a new FormSet instance
-        form_set = FormSet()
-        form_set.language = language
-        form_set.country = country
-        form_set.variant = variant
+        if form_set is None:
+            form_set = FormSet()
+            form_set.language = language
+            form_set.country = country
+            form_set.variant = variant
+            resources._get_form_sets()[key] = form_set
 
         # Add the new FormSet to the resources
         resources.add_form_set(form_set)
@@ -76,8 +79,8 @@ class FormSetFactory:
         return form_set
 
     def create_object(
-        self, attributes, resources: ValidatorResources
-    ) -> FormSet:
+        self, attributes, resources: 'ValidatorResources'
+    ) -> 'FormSet':
         """
         Creates or retrieves a FormSet based on XML attributes.
 
@@ -88,6 +91,7 @@ class FormSetFactory:
         Returns:
             FormSet: The created or retrieved FormSet instance.
         """
+        print("FormSetFactory: creating FormSet")
         language = attributes.get("language")
         country = attributes.get("country")
         variant = attributes.get("variant")

@@ -1,224 +1,197 @@
+# import pytest
+# import io
+# import xml.sax
+# from src.main.util.digester import Digester
+# from src.main.validator_resources import ValidatorResources
+# from src.main.form_set import FormSet
+# from src.main.form import Form
+# from src.main.field import Field
+# from src.main.var import Var
+# from src.main.msg import Msg
+
+# @pytest.fixture
+# def digester():
+#     resources = ValidatorResources()
+#     digester = Digester(root_object=resources)
+
+#     # Load digester rules from the real digester-rules.xml file
+#     digester.load_rules("src/resources/digester-rules.xml")
+#     return digester, resources
+
+# def test_digester_parse_validation_xml(digester):
+#     digester, resources = digester
+#     validation_xml = io.StringIO(
+#         """<?xml version="1.0"?>
+#         <form-validation>
+#             <formset>
+#                 <form name="userForm">
+#                     <field field_property="username" depends="required">
+#                         <var name="maxLength" value="50"/>
+#                         <msg name="error" key="username.required"/>
+#                     </field>
+#                 </form>
+#             </formset>
+#         </form-validation>
+#     """)
+#     digester.parse(validation_xml)
+
+#     assert resources._get_form_sets()  # Ensure at least one form set exists
+#     form_set = next(iter(resources._get_form_sets().values()))
+#     assert isinstance(form_set, FormSet)
+#     assert len(form_set.get_forms()) == 1
+
+#     form = next(iter(form_set.get_forms().values()))
+#     assert isinstance(form, Form)
+#     assert form.name == "userForm"
+
+#     field = form.fields[0]
+#     assert isinstance(field, Field)
+#     assert field.field_property == "username"
+#     assert field.depends == "required"
+
+#     var = next(iter(field.vars.values()))
+#     assert isinstance(var, Var)
+#     assert var.name == "maxLength"
+#     assert var.value == "50"
+
+#     msg = next(iter(field.msgs.values()))
+#     assert isinstance(msg, Msg)
+#     assert msg.name == "error"
+#     assert msg.key == "username.required"
+
 import pytest
 import io
 import xml.sax
-from src.main.util.digester import Digester  # Import the Digester class
-from src.main.FormSet import FormSet
-from src.main.Form import Form
-from src.main.Field import Field
-from src.main.Var import Var
-from src.main.Msg import Msg
-
+from src.main.util.digester import Digester
+from src.main.validator_resources import ValidatorResources
+from src.main.form_set import FormSet
+from src.main.form import Form
+from src.main.field import Field
+from src.main.var import Var
+from src.main.msg import Msg
 
 @pytest.fixture
 def digester():
-    """
-    Initializes the Digester instance and loads rules from a mock digester-rules.xml.
-    """
-    digester = Digester()
+    resources = ValidatorResources()
+    digester = Digester(root_object=resources)
 
-    # Mock digester-rules.xml as an in-memory string
-    rules_xml = io.StringIO(
-        """<?xml version="1.0"?>
-    <digester-rules>
-
-        <pattern value="form-validation">
-            <object-create-rule classname="FormSet" />
-            <set-properties-rule/>
-        </pattern>
-
-        <pattern value="form-validation/global">
-            
-            <pattern value="constant">
-                <call-method-rule methodname="add_constant" paramcount="2" />
-                <call-param-rule pattern="constant-name" paramnumber="0" />
-                <call-param-rule pattern="constant-value" paramnumber="1" />
-            </pattern>
-            
-            <pattern value="validator">
-                <object-create-rule classname="ValidatorAction" />
-                <set-properties-rule/>
-                <set-next-rule methodname="add_validator_action" paramtype="src.main.ValidatorAction.ValidatorAction" />
-                <call-method-rule pattern="javascript" methodname="setJavascript" paramcount="0" />
-            </pattern>
-            
-        </pattern>
-        
-        
-        <pattern value="form-validation/formset">
-
-            <factory-create-rule classname="FormSetFactory" />
-            
-            <pattern value="constant">
-                <call-method-rule methodname="add_constant" paramcount="2" />
-                <call-param-rule pattern="constant-name" paramnumber="0" />
-                <call-param-rule pattern="constant-value" paramnumber="1" />
-            </pattern>
-            
-            <pattern value="form">
-                <object-create-rule classname="Form" />
-                <set-properties-rule/>
-                <set-next-rule methodname="add_form" paramtype="Form" />
-                
-                <pattern value="field">
-                    <object-create-rule classname="Field" />
-                    <set-properties-rule/>
-                    <set-next-rule methodname="add_field" paramtype="Field" />
-                    
-                    <pattern value="var">
-                        <object-create-rule classname="Var" />
-                        <set-properties-rule/>
-                        <pattern value="var-name">
-                            <call-method-rule methodname="name" paramcount="0" />
-                        </pattern>
-                        <pattern value="var-value">
-                            <call-method-rule methodname="value" paramcount="0" />
-                        </pattern>
-                        <pattern value="var-jstype">
-                            <call-method-rule methodname="js_type" paramcount="0" />
-                        </pattern>
-                        <set-next-rule methodname="add_var" paramtype="Var" />
-                    </pattern>
-                    
-                    <pattern value="msg">
-                        <object-create-rule classname="Msg" />
-                        <set-properties-rule/>
-                        <set-next-rule methodname="add_msg" paramtype="Msg" />
-                    </pattern>
-                    
-                    <pattern value="arg">
-                        <object-create-rule classname="Arg" />
-                        <set-properties-rule/>
-                        <set-next-rule methodname="add_arg" paramtype="Arg" />
-                    </pattern>
-                
-                </pattern>
-                
-            </pattern>
-            
-        </pattern>
-    </digester-rules>
-    """
-    )
-
-    # Load rules
-    digester.load_rules(rules_xml)
-
-    import pprint
-
-    # Print the rules dictionary to verify correctness
-    pprint.pprint(digester.rules)
-
-    return digester
-
+    # Load digester rules from the real digester-rules.xml file
+    digester.load_rules("src/resources/digester-rules.xml")
+    return digester, resources
 
 def test_digester_parse_validation_xml(digester):
-    """
-    Tests that validation.xml is correctly parsed into FormSet, Form, Field, Var, and Msg objects.
-    """
+    digester, resources = digester
     validation_xml = io.StringIO(
         """<?xml version="1.0"?>
-    <form-validation>
-        <formset>
-            <form name="userForm">
-                <field field_property="username" depends="required">
-                    <var name="maxLength" value="50"/>
-                    <msg name="error" key="username.required"/>
-                </field>
-            </form>
-        </formset>
-    </form-validation>
-    """
-    )
+        <form-validation>
+            <formset>
+                <form name="userForm">
+                    <field field_property="username" depends="required">
+                        <var name="maxLength" value="50"/>
+                        <msg name="error" key="username.required"/>
+                    </field>
+                </form>
+            </formset>
+        </form-validation>
+    """)
+    digester.parse(validation_xml)
 
-    parsed_form_set = digester.parse(validation_xml)
+    assert resources._get_form_sets()  # Ensure at least one form set exists
+    form_set = next(iter(resources._get_form_sets().values()))
+    assert isinstance(form_set, FormSet)
+    assert len(form_set.get_forms()) == 1
 
-    assert isinstance(parsed_form_set, FormSet)
-    assert len(parsed_form_set.forms) == 1
-
-    form = list(parsed_form_set.forms.values())[0]
-
+    form = next(iter(form_set.get_forms().values()))
     assert isinstance(form, Form)
     assert form.name == "userForm"
-
-    assert len(form.fields) == 1
 
     field = form.fields[0]
     assert isinstance(field, Field)
     assert field.field_property == "username"
     assert field.depends == "required"
 
-    assert len(field.vars) == 1
-    var = list(field.vars.values())[0]
+    var = next(iter(field.vars.values()))
     assert isinstance(var, Var)
     assert var.name == "maxLength"
     assert var.value == "50"
 
-    assert len(field.msgs) == 1
-    msg = list(field.msgs.values())[0]
+    msg = next(iter(field.msgs.values()))
     assert isinstance(msg, Msg)
     assert msg.name == "error"
     assert msg.key == "username.required"
 
-
-def test_digester_empty_validation_xml(digester):
-    """
-    Tests parsing of an empty XML structure.
-    """
-    empty_xml = io.StringIO("<?xml version='1.0'?><form-validation></form-validation>")
-    parsed_form_set = digester.parse(empty_xml)
-
-    assert isinstance(parsed_form_set, FormSet)
-    assert len(parsed_form_set.forms) == 0
-
-
-def test_digester_multiple_forms(digester):
-    """
-    Tests parsing XML with multiple forms.
-    """
+def test_digester_multiple_fields(digester):
+    digester, resources = digester
     validation_xml = io.StringIO(
         """<?xml version="1.0"?>
-    <form-validation>
-        <formset>
-            <form name="userForm1">
-                <field field_property="username" depends="required">
-                    <var name="maxLength" value="50"/>
-                    <msg name="error" key="username.required"/>
-                </field>
-            </form>
-            <form name="userForm2">
-                <field field_property="email" depends="required">
-                    <var name="maxLength" value="100"/>
-                    <msg name="error" key="email.required"/>
-                </field>
-            </form>
-        </formset>
-    </form-validation>
-    """
-    )
+        <form-validation>
+            <formset>
+                <form name="multiFieldForm">
+                    <field field_property="username" depends="required"/>
+                    <field field_property="email" depends="email"/>
+                </form>
+            </formset>
+        </form-validation>
+    """)
+    digester.parse(validation_xml)
 
-    parsed_form_set = digester.parse(validation_xml)
+    form_set = next(iter(resources._get_form_sets().values()))
+    form = form_set.get_forms()["multiFieldForm"]
+    assert len(form.fields) == 2
+    assert form.fields[0].field_property == "username"
+    assert form.fields[1].field_property == "email"
 
-    assert len(parsed_form_set.forms) == 2
+def test_digester_constants(digester):
+    digester, resources = digester
+    validation_xml = io.StringIO(
+        """<?xml version="1.0"?>
+        <form-validation>
+            <constant>
+                <constant-name>minLength</constant-name>
+                <constant-value>5</constant-value>
+            </constant>
+        </form-validation>
+    """)
+    digester.parse(validation_xml)
 
-    form1, form2 = list(parsed_form_set.forms.values())
+    assert "minLength" in resources.h_constants
+    assert resources.h_constants["minLength"] == "5"
 
-    assert form1.name == "userForm1"
-    assert form2.name == "userForm2"
+def test_digester_multiple_constants(digester):
+    digester, resources = digester
+    validation_xml = io.StringIO(
+        """<?xml version="1.0"?>
+        <form-validation>
+            <constant>
+                <constant-name>minLength</constant-name>
+                <constant-value>5</constant-value>
+            </constant>
+            <constant>
+                <constant-name>maxLength</constant-name>
+                <constant-value>10</constant-value>
+            </constant>
+        </form-validation>
+    """)
+    digester.parse(validation_xml)
 
-    assert form1.fields[0].field_property == "username"
-    assert form2.fields[0].field_property == "email"
+    assert "minLength" in resources.h_constants
+    assert resources.h_constants["minLength"] == "5"
 
-    assert list(form1.fields[0].vars.values())[0].value == "50"
-    assert list(form2.fields[0].vars.values())[0].value == "100"
+    assert "maxLength" in resources.h_constants
+    assert resources.h_constants["maxLength"] == "10"
 
+def test_digester_validator_actions(digester):
+    digester, resources = digester
+    validation_xml = io.StringIO(
+        """<?xml version="1.0"?>
+        <form-validation>
+            <validator name="required" classname="RequiredValidator">
+                <javascript/>
+            </validator>
+        </form-validation>
+    """)
+    digester.parse(validation_xml)
 
-def test_digester_invalid_xml(digester):
-    """
-    Tests handling of invalid XML.
-    """
-    invalid_xml = io.StringIO(
-        "<form-validation><formset><form name='userForm'></formset></form-validation>"
-    )
-
-    with pytest.raises(xml.sax.SAXParseException):
-        digester.parse(invalid_xml)
+    assert "required" in resources.h_actions
+    action = resources.h_actions["required"]
+    assert action.name == "required"

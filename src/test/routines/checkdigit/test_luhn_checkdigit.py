@@ -7,7 +7,7 @@ Description:
             test.java.org.apache.commons.validator.routines.checkdigit.LuhnCheckDigitTest.java
             (https://github.com/apache/commons-validator/blob/master/src/test/java/org/apache/commons/validator/routines/checkdigit/LuhnCheckDigitTest.java)
 Author: Alicia Chu
-License (Taken from apache.commons.validator.routines.checkdigit.ISBN10CheckDigitTest.java):
+License (Taken from apache.commons.validator.routines.checkdigit.LuhnCheckDigitTest.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements. See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.

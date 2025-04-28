@@ -35,8 +35,28 @@ from src.main.routines.checkdigit.checkdigit import CheckDigit
 from src.main.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
 
 class CreditCardValidator:
+    """
+    Validates credit card numbers based on known issuer patterns, numeric format,
+    and Luhn check digit rules.
+
+    This class supports multiple built-in credit card types such as Visa, MasterCard, 
+    American Express, Discover, Diners, and VPay. It can also be configured with 
+    custom validation rules, either through regular expressions or prefix-based 
+    range validation.
+
+    Attributes:
+        serializable (bool): Indicates that instances can be serialized (always True).
+        cloneable (bool): Indicates whether instances can be cloned (always False).
+
+    Usage:
+        - Use the default constructor to validate common card types.
+        - Use `generic_credit_card_validator()` to validate any numeric card 
+          number within a length range using only Luhn check.
+        - Extend with custom `CodeValidator` or range-based validators for
+          specialized card types.
+    """
     serializable = True    # class is serializable
-    clone = False          # class is not cloneable
+    cloneable = False      # class is not cloneable
     
     class CreditCardRange:
         """

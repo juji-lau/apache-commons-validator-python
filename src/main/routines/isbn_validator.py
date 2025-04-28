@@ -3,7 +3,7 @@ Module Name: isbn_validator.py
 Description:
     Translates apache.commons.validator.routines.ISBNValidator.java
     This module provides a class `ISBNValidator` for validating ISBN-10 and ISBN-13 codes.
-    It also supports converting ISBN-10 codes to ISBN-13 if the `convert` attribute is set to `True`.
+    It also supports converting ISBN-10 codes to ISBN-13 if the `convert` attribute is set to `fov`.
     The class uses regular expressions to validate the formats and check digits for ISBN-10 and ISBN-13 codes.
     It also allows ISBN-10 codes to be converted to ISBN-13 using specific conversion logic.
 
@@ -42,14 +42,14 @@ class ISBNValidator:
     A validator class for ISBN-10 and ISBN-13 codes.
 
     This class validates whether a code is a valid ISBN-10 or ISBN-13 and provides the ability
-    to convert ISBN-10 codes to ISBN-13 if the `convert` property is set to `True`.
+    to convert ISBN-10 codes to ISBN-13 if the `convert` property is set to ``True``.
 
     Attributes:
         convert (bool): If True, all ISBN-10 codes will be converted to ISBN-13.
         isbn10_validator (CodeValidator): Validator instance for ISBN-10 codes.
         isbn13_validator (CodeValidator): Validator instance for ISBN-13 codes.
         serializable (bool): Indicates if the object is serializable.
-        clone (bool): Indicates if the object can be cloned.
+        cloneable (bool): Indicates if the object can be cloned.
 
     Constants:
         ISBN_10_LEN (int): The length of an ISBN-10 code.
@@ -63,7 +63,7 @@ class ISBNValidator:
 
     # Attributes to manage serialization and cloning capabilities
     serializable = True    # class is serializable
-    clone = False          # class is not cloneable
+    cloneable = False      # class is not cloneable
     
     # Constants
     __ISBN_10_LEN = 10
@@ -108,8 +108,8 @@ class ISBNValidator:
 
         Args:
             convert (bool): 
-                `True` if valid ISBN-10 codes should be converted to ISBN-13 codes.
-                `False` if valid ISBN-10 codes should be returned unchanged.
+                ``True`` if valid ISBN-10 codes should be converted to ISBN-13 codes.
+                ``False`` if valid ISBN-10 codes should be returned unchanged.
             
         Returns:
             A singleton instance of the ISBN validator.

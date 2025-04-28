@@ -91,12 +91,12 @@ class CodeValidator:
         min_length (int): The minimum length of the code.
         max_length (int): The maximum length of the code.
         serializable (bool): Indicates if the object is serializable (class attribute).
-        clone (bool): Indicates if the object can be cloned (class attribute).
+        cloneable (bool): Indicates if the object can be cloned (class attribute).
     """
     
     # Attributes to manage serialization and cloning capabilities
     serializable = True    # class is serializable
-    clone = False          # class is not cloneable
+    cloneable = False      # class is not cloneable
 
     def __init__(self, *, regex:str = None, regex_validator:RegexValidator=None, length:int=None, min_length:int = -1, max_length:int = -1, checkdigit:CheckDigit=None):
         """

@@ -24,7 +24,7 @@ class AbstractFormatValidator(ABC):
     This is a base class for building Date and Number Validators using format parsing.
     """
     serializable = True
-    clonable = True
+    cloneable = True
 
     def __init__(self, strict: bool):
         """

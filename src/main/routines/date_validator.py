@@ -75,7 +75,7 @@ class DateValidator(AbstractCalendarValidator):
 
     __VALIDATOR: Optional[DateValidator] = None  # Singleton instance
 
-    def __init__(self, *, strict: bool = True, date_style: int = 3) -> None:
+    def __init__(self, *, strict: bool = True, date_style:int=3) -> None:
         """
         Constructs a DateValidator instance with configurable parsing strictness and date style.
 
@@ -298,30 +298,4 @@ class DateValidator(AbstractCalendarValidator):
         Returns:
             Optional[datetime]: A valid datetime object if parsing succeeds, or None if invalid.
         """
-        # try:
-        #     parsed: Optional[datetime] = self._parse(value, pattern, locale, time_zone)
-        #     return parsed
-        # except (ValueError, TypeError):
-        #     return None
-        if pattern is None:
-            return self._parse(value=value)
-        
-        if locale is None:
-            dt = self._parse(value=value)
-        else:
-            dt = self._parse(value, locale = locale)
-            if dt is None:
-                return None
-        # Set the timezone
-        if time_zone is None:
-            # TODO: get default time zone
-            dt = dt.replace(tzinfo=time_zone)
-        else:
-            dt = dt.astimezone(time_zone)
-        
-        return dt
-
-
-
-
-    
+        return self._parse(value, pattern, locale, time_zone)

@@ -30,7 +30,7 @@ from datetime import datetime, tzinfo
 from dateutil.tz import gettz
 from typing import Optional, Final, Callable
 from src.main.routines.date_validator import DateValidator
-from src.main.util.datetime_helpers import J2PyLocale
+from src.main.util.datetime_helpers import J2PyLocale, debug, date_get_time
 from src.test.routines.test_abstract_calendar_validator import TestAbstractCalendarValidator
 from src.test.util.test_timezones import TestTimeZones
 
@@ -71,57 +71,47 @@ class TestDateValidator(TestAbstractCalendarValidator):
     diff_hour = TestAbstractCalendarValidator._create_date(tz_gmt, test_date, 115922)
     date20050822 = TestAbstractCalendarValidator._create_date(tz_gmt, 20050822, same_time) 
     same_day_two_am = TestAbstractCalendarValidator._create_date(tz_gmt, test_date, 20000)
-
-    # Compare dates
-    @pytest.mark.parametrize (
-        "compare_dt, input_tz, expected_output, assert_msg", [
-            (date20050824, tz_gmt, -1,"Expected value < 2005-08-24"),
-            (diff_hour, tz_gmt, 0, "Expected same date ignoring time"),
-            (date20050822, tz_gmt, 1, "Expected value > 2005-08-22"),
-            # Test using alternative timezone
-            (date20050824, TestTimeZones.EST, -1, "Expected value to be earlier than 2005-08-24 in EST"),
-            (diff_hour, TestTimeZones.EST, 0, "Expected value and diff_hour to be same date in EST"),
-            (same_day_two_am, TestTimeZones.EST, 1, "Expected value to be later than 2005-08-23 02:00:00 in EST"),
-            (date20050822, TestTimeZones.EST, 1, "Expected value to be later than 2005-08-22 in EST"),
-
-        ]
-    )
-    def test_compare_dates(self, value:datetime, compare_dt:datetime, input_tz:tzinfo, expected_output:int, assert_msg:str) -> None:
-        """ Tests the ``DateValidator.compare_dates()`` method."""
-        assert self.date_validator.compare_dates(value, compare_dt, input_tz) == expected_output, assert_msg
-
     # Compare weeks
     date20050830 = TestAbstractCalendarValidator._create_date(tz_gmt, 20050830, same_time)
     date20050816 = TestAbstractCalendarValidator._create_date(tz_gmt, 20050816, same_time)
-    @pytest.mark.parametrize (
-        "compare_dt, expected_output, assert_msg", [
-            (date20050830, -1,"Expected value in earlier week"),
-            (date20050824, 0, "Expected same week (24th)"),
-            (date20050822, 0, "Expected same week (22nd)"),
-            (date20050822, 0, "Expected same week (22nd again)"),
-            (date20050816, 1, "Expected value in later week"),
-        ]
-    )
-    def test_compare_weeks(self, value:datetime, compare_dt:datetime, expected_output:int, assert_msg:str) -> None:
-        """ Tests the ``DateValidator.compare_weeks()`` method."""
-        assert self.date_validator.compare_weeks(value, compare_dt, self.tz) == expected_output, assert_msg
-    
     # Compare months
     date20050901 = TestAbstractCalendarValidator._create_date(tz_gmt, 20050901, same_time)
     date20050801 = TestAbstractCalendarValidator._create_date(tz_gmt, 20050801, same_time)
     date20050731 = TestAbstractCalendarValidator._create_date(tz_gmt, 20050731, same_time)
+
+    # Compare dates
     @pytest.mark.parametrize (
-        "compare_dt, expected_output, assert_msg", [
-            (date20050901, -1, "Expected value in earlier month"),
-            (date20050830, 0,"Expected same month (30th)"),
-            (date20050801, 0, "Expected same month (1st)"),
-            (date20050816, 0, "Expected same month (16th)"),
-            (date20050731, 1, "Expected value in later month"),
+        "compare_func, compare_dt, input_tz, expected_output, assert_msg, expected_time", [
+            ("compare_dates", date20050824, tz_gmt, -1,"Expected value < 2005-08-24", 1124887522000),
+            ("compare_dates", diff_hour, tz_gmt, 0, "Expected same date ignoring time", 1124798362000),
+            ("compare_dates", date20050822, tz_gmt, 1, "Expected value > 2005-08-22", 1124714722000),
+            # Test using alternative timezone
+            ("compare_dates", date20050824, TestTimeZones.EST, -1, "Expected value to be earlier than 2005-08-24 in EST", 1124887522000),
+            ("compare_dates", diff_hour, TestTimeZones.EST, 0, "Expected value and diff_hour to be same date in EST", 1124798362000),
+            ("compare_dates", same_day_two_am, TestTimeZones.EST, 1, "Expected value to be later than 2005-08-23 02:00:00 in EST", 1124762400000),
+            ("compare_dates", date20050822, TestTimeZones.EST, 1, "Expected value to be later than 2005-08-22 in EST", 1124714722000),
+
+            # Compare Weeks
+            ("compare_weeks", date20050830, tz_gmt, -1,"Expected value in earlier week", 1125405922000),
+            ("compare_weeks", date20050824, tz_gmt, 0, "Expected same week (24th)", 1124887522000),
+            ("compare_weeks", date20050822,tz_gmt, 0, "Expected same week (22nd)", 1124714722000),
+            ("compare_weeks", date20050822, tz_gmt, 0, "Expected same week (22nd again)", 1124714722000),
+            ("compare_weeks", date20050816, tz_gmt, 1, "Expected value in later week", 1124196322000),
+
+            # Compare Months:
+            ("compare_months", date20050901, tz_gmt, -1, "Expected value in earlier month", 1125578722000),
+            ("compare_months", date20050830, tz_gmt, 0,"Expected same month (30th)", 1125405922000),
+            ("compare_months", date20050801, tz_gmt, 0, "Expected same month (1st)", 1122900322000),
+            ("compare_months", date20050816, tz_gmt, 0, "Expected same month (16th)", 1124196322000),
+            ("compare_months", date20050731, tz_gmt, 1, "Expected value in later month", 1122813922000),   
         ]
     )
-    def test_compare_months(self, value:datetime, compare_dt:datetime, expected_output:int, assert_msg:str) -> None:
-        """ Tests the ``DateValidator.compare_months()`` method."""
-        assert self.date_validator.compare_months(value, compare_dt, self.tz) == expected_output, assert_msg
+    def test_compare_funcs(self, compare_func:str, value:datetime, compare_dt:datetime, input_tz:tzinfo, expected_output:int, assert_msg:str, expected_time:int) -> None:
+        """ Tests the ``DateValidator.compare_dates()`` method.  Added a test to ensure the date was intialized correctly"""
+        func = getattr(self.date_validator, compare_func)
+        assert expected_time == date_get_time(compare_dt), debug(compare_dt)
+        assert func(value, compare_dt, input_tz) == expected_output, assert_msg
+
 
 
     # Compare quarters (not implemented)
@@ -187,10 +177,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
     patternVal = "2005-12-31"
     germanPattern = "dd MMM yyyy"
     
-    # 
     germanVal = "31 Dez. 2005"
-
-
     localeVal = "31.12.2005"
     defaultVal = "12/31/05"
     xxxx = "XXXX"
@@ -199,12 +186,20 @@ class TestDateValidator(TestAbstractCalendarValidator):
     @pytest.mark.parametrize (
         "assert_type, input_val, input_pattern, input_locale, assert_msg", [
             ("dt", defaultVal, None, default_locale, "validate(A) default"),
+            ("dt", defaultVal, None,  None, "validate(A) default, no locale "),   # Added test case, truly passing in no locale
+
             ("dt", localeVal, None, locale, "validate(A) locale "),
             ("dt", patternVal, pattern, default_locale, "validate(A) pattern "),
+            ("dt", patternVal, pattern, None, "validate(A) pattern, no locale "),   # Added test case, truly passing in no locale
+
             ("dt", germanVal, germanPattern, J2PyLocale.GERMAN, "validate(A) both"),
             (None, xxxx, None, default_locale, "validate(B) default"),
+            (None, xxxx, None, None, "validate(B) default, no locale "),   # Added test case, truly passing in no locale
+            
             (None, xxxx, None, locale, "validate(B) locale "),
             (None, xxxx, pattern, default_locale, "validate(B) pattern"),
+            (None, xxxx, pattern, None, "validate(B) pattern, no locale "),   # Added test case, truly passing in no locale
+
             (None, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "validate(B) both")
         ]
     )
@@ -216,15 +211,17 @@ class TestDateValidator(TestAbstractCalendarValidator):
         # Don't rely on specific German format - it varies between JVMs
         output_dt = DateValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale)
         if assert_type == "dt":
-            assert expected_dt.date() == output_dt.date(), assert_msg
+            assert date_get_time(expected_dt) == date_get_time(output_dt), assert_msg
         else:
             assert output_dt is None, assert_msg
 
     @pytest.mark.parametrize (
         "input_val, input_pattern, input_locale, assert_msg", [
             (defaultVal, None, default_locale,  "validate(C) default"),
+            (defaultVal, None, None,  "validate(C) default, no locale "),   # Added test case, truly passing in no locale
             (localeVal, None, locale, "validate(C) locale "),
             (patternVal, pattern, default_locale, "validate(C) pattern "),
+            (patternVal, pattern, None, "validate(C) pattern, no locale "),   # Added test case, truly passing in no locale
             (germanVal, germanPattern, J2PyLocale.GERMAN, "validate(C) both"),  
         ]
     )
@@ -233,22 +230,32 @@ class TestDateValidator(TestAbstractCalendarValidator):
         Test `DateValidator.is_valid()`method with a different timezone.  
         # Also includes test cases in `test`AbstractCalendarValidatorTest.java`.
         """
-        # Want to check the timezone differences; can't use .time() because that's time-zone naive. 
-        # Can't use .date() because that's in-sensitive to hours.
+        # Check to make sure testing datetimes were initialized correctly.
         assert expected_dt.tzinfo != expected_zone.tzinfo, f"default/EET same {zone}"
-        assert expected_zone.date() == DateValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone).date(), assert_msg
+        assert 1136005200000 == date_get_time(expected_dt), f"Messed up expected date \n {debug(1136005200000,expected_dt)}"
+        assert 1135980000000 == date_get_time(expected_zone), f"Messed up timezone creation \n {debug(1136005200000,expected_zone)}"
+        output_dt = DateValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone)
+        assert date_get_time(expected_zone) == date_get_time(output_dt), assert_msg
 
     @pytest.mark.parametrize (
         "assert_type, input_val, input_pattern, input_locale, assert_msg", [
             # True
             (True, defaultVal, None, default_locale, "isValid(A) default"),
+            (True, defaultVal, None, None, "isValid(A) default, no locale "),   # Added test case, truly passing in no locale
+
             (True, localeVal, None, locale, "isValid(A) locale "),
             (True, patternVal, pattern, default_locale, "isValid(A) pattern "),
+            (True, patternVal, pattern, None, "isValid(A) pattern, no locale "),   # Added test case, truly passing in no locale
+
             (True, germanVal, germanPattern, J2PyLocale.GERMAN, "isValid(A) both"),
             # False
             (False, xxxx, None, default_locale, "is_valid(B) default"),
+            (False, xxxx, None, None, "is_valid(B) default, no locale "),   # Added test case, truly passing in no locale
+
             (False, xxxx, None, locale, "is_valid(B) locale "),
             (False, xxxx, pattern, default_locale, "is_valid(B) pattern"),
+            (False, xxxx, pattern, None, "is_valid(B) pattern, no locale "),   # Added test case, truly passing in no locale
+
             (False, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "is_valid(B) both")
         ]
     )

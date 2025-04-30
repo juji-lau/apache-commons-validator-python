@@ -40,12 +40,11 @@ Changes:
 
 """
 from __future__ import annotations            
-from dateparser import parse
 from datetime import datetime, date, time, tzinfo
 from typing import Optional, Callable
 
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
-from src.main.util.datetime_helpers import timezone_has_same_rules, locale_reg2dp
+from src.main.util.datetime_helpers import timezone_has_same_rules
 
 class CalendarValidator(AbstractCalendarValidator):
     """
@@ -101,7 +100,7 @@ class CalendarValidator(AbstractCalendarValidator):
     serializable = True    # Class extends AbstracCalendarvalidator which is serializable
     cloneable = False      # Class extends AbstracCalendarvalidator which is not cloneable
 
-    def __init__(self, *, strict:bool = True, date_style:int = 3):
+    def __init__(self, *, strict:bool = True, date_style:int=3):
         """
         Constructs an instance of the CalendarValidator with the specified params.
 
@@ -268,20 +267,24 @@ class CalendarValidator(AbstractCalendarValidator):
         Returns:
             The parsed `datetime` if valid or ``None`` if invalid.
         """
-        if pattern is None:
-            return self._parse(value=value, time_zone)
+        return self._parse(value, pattern, locale, time_zone)
+        # if time_zone is None:
+        #     # Get default timezone if none
+        #     time_zone = get_default_tzinfo()
+        # if pattern is None:
+        #     return self._parse(value=value, time_zone=time_zone)
         
-        if locale is None:
-            dt = self._parse(value=value)
-        else:
-            dt = self._parse(value, locale = locale)
-            if dt is None:
-                return None
-        # Set the timezone
-        if time_zone is None:
-            # TODO: get default time zone
-            dt = dt.replace(tzinfo=time_zone)
-        else:
-            dt = dt.astimezone(time_zone)
+        # if locale is None:
+        #     dt = self._parse(value=value, time_zone=time_zone)
+        # else:
+        #     dt = self._parse(value, locale = locale, time_zone=time_zone)
+        #     if dt is None:
+        #         return None
+        # # # Set the timezone
+        # # if time_zone is None:
+        # #     # TODO: get default time zone
+        # #     dt = dt.replace(tzinfo=time_zone)
+        # # else:
+        # #     dt = dt.astimezone(time_zone)
         
-        return dt
+        # return dt

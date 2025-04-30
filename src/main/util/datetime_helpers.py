@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from babel.dates import parse_pattern
+from babel.dates import parse_pattern, parse_date, parse_time
 from datetime import timedelta, timezone, time, date, datetime, tzinfo
 # timezone is a concrete implentation of abstract tzinfo class
 from dateutil.tz import tzlocal
@@ -8,10 +8,24 @@ from dateutil.tz import tzlocal
 from typing import Optional, Final, Union
 import re
 from zoneinfo import ZoneInfo
+from tzlocal import get_localzone_name
 
-def debug(d1:datetime, d2:datetime) -> str:
-    return f"Assert failed; \n Expected: {d1} and time {date_get_time(d1)}, and tzinfo: {d1.tzinfo} \n EST Input: {d2} and time: {date_get_time(d2)} and tzinfo: {d2.tzinfo}"
+def debug(d1:object, d2:object=None) -> str:
+    if isinstance(d1, datetime):
+        s1 = f"Expected: {d1} and time {date_get_time(d1)} and tzinfo: {d1.tzinfo}"
+    else:
+        s1 = f"Expected: {d1}"
+    if d2 is not None:
+        if isinstance(d2, datetime):
+            s2 = f"GOT: {d2} and time {date_get_time(d2)} and tzinfo: {d2.tzinfo}"
+        else:
+            s2 = f"GOT: {d2}"
+    else:
+        s2 = "None"
 
+    return f"Assert failed; \n {s1} \n {s2}"
+
+  
 def date_get_time(dt:datetime) -> float:
     """ 
     Python wrapper for Java's ``Date.getTime()`` function.
@@ -158,6 +172,7 @@ class J2PyLocale:
     US:str = "en_US"
     GERMAN:str = "de"
     GERMANY:str = "de_DE"
+    UK:str = "en_GB"
 
 
 # Format a change a datetime to the timezone
@@ -176,6 +191,7 @@ def update_tz(dt:datetime, tz:tzinfo) -> datetime:
 
 locale_reg2dp_dict = {
     'en_US' : 'en-001',
+    # 'en_US' : 'en-US',
     'en-GB' : 'en-150'
 }
 def locale_reg2dp(locale:str) -> str:
@@ -190,11 +206,98 @@ def get_default_tzinfo() -> tzinfo:
     """ 
     Gets the system's default timezone.
     """
-    return datetime.now().astimezone().tzinfo
+    zone_name = get_localzone_name()
+    tz_local = ZoneInfo(zone_name)
+    return tz_local
+    # return datetime.now().astimezone().tzinfo
 
-# def safe_parse()
+def val_is_naive(val:str) -> bool:
 
-#         Attributes:
+    """Return True if dateutil finds a tzinfo in s."""
+    from dateutil import parser
+    try:
+        dt = parser.parse(val, default=None)  # may raise if totally unparsable
+        if dt.tzinfo == None:
+            print(f"HELPER: val is naive: {val}")
+            return True
+        print(f"HELPER: val is aware: {val} with tzinfo {dt.tzinfo}")
+        # return dt.tzinfo is None
+        return False
+    except Exception as e:
+        print(f"HELPER: can't parse val: {val} with err message; {e}")
+        return False
+
+def get_tzname(tz:tzinfo):
+    dt:datetime = datetime.now().astimezone(tz=tz)
+    return dt.tzname()
+
+
+def babel_parse_date(value, locale, pattern, time_zone) -> datetime:
+    try:
+        some_date = parse_date(string=value, locale=locale)
+        none_time = time(0, 0, 0)
+        dt = datetime.combine(some_date, none_time, tzinfo = time_zone)
+        if dt is None:
+            raise Exception
+    except Exception as e:
+        print(f"Babel_helper parse couldn't parse this this string. \n Message: {e}")
+        return None
+    return dt
+
+def babel_parse_time(value, locale, pattern, time_zone) -> datetime:
+    try:
+        epoch_date = date(1970, 1, 1)
+        some_time = parse_time(value, locale)
+        dt = datetime.combine(epoch_date, some_time, tzinfo = time_zone)
+        if dt is None:
+            raise Exception
+    except Exception as e:
+        print(f"Babel_helper parse couldn't parse this this string. \n Message: {e}")
+        return None
+    return dt
+
+zero_str = {
+    ""
+}
+
+def babel_parse_datetime(value, locale, pattern, time_zone) -> datetime:
+    try:
+        date = parse_date(string=value, locale=locale)
+        time = parse_time(string=value, locale=locale)
+        dt = datetime.combine(date, time, tzinfo = time_zone)
+        if dt is None:
+            raise Exception
+    except Exception as e:
+        print(f"Babel_helper parse couldn't parse this this string. \n Message: {e}")
+        return None
+    return dt
+
+def ldml2strptime(style_format:str = 'short', locale:str = None):
+    """
+    Gets the pattern to use in ``datetime.strptime()`` based on the input locale.
+    """
+    from babel.dates import get_time_format
+    if locale is None:
+        pattern = str(get_time_format(format=style_format))
+    else:
+        pattern = str(get_time_format(style_format, locale=locale))
+    
+    output = fmt_java2py(pattern)
+    print(f"LDML mapped {pattern} to {output}")
+    return output
+    LDML_TO_STRPTIME = [
+        (r"yyyy", "%Y"),
+        (r"yy",   "%y"),
+        (r"MM",   "%m"),
+        (r"dd",   "%d"),
+        (r"HH",   "%H"),
+        (r"hh",   "%I"),
+        (r"mm",   "%M"),
+        (r"ss",   "%S"),
+        (r"\ba\b", "%p"),           # careful: match 'a' token not in words
+        # ... add more rules as needed
+    ]
+#  Attributes:
             # YEAR (int): The year.
             # MONTH (int): The month.
             #     The first month of the year (JANUARY) has a value of 0.

@@ -27,7 +27,7 @@ from typing import Final, Optional, Union
 from datetime import date, time, tzinfo, timedelta, timezone, datetime
 
 # from src.main.util.calendar_wrapper import Calendar
-from src.main.util.Locale import Locale
+from src.main.util.datetime_helpers import get_default_tzinfo
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
 
 class TestAbstractCalendarValidator:
@@ -49,7 +49,7 @@ class TestAbstractCalendarValidator:
         Create a ``datetime`` instance for a specified time zone, date and time.
 
         Args:
-            zone (timezone): The time zone.
+            zone (timezone): The time zone. Use system default if ``None``.
             date (int): The date in yyyyMMdd format.
             time (int): The time in HH:mm:ss format.
         
@@ -65,6 +65,7 @@ class TestAbstractCalendarValidator:
         sec = time % 100
 
         if zone is None:
+            # Get default tzinfo
             calendar = datetime(year, month, day, hour, min, sec, microsecond=0)
         else:
             calendar = datetime(year, month, day, hour, min, sec, microsecond=0, tzinfo=zone)

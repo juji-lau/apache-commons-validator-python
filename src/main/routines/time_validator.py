@@ -191,14 +191,15 @@ class TimeValidator(AbstractCalendarValidator):
         # return value
     
     def validate(
-        self,
+        self, *,
         value: str,
         pattern: Optional[str] = None,
         locale: Optional[str] = None,
         time_zone: Optional[tzinfo] = None
     ) -> Optional[datetime]:
         """
-        Validates and converts a date string into a datetime object using the provided pattern, locale, and time zone.
+        Validates and converts a time string into a datetime object using the provided pattern, locale, and time zone.
+        The datetime will represent the time string elapsed since the epoch (year, month, day will be set to 1970, 1, 1 respectively.)
 
         Args:
             value (str): The input string to validate.
@@ -207,8 +208,12 @@ class TimeValidator(AbstractCalendarValidator):
             time_zone (Optional[tzinfo]): The timezone to apply to the resulting datetime. If None, no change is made.
 
         Returns:
-            Optional[datetime]: A valid datetime object if parsing succeeds, or None if invalid.
+            Optional[datetime]: 
+                A datetime object representing the time-string elapsed since the the Epoch, if parsing succeeds. 
+                ``None`` if invalid.
         """
+        return self._parse(value, pattern, locale, time_zone)
+
         # try:
         #     parsed: Optional[datetime] = self._parse(value, pattern, locale, time_zone)
         #     return parsed

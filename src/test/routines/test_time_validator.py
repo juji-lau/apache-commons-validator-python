@@ -42,7 +42,7 @@ from datetime import datetime, tzinfo
 from dateutil.tz import gettz
 from typing import Optional, Final, Callable
 from src.main.routines.time_validator import TimeValidator
-from src.main.util.datetime_helpers import J2PyLocale, locale_reg2dp
+from src.main.util.datetime_helpers import J2PyLocale, locale_reg2dp, date_get_time, debug
 from src.test.routines.test_abstract_calendar_validator import TestAbstractCalendarValidator
 from src.test.util.test_timezones import TestTimeZones
 # from icu import Locale, LocaleMatcher, Collator, ICUError
@@ -220,11 +220,6 @@ class TestTimeValidator(TestAbstractCalendarValidator):
     hourGreater = _create_time(tz_gmt, test_time + hour, 100)     # +1 hour
     hourLess = _create_time(tz_gmt, test_time - hour, 100)     # -1 hour
     
-    # @pytest.fixture
-    # def value(cls) -> datetime:
-    #     """datetime object used in multiple tests."""
-    #     return _create_time(cls.tz_gmt, cls.test_time, 400)
-
     # Compare time (hours, minutes, seconds, microseconds)
     @pytest.mark.parametrize (
         "compare_dt, expected_output, assert_msg", [
@@ -286,55 +281,66 @@ class TestTimeValidator(TestAbstractCalendarValidator):
     # Test validation methods: (format(), is_valid(), validate()):
 
     # Constants
-    val = "16:49"
+    val = "4:49 PM"
     val_us = "4:49 PM"
-    # default_locale = locale_reg2dp("en-150")
-    # default_locale = 'en-001'
-    # default_locale = 'en-150'
-    # default_locale = 'en_GB'
-    default_locale = '_'.join(('en-GB').split('-'))
+    locale = 'en_GB'
+    val_gb = "16:49"
 
 
     @pytest.mark.parametrize (
         "expected_str, input_pattern, input_locale, assert_msg", [
             ("16-49-23", "HH-mm-ss", None, "Format pattern"),
             (val_us, None, J2PyLocale.US, "Format locale"),
-            (val, None, default_locale, "Format default")
+            (val, None, None, "Format default"),
+            (val_gb, None, locale, "Format great Britain")
         ]
     )
     def test_format(self, expected_str:str, input_pattern:str, input_locale:str, assert_msg:str) -> None:
         """ Test Invalid dates with "locale" validation."""
         # The JVM format varies; calculate expected results.
-        test = TimeValidator.get_instance().validate("16:49:23", "HH:mm:ss", locale='en-GB', time_zone=None)
+        test = TimeValidator.get_instance().validate(value="16:49:23", pattern="HH:mm:ss", locale='en-GB', time_zone=None)
         assert test is not None, "Test Date"
         assert expected_str == self._validator.format(value=test, pattern=input_pattern, locale=input_locale), assert_msg
 
-    def test_locale_valid(self) -> None:
-        """ Test valid dates with ``Locale`` validation. """
-        pass
-    
-    def test_locale_valid(self) -> None:
+    def test_locale_invalid(self) -> None:
         """ Test invalid dates with ``Locale`` validation. """
-        pass
+        for i, invalid_locale in enumerate(self._locale_invalid):
+            text = f"{i} value=[{invalid_locale}] passed "
+            date = self._validator.validate(value=invalid_locale, locale=J2PyLocale.US)
+            print(f"Created date: {date} from string: {invalid_locale}")
+            assert date is None, f"validate() {text}"
+            assert self._validator.is_valid(value=invalid_locale,locale=J2PyLocale.UK) == False, f"is_valid() {text}"
+    
+    # def test_locale_valid( self) -> None:
+    #     """ Test invalid dates with ``Locale`` validation. """
+    #     for i, valid_locale in enumerate(self._locale_valid):
+    #         text = f"{i} value=[{valid_locale}] failed "
+    #         dt = self._validator.validate(valid_locale, J2PyLocale.UK)
+    #         assert dt is not None, f"validate() {text}"
+    #         assert self._validator.is_valid(valid_locale, J2PyLocale.UK) == True, f"is_valid() {text}"
+    #         assert date_get_time(self._locale_expect[i]) == date_get_time(dt), f"FAILED: {debug(self._locale_expect[i], dt)}"
+    #         # assert date_get_time(self._locale_expect[i]) == date_get_time(dt), f"compare {text}"
 
-    def test_pattern_invalid(self) -> None:
-        """ Test Invalid dates with "pattern" validation."""
-        pass
+    # def test_pattern_invalid(self) -> None:
+    #     """ Test Invalid dates with "pattern" validation."""
+    #     pass
+    # from babel.dates import parse_time
 
-    def test_pattern_valid (self) -> None:
-        """Test valid dates with "pattern" validation. """
-        pass
+    # def test_pattern_valid (self) -> None:
+    #     """Test valid dates with "pattern" validation. """
+    #     pass
     
 
     def test_timezone_default(self) -> None:
-        """Test timezone functionality using default timezone, locale, and pattern."""
+        """Test timezone functionality using default timezone, locale of british, and pattern."""
         # result:datetime = self._validator.validate(value="18:01", time_zone = self.tz_gmt)
-        result:datetime = self._validator.validate(value="18:01")
+        result:datetime = self._validator.validate(value="18:01", locale='en_GB')
 
         assert result is not None, "Default result"
+        # assert TimeZones.GMT == result.getTimeZone(), "default zone"
         assert 18 == result.hour, "default hour"
         assert 1 == result.minute, "zone minute"
-        assert None == result.tzinfo
+        # assert None == result.tzinfo
         assert False == True, f"TZ info: {result.tzinfo}, result: {result}"
     
 

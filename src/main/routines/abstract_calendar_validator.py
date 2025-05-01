@@ -729,7 +729,7 @@ class AbstractCalendarValidator(AbstractFormatValidator):
                     used_format = dt_help.ldml2strptime(style_format=time_format)
                     dt = datetime.strptime(value, used_format)
                 except Exception as e:
-                    print(f"INVALID ARGS: {e}")
+                    print(f"INVALID ARGS: no pattern, no locale {e}")
                     dt = None
                 print(f"PARSED TiME no Locale: {dt}")
                 return dt
@@ -737,9 +737,11 @@ class AbstractCalendarValidator(AbstractFormatValidator):
                 # Use provided locale AND initialized style
                 try:
                     used_format = dt_help.ldml2strptime(style_format=time_format, locale=locale)
+                    print(f"format: {used_format}, and value: {value}")
                     dt = datetime.strptime(value, used_format)
+                    print(f"Got dt: {dt}")
                 except Exception as e:
-                    print(f"INVALID ARGS: {e}")
+                    print(f"INVALID ARGS: no pattern, Yes locale {e}, usedPfomrat: {used_format}, value: {value}")
                     dt = None
                 # For now, just return dt
                 print(f"PARSED TiME Yes Locale: {dt}")
@@ -781,41 +783,57 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             if t is None:
                 return None
 
+        # strptime_format = dt_help.fmt_java2py(pattern)
         elif locale is None:
             # Pattern provided, no locale (use pattern only)
-            t = parse(date_string=value, date_formats=[pattern])
+            try:
+                strptime_format = dt_help.fmt_java2py(pattern)
+                t = datetime.strptime(value, strptime_format)
+            except Exception as e:
+                print(f"INValid args: pattern and no locale: {e}")
+                return None
+            # t = parse(date_string=value, date_formats=[pattern])
         else:
             # Locale and pattern BOTH given; use both
-            print(f"Parsingn time locale and pattern BOTH given; use both with bulky parse: locale: {locale}, pattern: {pattern}, value: {value}")
-            # TODO: Figure bulky parse
-            dp_locale = dt_help.locale_reg2dp(locale)
-            t = parse(date_string=value, date_formats=[pattern], locales=[dp_locale])
-            if t is None:
-                if "_" in locale:
-                    lang, country = locale.split("_")
-                    t = parse(value, date_formats = [pattern], languages = [lang])
-                    if t is None:
-                        t = parse(value, date_formats = [pattern], region=country)
-                else:
-                    # Try language only
-                    t = parse(value, languages = [dp_locale])
-                    if t is None:
-                        # Try country only
-                        t = parse(value, region = dp_locale)
-        if t is None:
-            print(f"ABSTRACT.PARSE FAILED, returning None")
-            return None
-        print(f"Parsing time got: {t}")
-        # Now change it by setting the year, month, day to the epoch.
-        if t.time() == time(0, 0, 0):
-            print(f"TIME: parsed a date stirng possibly, dt: {t}, and time: {t.time()}, and value: {value}")
             try:
-                parse_time(value)
+                # strptime_format = dt_help.ldml2strptime(pattern, locale)
+                strptime_format = dt_help.fmt_java2py(pattern)
+                t = datetime.strptime(value, strptime_format)
             except Exception as e:
-                print(f"Really was an invalid time string... {e}")
+                print(f"INValid args: pattern and locale: {e}")
                 return None
+            # return t
+        #     print(f"Parsingn time locale and pattern BOTH given; use both with bulky parse: locale: {locale}, pattern: {pattern}, value: {value}")
+        #     # TODO: Figure bulky parse
+        #     dp_locale = dt_help.locale_reg2dp(locale)
+        #     t = parse(date_string=value, date_formats=[pattern], locales=[dp_locale])
+        #     if t is None:
+        #         if "_" in locale:
+        #             lang, country = locale.split("_")
+        #             t = parse(value, date_formats = [pattern], languages = [lang])
+        #             if t is None:
+        #                 t = parse(value, date_formats = [pattern], region=country)
+        #         else:
+        #             # Try language only
+        #             t = parse(value, languages = [dp_locale])
+        #             if t is None:
+        #                 # Try country only
+        #                 t = parse(value, region = dp_locale)
+        # if t is None:
+        #     print(f"ABSTRACT.PARSE FAILED, returning None")
+        #     return None
+        # print(f"Parsing time got: {t}")
+        # # Now change it by setting the year, month, day to the epoch.
+        # if t.time() == time(0, 0, 0):
+        #     print(f"TIME: parsed a date stirng possibly, dt: {t}, and time: {t.time()}, and value: {value}")
+        #     try:
+        #         parse_time(value)
+        #     except Exception as e:
+        #         print(f"Really was an invalid time string... {e}")
+        #         return None
         epoch_date = date(1970, 1, 1)
-        t = datetime.combine(epoch_date, t.time())
+        t = datetime.combine(epoch_date, t.time(), tzinfo=time_zone)
+        # t = datetime.combine(epoch_date, t.time())
         print(f"Parsing time got: Resetting to epoch: Got: {t}")
         return t
 

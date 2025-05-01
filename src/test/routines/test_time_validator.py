@@ -186,11 +186,11 @@ class TestTimeValidator(TestAbstractCalendarValidator):
 
     def setup_method(self):
         # self.__time_validator:TimeValidator = TimeValidator()
-        print(f"CREATING TINME SETUP")
-        try:
-            locale.setlocale(locale.LC_ALL, 'en_GB')
-        except Exception as e:
-            print(f"FAILED TO SET LOCALE TO en_GB; original: {original_locale}")
+        # print(f"CREATING TINME SETUP")
+        # try:
+        #     locale.setlocale(locale.LC_ALL, 'en_GB')
+        # except Exception as e:
+        #     print(f"FAILED TO SET LOCALE TO en_GB; original: {original_locale}")
         self._validator = TimeValidator()
     
     def teardown_method(self) -> None:
@@ -283,7 +283,7 @@ class TestTimeValidator(TestAbstractCalendarValidator):
     # Constants
     val = "4:49 PM"
     val_us = "4:49 PM"
-    locale = 'en_GB'
+    gb_locale = 'en_GB'
     val_gb = "16:49"
 
 
@@ -292,18 +292,18 @@ class TestTimeValidator(TestAbstractCalendarValidator):
             ("16-49-23", "HH-mm-ss", None, "Format pattern"),
             (val_us, None, J2PyLocale.US, "Format locale"),
             (val, None, None, "Format default"),
-            (val_gb, None, locale, "Format great Britain")
+            (val_gb, None, gb_locale, "Format great Britain")
         ]
     )
     def test_format(self, expected_str:str, input_pattern:str, input_locale:str, assert_msg:str) -> None:
         """ Test Invalid dates with "locale" validation."""
         # The JVM format varies; calculate expected results.
-        test = TimeValidator.get_instance().validate(value="16:49:23", pattern="HH:mm:ss", locale='en-GB', time_zone=None)
+        test = TimeValidator.get_instance().validate(value="16:49:23", pattern="HH:mm:ss", locale='en_GB', time_zone=None)
         assert test is not None, "Test Date"
         assert expected_str == self._validator.format(value=test, pattern=input_pattern, locale=input_locale), assert_msg
 
     def test_locale_invalid(self) -> None:
-        """ Test invalid dates with ``Locale`` validation. """
+        """ Test invalid time strings with ``Locale`` validation. """
         for i, invalid_locale in enumerate(self._locale_invalid):
             text = f"{i} value=[{invalid_locale}] passed "
             date = self._validator.validate(value=invalid_locale, locale=J2PyLocale.US)
@@ -311,72 +311,76 @@ class TestTimeValidator(TestAbstractCalendarValidator):
             assert date is None, f"validate() {text}"
             assert self._validator.is_valid(value=invalid_locale,locale=J2PyLocale.UK) == False, f"is_valid() {text}"
     
-    # def test_locale_valid( self) -> None:
-    #     """ Test invalid dates with ``Locale`` validation. """
-    #     for i, valid_locale in enumerate(self._locale_valid):
-    #         text = f"{i} value=[{valid_locale}] failed "
-    #         dt = self._validator.validate(valid_locale, J2PyLocale.UK)
-    #         assert dt is not None, f"validate() {text}"
-    #         assert self._validator.is_valid(valid_locale, J2PyLocale.UK) == True, f"is_valid() {text}"
-    #         assert date_get_time(self._locale_expect[i]) == date_get_time(dt), f"FAILED: {debug(self._locale_expect[i], dt)}"
-    #         # assert date_get_time(self._locale_expect[i]) == date_get_time(dt), f"compare {text}"
-
-    # def test_pattern_invalid(self) -> None:
-    #     """ Test Invalid dates with "pattern" validation."""
-    #     pass
-    # from babel.dates import parse_time
-
-    # def test_pattern_valid (self) -> None:
-    #     """Test valid dates with "pattern" validation. """
-    #     pass
     
+    def test_locale_valid( self) -> None:
+        """ Test valid time strings with ``Locale`` validation. """
+        for i, valid_locale in enumerate(self._locale_valid):
+            text = f"{i} value=[{valid_locale}] failed "
+            dt = self._validator.validate(value=valid_locale, locale=J2PyLocale.UK)
+            assert dt is not None, f"validate() {text}"
+            assert self._validator.is_valid(value=valid_locale, locale=J2PyLocale.UK) == True, f"is_valid() {text}"
+            assert date_get_time(self._locale_expect[i]) == date_get_time(dt), f"compare {text}"
+
+    def test_pattern_invalid(self) -> None:
+        """ Test invalid time strings with "pattern" validation."""
+        for i, invalid_pattern in enumerate(self._pattern_invalid):
+            text = f"{i} value=[{invalid_pattern}] passed "
+            dt = self._validator.validate(value=invalid_pattern, pattern='HH-mm-ss')
+            assert dt is None, f"validate() {text} {dt}"
+            assert self._validator.is_valid(value=invalid_pattern, pattern="HH-mmk-ss") == False, f"is_valid() {text}"
+
+    def test_pattern_valid(self) -> None:
+        """ Test valid time strings with "pattern" validation."""
+        for i, valid_pattern in enumerate(self._pattern_valid):
+            text = f"{i} value=[{valid_pattern}] failed "
+            dt = self._validator.validate(value=valid_pattern, pattern='HH-mm-ss')
+            assert dt is not None, f"validate() {text}"
+            assert self._validator.is_valid(value=valid_pattern, pattern='HH-mm-ss') == True, f"is_valid() {text}"
+            assert date_get_time(self._pattern_expect[i]) == date_get_time(dt), f"compare {text}"
+
 
     def test_timezone_default(self) -> None:
         """Test timezone functionality using default timezone, locale of british, and pattern."""
         # result:datetime = self._validator.validate(value="18:01", time_zone = self.tz_gmt)
-        result:datetime = self._validator.validate(value="18:01", locale='en_GB')
-
+        result:datetime = self._validator.validate(value="18:01", locale='en_GB', time_zone = self.tz_gmt)
         assert result is not None, "Default result"
-        # assert TimeZones.GMT == result.getTimeZone(), "default zone"
+        assert self.tz_gmt == result.tzinfo, "default zone"
         assert 18 == result.hour, "default hour"
         assert 1 == result.minute, "zone minute"
-        # assert None == result.tzinfo
-        assert False == True, f"TZ info: {result.tzinfo}, result: {result}"
-    
-
-    # def test_timezone_est(self) -> None:
-    #     """ Test time timezone functionality using est timezone, and default loacale and pattern."""
-    #     result:datetime = self._validator.validate(value = "16:49", time_zone = TestTimeZones.EST)
-    #     assert result is not None, "Default result"
-    #     assert TestTimeZones.EST == result.tzinfo, "zone zone"
-    #     assert 16 == result.hour, "zone hour"
-    #     assert 49 == result.minute, "zone minute"
-    
-    
-    # def test_timezone_est_pattern(self) -> None:
-    #     """ Test timezone functionality using est timezone, default locale, and a custom pattern."""
-    #     result:datetime = self._validator.validate(value = "14-34", pattern = "HH-mm", time_zone = TestTimeZones.EST)
-    #     assert result is not None, "pattern result"
-    #     assert TestTimeZones.EST == result.tzinfo, "pattern zone"
-    #     assert 14 == result.hour, "zone hour"
-    #     assert 34 == result.minute, "zone minute"
+        # assert True == False, f"timezone: {result.tzinfo}"
 
 
-    # def test_timezone_est_locale(self) -> None:
-    #     """Test timezone functionality using est timezone, custom locale, and a default pattern."""
-    #     # us_cal = datetime(2005, 1, 1, hour=19, minute=18, tzinfo="en_US")        # Python months are 1 based
-    #     us_val = "7:18 PM"
-    #     result:datetime = self._validator.validate(value = us_val, locale = J2PyLocale.US, time_zone = TestTimeZones.EST)
-    #     assert result is not None, f"locale result: {us_val}"
-    #     assert TestTimeZones.EST == result.tzinfo, f"locale zone: {us_val}"
-    #     assert 19 == result.hour, f"locale hour: {us_val}"
-    #     assert 18 == result.minute, f"locale minute: {us_val}"
+    def test_timezone_est(self) -> None:
+        """ Test time timezone functionality using est timezone, and default loacale and pattern."""
+        result:datetime = self._validator.validate(value="16:49", locale='en_GB', time_zone = TestTimeZones.EST)
+        assert result is not None, "Default result"
+        assert TestTimeZones.EST == result.tzinfo, "zone zone"
+        assert 16 == result.hour, "zone hour"
+        assert 49 == result.minute, "zone minute"
+    
+    
+    def test_timezone_est_pattern(self) -> None:
+        """ Test timezone functionality using est timezone, default locale, and a custom pattern."""
+        result:datetime = self._validator.validate(value = "14-34", pattern = "HH-mm", locale = 'en_GB', time_zone = TestTimeZones.EST)
+        assert result is not None, "pattern result"
+        assert TestTimeZones.EST == result.tzinfo, "pattern zone"
+        assert 14 == result.hour, "zone hour"
+        assert 34 == result.minute, "zone minute"
+
+
+    def test_timezone_est_locale(self) -> None:
+        """Test timezone functionality using est timezone, custom locale, and a default pattern."""
+        us_val = "7:18 PM"
+        result:datetime = self._validator.validate(value=us_val, locale=J2PyLocale.US, time_zone=TestTimeZones.EST)
+        assert result is not None, f"locale result: {us_val}"
+        assert TestTimeZones.EST == result.tzinfo, f"locale zone: {us_val}"
+        assert 19 == result.hour, f"locale hour: {us_val}"
+        assert 18 == result.minute, f"locale minute: {us_val}"
 
     
     # def test_timezone_est_pattern_locale(self) -> None:
     #     """ Test timezone functionality using est timezone, and a custom locale and pattern."""
     #     dt_pattern = "dd/MMM/yy HH-mm"
-    #     # de_cal = datetime(2005, 11, 31, hour=21, minute=5, locale = J2PyLocale.GERMAN)          # Python months are 1 based
     #     german_sample = "31/Dez./05 21-05"
     #     result:datetime = self._validator.validate(value = german_sample, pattern = dt_pattern, locale = J2PyLocale.GERMAN, time_zone = TestTimeZones.EST)
     #     assert result is not None, f"pattern result: {german_sample}"
@@ -386,13 +390,17 @@ class TestTimeValidator(TestAbstractCalendarValidator):
     #     assert 31 == result.day, "pattern day"
     #     assert 21 == result.hour, "pattern hour"
     #     assert 5 == result.minute, "pattern minute"
-    #     result = None
+    # #     result = None
 
 
     # def test_timezone_pattern_locale(self) -> None:
     #     """Test timezone functionality using default timezone, and a custom locale and pattern."""
     #     dt_pattern = "dd/MMM/yy HH-mm"
     #     german_sample = "31/Dez./05 21-05"
+    #     # import locale
+    #     # locale.setlocale(locale.LC_ALL, locale=J2PyLocale.GERMAN)
+    #     # print(f" locale get locale: {locale.getlocale()}, terminal: ('en_US', 'UTF-8')")
+    #     # print(f"locale.getlocale.LCTIme: {locale.getlocale(locale.LC_TIME)}, terminal (None, None)")
     #     result:datetime = self._validator.validate(value = german_sample, pattern = dt_pattern, locale = J2PyLocale.GERMAN)
     #     assert result is not None, f"Pattern result: {german_sample}"
     #     assert self.tz_gmt == result.tzinfo, "pattern zone"
@@ -401,87 +409,4 @@ class TestTimeValidator(TestAbstractCalendarValidator):
     #     assert 31 == result.day, "pattern day"
     #     assert 21 == result.hour, "pattern hour"
     #     assert 5 == result.minute, "pattern minute"
-    #     result = None
-
-    
-    # @pytest.fixture
-    # def expected_zone(self, zone) -> datetime:
-    #     """Datetime with a different tzinfo that the system default."""
-    #     return self._create_calendar(zone=zone, date=20051231, time=0)
-
-    # locale = J2PyLocale.GERMAN
-    # pattern = "yyyy-MM-dd"
-    # patternVal = "2005-12-31"
-    # germanPattern = "dd MMM yyyy"
-    
-    # # 
-    # germanVal = "31 Dez. 2005"
-
-
-    # localeVal = "31.12.2005"
-    # defaultVal = "12/31/05"
-    # xxxx = "XXXX"
-    # default_locale = "en_US"
-
-    # @pytest.mark.parametrize (
-    #     "assert_type, input_val, input_pattern, input_locale, assert_msg", [
-    #         ("dt", defaultVal, None, default_locale, "validate(A) default"),
-    #         ("dt", localeVal, None, locale, "validate(A) locale "),
-    #         ("dt", patternVal, pattern, default_locale, "validate(A) pattern "),
-    #         ("dt", germanVal, germanPattern, J2PyLocale.GERMAN, "validate(A) both"),
-    #         (None, xxxx, None, default_locale, "validate(B) default"),
-    #         (None, xxxx, None, locale, "validate(B) locale "),
-    #         (None, xxxx, pattern, default_locale, "validate(B) pattern"),
-    #         (None, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "validate(B) both")
-    #     ]
-    # )
-    # def test_validate(self, assert_type:Optional[str], expected_dt:datetime, input_val:str, input_pattern:str, input_locale:str, assert_msg:str) -> None:
-    #     """
-    #     Test `DateValidator.validate()`method.  
-    #     # Also includes test cases in `test`AbstractCalendarValidatorTest.java`.
-    #     """
-    #     # Don't rely on specific German format - it varies between JVMs
-    #     output_dt = DateValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale)
-    #     if assert_type == "dt":
-    #         assert expected_dt.date() == output_dt.date(), assert_msg
-    #     else:
-    #         assert output_dt is None, assert_msg
-
-    # @pytest.mark.parametrize (
-    #     "input_val, input_pattern, input_locale, assert_msg", [
-    #         (defaultVal, None, default_locale,  "validate(C) default"),
-    #         (localeVal, None, locale, "validate(C) locale "),
-    #         (patternVal, pattern, default_locale, "validate(C) pattern "),
-    #         (germanVal, germanPattern, J2PyLocale.GERMAN, "validate(C) both"),  
-    #     ]
-    # )
-    # def test_validate_timezone(self, expected_dt:datetime, expected_zone:datetime, zone:tzinfo, input_val, input_pattern:str, input_locale, assert_msg:str) -> None:
-    #     """
-    #     Test `DateValidator.is_valid()`method with a different timezone.  
-    #     # Also includes test cases in `test`AbstractCalendarValidatorTest.java`.
-    #     """
-    #     # Want to check the timezone differences; can't use .time() because that's time-zone naive. 
-    #     # Can't use .date() because that's in-sensitive to hours.
-    #     assert expected_dt.tzinfo != expected_zone.tzinfo, f"default/EET same {zone}"
-    #     assert expected_zone.date() == DateValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone).date(), assert_msg
-
-    # @pytest.mark.parametrize (
-    #     "assert_type, input_val, input_pattern, input_locale, assert_msg", [
-    #         # True
-    #         (True, defaultVal, None, default_locale, "isValid(A) default"),
-    #         (True, localeVal, None, locale, "isValid(A) locale "),
-    #         (True, patternVal, pattern, default_locale, "isValid(A) pattern "),
-    #         (True, germanVal, germanPattern, J2PyLocale.GERMAN, "isValid(A) both"),
-    #         # False
-    #         (False, xxxx, None, default_locale, "is_valid(B) default"),
-    #         (False, xxxx, None, locale, "is_valid(B) locale "),
-    #         (False, xxxx, pattern, default_locale, "is_valid(B) pattern"),
-    #         (False, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "is_valid(B) both")
-    #     ]
-    # )
-    # def test_is_valid(self, assert_type:bool, input_val:str, input_pattern:str, input_locale:str, assert_msg:str) -> None:
-    #     """
-    #     Test `CalendarValidator.is_valid()`method.  
-    #     # Also includes test cases in `test`AbstractCalendarValidatorTest.java`.
-    #     """
-    #     assert assert_type == DateValidator.get_instance().is_valid(value=input_val, pattern=input_pattern, locale=input_locale), assert_msg
+    #     # result = None

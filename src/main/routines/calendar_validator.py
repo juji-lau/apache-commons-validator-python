@@ -268,23 +268,3 @@ class CalendarValidator(AbstractCalendarValidator):
             The parsed `datetime` if valid or ``None`` if invalid.
         """
         return self._parse(value, pattern, locale, time_zone)
-        # if time_zone is None:
-        #     # Get default timezone if none
-        #     time_zone = get_default_tzinfo()
-        # if pattern is None:
-        #     return self._parse(value=value, time_zone=time_zone)
-        
-        # if locale is None:
-        #     dt = self._parse(value=value, time_zone=time_zone)
-        # else:
-        #     dt = self._parse(value, locale = locale, time_zone=time_zone)
-        #     if dt is None:
-        #         return None
-        # # # Set the timezone
-        # # if time_zone is None:
-        # #     # TODO: get default time zone
-        # #     dt = dt.replace(tzinfo=time_zone)
-        # # else:
-        # #     dt = dt.astimezone(time_zone)
-        
-        # return dt

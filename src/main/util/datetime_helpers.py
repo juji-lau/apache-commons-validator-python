@@ -272,6 +272,16 @@ def babel_parse_datetime(value, locale, pattern, time_zone) -> datetime:
         return None
     return dt
 
+def ldml2dt(value:str, pattern:str, locale:str=None) -> datetime:
+    try:
+        py_pattern = fmt_java2py(pattern)
+        dt = datetime.strptime(value, py_pattern)
+        print(f"Parsed value: {value} with pattern {pattern}, and got format: {py_pattern}, with result: {dt}!!")
+        return dt
+    except Exception as e:
+        print(f"Couldn't parse value: {value} with pattern: {pattern}, and error: {e}")
+        return None
+
 def ldml2strptime(style_format:str = 'short', locale:str = None):
     """
     Gets the pattern to use in ``datetime.strptime()`` based on the input locale.
@@ -283,20 +293,167 @@ def ldml2strptime(style_format:str = 'short', locale:str = None):
         pattern = str(get_time_format(style_format, locale=locale))
     
     output = fmt_java2py(pattern)
-    print(f"LDML mapped {pattern} to {output}")
+    print(f"LDML TIME: mapped {pattern} to {output}")
     return output
-    LDML_TO_STRPTIME = [
-        (r"yyyy", "%Y"),
-        (r"yy",   "%y"),
-        (r"MM",   "%m"),
-        (r"dd",   "%d"),
-        (r"HH",   "%H"),
-        (r"hh",   "%I"),
-        (r"mm",   "%M"),
-        (r"ss",   "%S"),
-        (r"\ba\b", "%p"),           # careful: match 'a' token not in words
+
+
+def ldml2strpdate(value:str, style_format:str = 'short', locale:str = None) -> datetime:
+    """
+    Gets the pattern to use in ``datetime.strptime()`` based on the input locale.
+    """
+    from babel.dates import get_date_format
+    try:
+
+        if style_format == 'short':
+            # Flexible parsing
+            print(f"Parsing short.")
+            dt = short_dt_parser(value, locale)
+            print(f"Short parsing: Got: {dt} with value: {value}")
+        else:
+            print(f"parsing Others")
+            pattern = str(get_date_format(style_format, locale=locale))
+            # Try parse pattern
+            parsing_pattern = fmt_java2py(pattern)
+            print(f"LDML DATE: mapped {pattern} to {parsing_pattern}")
+            dt = datetime.strptime(value, parsing_pattern)
+            print(f"Non short parsing: got: {dt} with format: {parsing_pattern}, and value: {value}, timezone:")
+
+    except Exception as e:
+        print(f"Couldn't parse the value: {value}, with message: {e}")
+        return None
+    
+    print(f"Successfully parsed: {dt} with value: {value}, and locale: {locale}!!!")
+    return dt
+
+def short_dt_parser(value:str, locale:str = None) -> datetime:
+    """
+    Parses value string into the representing datetime in the locale's "short" style.
+    Except there are multiple acceptable "short" strings in Java, but only one acceptable 
+    "short" string in Python. This function aims to mimic Java's flexibility. Uses the 
+    system's default locale if a locale is not provided.
+    """
+    from babel.dates import get_date_format
+    if locale is None:
+        ldml = get_date_format('short').pattern
+    else:
+        ldml = get_date_format('short', locale=locale).pattern
+    
+    pat = parse_pattern(ldml).format  # e.g. '%(M)s/%(d)s/%(yy)s'
+
+    # 2. Build regex from tokens
+    token_re = re.compile(r'%\((?P<tok>.*?)\)s')
+    parts = []
+    last = 0
+    for m in token_re.finditer(pat):
+        # literal part
+        lit = re.escape(pat[last:m.start()])
+        parts.append(lit)
+        # token part
+        tok = m.group('tok')
+        if tok.startswith('d'):        # d, dd, ddd… → day
+            parts.append(r'(?P<day>\d+)')
+        elif tok.startswith('M'):      # M, MM, MMM… → month
+            parts.append(r'(?P<month>\d+)')
+        elif tok.startswith('y'):      # y, yy, yyyy… → year
+            parts.append(r'(?P<year>\d+)')
+        else:
+            raise ValueError(f"Unsupported token: {tok}")
+        last = m.end()
+    parts.append(re.escape(pat[last:]))
+    regex = '^' + ''.join(parts) + '$'
+
+    # 3. Match and extract
+    m = re.match(regex, value)
+    if not m:
+        print(f"Unparseable date: {value!r} for pattern {ldml!r}")
+        # raise ValueError(f"Unparseable date: {value!r} for pattern {ldml_pattern!r}")
+        return None
+
+    # 4. Convert fields
+    month = int(m.group('month'))
+    day   = int(m.group('day'))
+    ystr  = m.group('year')
+    # Pivot two‐digit years
+    if len(ystr) == 2 and ystr.isdigit():
+        now = date.today()
+        pivot = now.year - 80
+        century = pivot - (pivot % 100)
+        year = century + int(ystr)
+        if year < pivot:
+            year += 100
+    else:
+        year = int(ystr)
+
+    return datetime(year, month, day)
+
+
+
+def try_again(value:str, ldml_pattern:str) -> datetime:
+    pat = parse_pattern(ldml_pattern).format  # e.g. '%(M)s/%(d)s/%(yy)s'
+
+    # 2. Build regex from tokens
+    token_re = re.compile(r'%\((?P<tok>.*?)\)s')
+    parts = []
+    last = 0
+    for m in token_re.finditer(pat):
+        # literal part
+        lit = re.escape(pat[last:m.start()])
+        parts.append(lit)
+        # token part
+        tok = m.group('tok')
+        if tok.startswith('d'):        # d, dd, ddd… → day
+            parts.append(r'(?P<day>\d+)')
+        elif tok.startswith('M'):      # M, MM, MMM… → month
+            parts.append(r'(?P<month>\d+)')
+        elif tok.startswith('y'):      # y, yy, yyyy… → year
+            parts.append(r'(?P<year>\d+)')
+        else:
+            raise ValueError(f"Unsupported token: {tok}")
+        last = m.end()
+    parts.append(re.escape(pat[last:]))
+    regex = '^' + ''.join(parts) + '$'
+
+    # 3. Match and extract
+    m = re.match(regex, value)
+    if not m:
+        print(f"Unparseable date: {value!r} for pattern {ldml_pattern!r}")
+        return None
+        # raise ValueError(f"Unparseable date: {value!r} for pattern {ldml_pattern!r}")
+
+    # 4. Convert fields
+    month = int(m.group('month'))
+    day   = int(m.group('day'))
+    ystr  = m.group('year')
+    # Pivot two‐digit years
+    if len(ystr) == 2 and ystr.isdigit():
+        now = date.today()
+        pivot = now.year - 80
+        century = pivot - (pivot % 100)
+        year = century + int(ystr)
+        if year < pivot:
+            year += 100
+    else:
+        year = int(ystr)
+
+    return datetime(year, month, day)
+
+# # Example usage:
+# for value in ["1/1/05", "01/01/2005", "12/31/05", "12/31/2005"]:
+#     print(value, "→", flexible_short_dt_parser(value, locale='en_US'))
+
+
+
+#     LDML_TO_STRPTIME = [
+#         (r"yyyy", "%Y"),
+#         (r"yy",   "%y"),
+#         (r"MM",   "%m"),
+#         (r"dd",   "%d"),
+#         (r"HH",   "%H"),
+#         (r"hh",   "%I"),
+#         (r"mm",   "%M"),
+#         (r"ss",   "%S"),
+#         (r"\ba\b", "%p"),           # careful: match 'a' token not in words
         # ... add more rules as needed
-    ]
 #  Attributes:
             # YEAR (int): The year.
             # MONTH (int): The month.

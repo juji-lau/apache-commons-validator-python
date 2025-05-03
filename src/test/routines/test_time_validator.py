@@ -45,13 +45,11 @@ from src.main.routines.time_validator import TimeValidator
 from src.main.util.datetime_helpers import J2PyLocale, locale_reg2dp, date_get_time, debug
 from src.test.routines.test_abstract_calendar_validator import TestAbstractCalendarValidator
 from src.test.util.test_timezones import TestTimeZones
-# from icu import Locale, LocaleMatcher, Collator, ICUError
 import locale
 
-# Set the default ICU locale for your process
+# Set the default ICU locale for the process
 original_locale = locale.setlocale(locale.LC_ALL, None)
 
-    # @classmethod
 def _create_time(zone:tzinfo, time:int, millisecond:int) -> datetime:
     """
     Create a datetime instance for a specified time zone, date and time. 
@@ -279,13 +277,12 @@ class TestTimeValidator(TestAbstractCalendarValidator):
     
 
     # Test validation methods: (format(), is_valid(), validate()):
-
-    # Constants
+    
+    # test_format() constants:
     val = "4:49 PM"
     val_us = "4:49 PM"
     gb_locale = 'en_GB'
     val_gb = "16:49"
-
 
     @pytest.mark.parametrize (
         "expected_str, input_pattern, input_locale, assert_msg", [

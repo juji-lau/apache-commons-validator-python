@@ -37,7 +37,7 @@ from datetime import tzinfo, datetime
 from typing import Final, Optional
 from zoneinfo import ZoneInfo
 
-from src.main.util.datetime_helpers import J2PyLocale, date_get_time, timezone_has_same_rules, debug, get_default_tzinfo, get_localzone_name
+from src.main.util.datetime_helpers import J2PyLocale, date_get_time, timezone_has_same_rules, debug, get_default_tzinfo
 from src.main.util.Locale import Locale
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
 from src.main.routines.calendar_validator import CalendarValidator

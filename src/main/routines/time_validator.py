@@ -30,8 +30,7 @@ from datetime import datetime, date, time, tzinfo
 from typing import Optional, Final, Callable
 
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
-from src.main.util.utils import integer_compare
-from src.main.util.datetime_helpers import get_default_tzinfo, update_tz, J2PyLocale, fmt_java2py, locale_reg2dp
+
 
 class TimeValidator(AbstractCalendarValidator):
     """
@@ -180,15 +179,13 @@ class TimeValidator(AbstractCalendarValidator):
         Returns:
             The newly timezone-aware ``datetime`` object.
         """
-        # TODO: hers:
         if isinstance(value, datetime):
             return value
         elif isinstance(value, date):
             # Converts it to a datetime by adding a time of 00:00:00.
             return datetime.combine(value, time.min)
         raise TypeError(f"Unsupported value type: {type(value)}")
-        # TODO: mines
-        # return value
+
     
     def validate(
         self, *,

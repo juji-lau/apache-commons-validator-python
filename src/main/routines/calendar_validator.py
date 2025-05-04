@@ -234,7 +234,7 @@ class CalendarValidator(AbstractCalendarValidator):
         """
         return self._compare(value, compare, "year")
 
-    # @override
+
     def _process_parsed_value(self, value:date, formatter:Callable) -> datetime:
         """
         Convert the parsed ``date`` to a `datetime`.

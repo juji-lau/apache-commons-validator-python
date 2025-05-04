@@ -183,12 +183,6 @@ class TestTimeValidator(TestAbstractCalendarValidator):
  
 
     def setup_method(self):
-        # self.__time_validator:TimeValidator = TimeValidator()
-        # print(f"CREATING TINME SETUP")
-        # try:
-        #     locale.setlocale(locale.LC_ALL, 'en_GB')
-        # except Exception as e:
-        #     print(f"FAILED TO SET LOCALE TO en_GB; original: {original_locale}")
         self._validator = TimeValidator()
     
     def teardown_method(self) -> None:

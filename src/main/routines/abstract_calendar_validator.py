@@ -31,17 +31,12 @@ Changes:
     Implemented ``parse()`` in the concrete subclasses instead.
 
 """
-from abc import ABC, abstractmethod
-from typing import Any, Union, Optional, Final, Callable
-from calendar import Calendar
-import locale
+from typing import Union, Optional, Callable
 
-from datetime import datetime, timezone, tzinfo, date, time
+from datetime import datetime, timezone, tzinfo, date
 from dateparser import parse
-from dateutil.tz import tzlocal
 from babel import Locale
-from babel.dates import format_datetime, format_time, format_date, parse_date, parse_time
-# from src.main.util.datetime_helpers import update_tz, locale_reg2dp, get_default_tzinfo, val_is_naive, get_tzname, babel_parse_datetime, babel_parse_date, babel_parse_time
+from babel.dates import format_datetime, format_time, format_date
 import src.main.util.datetime_helpers as dt_help
 from src.main.util.utils import integer_compare, to_lower
 from src.main.util.Locale import Locale
@@ -253,7 +248,6 @@ class AbstractCalendarValidator(AbstractFormatValidator):
         raise ValueError(f"Invalid field: {field}")
 
 
-    # @override
     def _format(self, *, value:object, formatter:Callable) -> str:
         """
         Format a ``date`` value as a string with the sepcified ``formatter``.
@@ -270,10 +264,6 @@ class AbstractCalendarValidator(AbstractFormatValidator):
         
         # Convert it to a date
         if isinstance(value, datetime):
-            print(f"_FORMAT before: {value} and tz: {value.tzinfo}")
-            print(f"_FORMAT>FORMATWRE: {formatter}")
-            todo = formatter(value)
-            print(f"RETURNING THIS: {todo}")
             return formatter(value)
 
 
@@ -293,29 +283,28 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             The value formatted as a String.
 
         """
-        print(f"FORMAT: value: {value}, pattern: {pattern}, locale: {locale}, timezone: {time_zone}")
         if value is None:
             return None
         # Decide the timezone:
         # If the time_zone is not given, and the value is timezone-aware, use the tzinfo from the value
         # If the time_zone is not given, and the value is timezone-naive, use the system default
         # If the time_zone is given update the value tzinfo to match
+
+        # If the timezone is not given, use the value's timezone or the system default.
         if time_zone is None:
             if isinstance(value, datetime):
-                # Grab existing tzinfo
                 time_zone = value.tzinfo
             else:
-                time_zone = tzlocal()
+                time_zone = dt_help.get_default_tzinfo()
+        # If the timezone is given, update the value's timezone to match.
         else:
-            # If timezone is given, update the object to match the timezone
             if isinstance(value, datetime):
-                value = dt_help.update_tz(value, time_zone)
+                if value.tzinfo is None:
+                    value = value.replace(tzinfo=time_zone)
+                else:
+                    value = value.astimezone(tz=time_zone)
        
-        # Create the function; self._get_format() Sets pattern and locale
         formatter = self._get_format(pattern=pattern, locale=locale)
-        # formatter, = self._get_format(pattern, locale, time_zone)
-        # print(f"TIMEZONE EXISTS: formattetr is: {formatter} and tz is  {time_zone} ")
-        # Call the function using self._format()
         return self._format(value=value, formatter=formatter)
    
 
@@ -331,14 +320,17 @@ class AbstractCalendarValidator(AbstractFormatValidator):
         Returns:
             The function to format the object based on the pattern, locale, or the system default.
         """
+        if locale is None:
+            locale = dt_help.get_default_locale()
 
-        def get_format_locale(locale:Union[str, Locale] = None) -> Callable:
+       
+        def get_format_no_pattern(locale:Union[str, Locale]) -> Callable:
             """
             Returns a function to format the ``datetime`` or ``time`` for the specified locale.
             Called when pattern is blank or None.
 
             Args:
-                locale (Union[str, Locale]): The locale to use; System default if ``None``.
+                locale (Union[str, Locale]): The locale to use.
             
             Returns:
                 The function to format the object.
@@ -348,50 +340,27 @@ class AbstractCalendarValidator(AbstractFormatValidator):
                 Instead of overloading the Python ``_get_format()``, I used a helper function to keep the logic closer to the
                 Java implementation, hence easier to debug.
             """
-            # Locale is given; pattern is not; use locale
-            if self.__date_style >= 0 and self.__time_style >= 0:
-                # Formatting a datetime
-                # Create the datetime pattern of this class.
-                used_date_format = self.__int2str_style.get(self.__date_style, 'short')
-                used_time_format = self.__int2str_style.get(self.__time_style, 'short')
-                used_datetime_format = f"{used_date_format} {used_time_format}"  
-                if locale is None:
-                    # Use system default for locale
-                    formatter = lambda dt:format_datetime(dt, format = used_datetime_format)
-                else:
-                    # Use provided locale AND initialized style
-                    formatter = lambda dt:format_datetime(dt, format = used_datetime_format, locale = locale) 
+            # Get formatting styles for date and time
+            date_format_style = self.__int2str_style.get(self.__date_style, 'short')
+            time_format_style = self.__int2str_style.get(self.__time_style, 'short')
             
-            elif self.__time_style >= 0:
-                # Formatting a time only
-                used_time_format = self.__int2str_style.get(self.__time_style, 'short')
-                if locale is None:
-                    # Use system default
-                    formatter = lambda dt:format_time(dt, format = used_time_format)
-                else:
-                    # Use provided locale AND initialized style
-                    formatter = lambda dt:format_time(dt, format = used_time_format, locale = locale)
-
+            # Formatting a datetime
+            if self.__date_style >= 0 and self.__time_style >= 0:
+                # Create the datetime pattern of this class.
+                datetime_format_style = f"{date_format_style} {time_format_style}"  
+                return lambda dt:format_datetime(dt, format = datetime_format_style, locale = locale) 
+            # Formatting a time only
+            elif self.__time_style >= 0:        
+                return lambda dt:format_time(dt, format = time_format_style, locale = locale)          
+            # Formatting a date only
             else:
-                # Formatting a date only
-                used_date_format = self.__int2str_style.get(self.__date_style, 'short')
-                if locale is None:
-                    # Use system default
-                    formatter = lambda dt:format_date(dt, format = used_date_format)
-                else:
-                    # Use provided locale AND initialized style
-                    formatter = lambda dt:format_date(dt, format = used_date_format, locale = locale)
-            return formatter
+                return lambda dt:format_date(dt, format = date_format_style, locale = locale)
 
         if GenericValidator.is_blank_or_null(pattern):
-            # No pattern given; purely dependent on locale (which may or may not be None).
-            return get_format_locale(locale=locale)
-        elif locale is None:
-            # Locale is None, we have a pattern
-            return lambda dt:format_datetime(datetime=dt, format=pattern)
+            # No pattern given; purely dependent on locale.
+            return get_format_no_pattern(locale)
         else:
-            # Locale and pattern are BOTH given
-            # TODO: Ensure that this function uses both pattern and locale for stricter check, instead of prioritizing one.
+            # Use both locale AND pattern to format the datetime
             return lambda dt:format_datetime(datetime=dt, format=pattern, locale=locale)
 
 
@@ -433,320 +402,247 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
         if GenericValidator.is_blank_or_null(value):
             return None
-        
+      
+        # Create the settings dict to call dateparser.parse() with,
+        # And set the time_zone to the system default if `None`.
+        settings = {'RETURN_AS_TIMEZONE_AWARE': True}
         if time_zone is None:
-            # Get local timezone
             time_zone = dt_help.get_default_tzinfo()
-        
-        # Create settings.
-        settings = {'RETURN_AS_TIMEZONE_AWARE': True, 'TO_TIMEZONE' : dt_help.get_tzname(time_zone)}
-        if time_zone != dt_help.get_default_tzinfo():
+        else:
+            # If we are not using default, we need to tell dateparser parse to the passed in tzinfo
             settings.update({'TIMEZONE' : dt_help.get_tzname(time_zone)})
-
-        print(f"ABSTRACT.parse, SETTINGS: {settings}")
+        settings.update({'TO_TIMEZONE' : dt_help.get_tzname(time_zone)})
+        
+        # Call the correct parser
         if self.__time_style >= 0 and self.__date_style >= 0:
-            print(f"Parsing datetime")
+            # Parsing datetime(not implemented here)
             return self.__parse_datetime(value, pattern, locale, time_zone, settings)
         elif self.__time_style >= 0:
-            print(f"Parsing time only")
+            # Parsing time only
             return self.__parse_time(value, pattern, locale, time_zone, settings)
         else:
-            print(f"Parsing date only")
-            if self.__date_style < 0 and self.__time_style < 0:
-                print(f"ERROR, no specified DATE or TIME validation??")
+            # Parsing date only (by process of elimination)
+            assert (self.__date_style < 0 and self.__time_style < 0) is False, f"ERROR, no specified DATE or TIME validation??"
             return self.__parse_date(value, pattern, locale, time_zone, settings)
     
+
     def __parse_datetime(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
+        """
+        A use case was not implemented in Java's Validator, so this function is untested.
+        """
         return 0
-        def parse_datetime_locale(value:str, locale:Union[str, Locale] = None, settings:dict=None) -> object:
-            """
-            Returns the ``datetime`` or ``time`` object based on the passed in locale.
-            Uses system default if ``None``.
-            Only called if there is no pattern.
+        dt_date:datetime = self.__parse_date(value, pattern, locale, time_zone, settings)
+        dt_time:datetime = self.__parse_time(value, pattern, locale, time_zone, settings)
+        try:
+            return datetime.combine(dt_date.date(), dt_time.time(), tzinfo=dt_date.tzinfo)
+        except Exception as e:
+            return None
 
-            Args:
-                locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
-                time_zone (tzinfo): The timezone to parse the object to.
 
-            Returns: 
-                The parsed ``datetime`` or ``time`` object.
+    # def __parse_datetime(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
+    #     return 0
+    #     def parse_datetime_locale(value:str, locale:Union[str, Locale] = None, settings:dict=None) -> object:
+        #     """
+        #     Returns the ``datetime`` or ``time`` object based on the passed in locale.
+        #     Uses system default if ``None``.
+        #     Only called if there is no pattern.
+
+        #     Args:
+        #         locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
+        #         time_zone (tzinfo): The timezone to parse the object to.
+
+        #     Returns: 
+        #         The parsed ``datetime`` or ``time`` object.
             
-            Changes from Java:
-                This function does not exist in Java. It was created to mimic the logic in our
-                ``_get_format()``, since we need the logic but cannot use the function.
-                (See documentation for ``_parse()`` for a more detailed explanation.)
-            """
-            # Only called if pattern is None
-            # Formatting a datetime or date
-            if locale is None:
-                # Pattern AND locale is None
-                dt = parse(date_string=value, settings=settings)
-                print(f"abstract.__dtparser used default locale: {dt}")
+        #     Changes from Java:
+        #         This function does not exist in Java. It was created to mimic the logic in our
+        #         ``_get_format()``, since we need the logic but cannot use the function.
+        #         (See documentation for ``_parse()`` for a more detailed explanation.)
+        #     """
+        #     # Only called if pattern is None
+        #     # Formatting a datetime or date
+        #     if locale is None:
+        #         # Pattern AND locale is None
+        #         dt = parse(date_string=value, settings=settings)
+        #         print(f"abstract.__dtparser used default locale: {dt}")
 
-                # dt = dt_help.babel_parse_datetime(value, locale, pattern, time_zone)
-                # date = parse_date(string=value, locale=locale, format=pattern)
-                # time = parse_time(string=value, locale=locale, format=pattern)
-                # dt = datetime.combine(date, time, tzinfo = time_zone)
-                # Use system default for locale
-                # formatter = lambda dt:format_datetime(dt, format = used_datetime_format)
-            else:
-                # Use provided locale AND initialized style
-                dt = dt_help.babel_parse_datetime(value=value, locale=locale, pattern=None, time_zone=time_zone)
-                if dt is None:
-                    dp_locale = dt_help.locale_reg2dp(locale)
-                    dt = parse(date_string=value, locales=[dp_locale], settings=settings)
-                    if dt is None:
-                        print(f"REGULAR PARSE FAILED, {value}")
-                    # TODO: refactor bulky parse
-                        if "_" in locale:
-                            lang, country = locale.split("_")
-                            dt = parse(value, languages = [lang], settings=settings)
-                            if dt is None:
-                                dt = parse(value, region=country, settings=settings)
-                        else:
-                            # Try language only
-                            dt = parse(value, languages = [dp_locale], settings=settings)
-                            if dt is None:
-                                # Try country only
-                                dt = parse(value, region = dp_locale, settings=settings)
-                if dt is None:
-                    print(f"ABSTRACT.PARSE_HELPER failed; returning None.")
-                else:
-                    print(f"Abstract.parse_locale, dt: {dt}")
-                return dt
+        #         # dt = dt_help.babel_parse_datetime(value, locale, pattern, time_zone)
+        #         # date = parse_date(string=value, locale=locale, format=pattern)
+        #         # time = parse_time(string=value, locale=locale, format=pattern)
+        #         # dt = datetime.combine(date, time, tzinfo = time_zone)
+        #         # Use system default for locale
+        #         # formatter = lambda dt:format_datetime(dt, format = datetime_format_style)
+        #     else:
+        #         # Use provided locale AND initialized style
+        #         dt = dt_help.babel_parse_datetime(value=value, locale=locale, pattern=None, time_zone=time_zone)
+        #         if dt is None:
+        #             dp_locale = dt_help.locale_reg2dp(locale)
+        #             dt = parse(date_string=value, locales=[dp_locale], settings=settings)
+        #             if dt is None:
+        #                 print(f"REGULAR PARSE FAILED, {value}")
+        #             # TODO: refactor bulky parse
+        #                 if "_" in locale:
+        #                     lang, country = locale.split("_")
+        #                     dt = parse(value, languages = [lang], settings=settings)
+        #                     if dt is None:
+        #                         dt = parse(value, region=country, settings=settings)
+        #                 else:
+        #                     # Try language only
+        #                     dt = parse(value, languages = [dp_locale], settings=settings)
+        #                     if dt is None:
+        #                         # Try country only
+        #                         dt = parse(value, region = dp_locale, settings=settings)
+        #         if dt is None:
+        #             print(f"ABSTRACT.PARSE_HELPER failed; returning None.")
+        #         else:
+        #             print(f"Abstract.parse_locale, dt: {dt}")
+        #         return dt
 
-        if GenericValidator.is_blank_or_null(pattern):
-            # No pattern, use locale only (which may or may not be the default).
-            dt = parse_datetime_locale(value, locale, settings=settings)
-            return dt
-        elif locale is None:
-            # Pattern provided, no locale (use pattern only)
-            dt = parse(date_string=value, date_formats=[pattern], settings=settings)
-            print(f"ABSTRACT.PARSE, No locale: Value: {value}, settings: {settings}, result: {dt}")
+        # if GenericValidator.is_blank_or_null(pattern):
+        #     # No pattern, use locale only (which may or may not be the default).
+        #     dt = parse_datetime_locale(value, locale, settings=settings)
+        #     return dt
+        # elif locale is None:
+        #     # Pattern provided, no locale (use pattern only)
+        #     dt = parse(date_string=value, date_formats=[pattern], settings=settings)
+        #     print(f"ABSTRACT.PARSE, No locale: Value: {value}, settings: {settings}, result: {dt}")
 
-        else:
-            print(f"Locale and pattern BOTH given; use both")
-            # TODO: Figure bulky parse
-            dp_locale = dt_help.locale_reg2dp(locale)
-            dt = parse(date_string=value, date_formats=[pattern], locales=[dp_locale], settings=settings)
-            if dt is None:
-                if "_" in locale:
-                    lang, country = locale.split("_")
-                    dt = parse(value, date_formats = [pattern], languages = [lang], settings=settings)
-                    if dt is None:
-                        dt = parse(value, date_formats = [pattern], region=country, settings=settings)
-                else:
-                    # Try language only
-                    dt = parse(value, languages = [dp_locale], settings=settings)
-                    if dt is None:
-                        # Try country only
-                        dt = parse(value, region = dp_locale, settings=settings)
-                if dt is None:
-                    print(f"ABSTRACT.PARSE FAILED, returning None")
-                    # return None
-                print(f"ABSTRACT.PARSE, Locale and Pattern given: Value: {value}, settings: {settings}, result: {dt}")
-                return dt
+        # else:
+        #     print(f"Locale and pattern BOTH given; use both")
+        #     # TODO: Figure bulky parse
+        #     dp_locale = dt_help.locale_reg2dp(locale)
+        #     dt = parse(date_string=value, date_formats=[pattern], locales=[dp_locale], settings=settings)
+        #     if dt is None:
+        #         if "_" in locale:
+        #             lang, country = locale.split("_")
+        #             dt = parse(value, date_formats = [pattern], languages = [lang], settings=settings)
+        #             if dt is None:
+        #                 dt = parse(value, date_formats = [pattern], region=country, settings=settings)
+        #         else:
+        #             # Try language only
+        #             dt = parse(value, languages = [dp_locale], settings=settings)
+        #             if dt is None:
+        #                 # Try country only
+        #                 dt = parse(value, region = dp_locale, settings=settings)
+        #         if dt is None:
+        #             print(f"ABSTRACT.PARSE FAILED, returning None")
+        #             # return None
+        #         print(f"ABSTRACT.PARSE, Locale and Pattern given: Value: {value}, settings: {settings}, result: {dt}")
+        #         return dt
 
       
     def __parse_date(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
-        # parsing date only
-        print(f"ABSTRACT: PARSING DATE ONLY")
-        def parse_date_locale(value:str, locale:Union[str, Locale] = None, time_zone:tzinfo=None, settings =None) -> object:
-            """
-            Returns the ``datetime`` object based on the passed in locale.
-            Uses system default if ``None``.
-            Only called if there is no pattern.
+        # TODO: Improve documentation
+        """
+        Returns the ``datetime`` object parsed from the value stirng based on the passed in locale and timezone.
+        Uses system default for the locale and timezone if any of them are ``None``.
 
-            Args:
-                locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
-                time_zone (tzinfo): The timezone to parse the object to.
+        Args:
+            value (str): TODO
+            pattern (str): TODO
+            locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
+            time_zone (tzinfo): The timezone to parse the object to.
+            settings (dict): TODO            
 
-            Returns: 
-                The parsed ``datetime`` object.
-            
-            Changes from Java:
-                This function does not exist in Java. It was created to mimic the logic in our
-                ``_get_format()``, since we need the logic but cannot use the function.
-                (See documentation for ``_parse()`` for a more detailed explanation.)
-            """
-
-            # Only called if we are parsing a time AND pattern is not given
-            date_format = self.__int2str_style.get(self.__date_style, 'short')
-            # if locale is None:  # The two branches are exactly the same; merge when reformatting.
-            #     # Pattern AND locale is None
-            #     try:
-            #         # used_format = dt_help.ldml2strptime(style_format=date_format, locale=locale)
-            #         used_format = dt_help.ldml2strpdate(style_format=date_format)
-            #         print(f"format: {used_format}, and value: {value}, timezone: {time_zone}")
-            #         dt = datetime.strptime(value, used_format)
-            #         print(f"Got dt: {dt} with tiemzone: {dt.tzinfo}")
-            #     except Exception as e:
-            #         print(f"INVALID ARGS: no pattern, No locale {e}, value: {value}, timezone: {time_zone}")
-            #         dt = None
-            #     # For now, just return dt
-            #     return dt
-
-            # else:
-            #     # Use provided locale AND initialized style
-            #     print(f"parsing No pattern, Yes locale: {locale}")
-            #     try:
-            #         used_format = dt_help.ldml2strpdate(style_format=date_format, locale=locale)
-            #         print(f"format: {used_format}, and value: {value}, and timezone: {time_zone}")
-            #         dt = datetime.strptime(value, used_format)
-            #         print(f"Got dt: {dt} with tiemzone: {dt.tzinfo}")
-            #     except Exception as e:
-            #         print(f"INVALID ARGS: no pattern, Yes locale {e}, value: {value}, and timezone: {time_zone}")
-            #         dt = None
-            #     # For now, just return dt
-            #     return dt
-            return dt_help.ldml2strpdate(value=value, style_format=date_format, locale=locale)
-
-        if GenericValidator.is_blank_or_null(pattern):
-            # No pattern, use locale only (which may or may not be the default).
-            print(f"No pattern provided; using locale as defaults")
-            dt = parse_date_locale(value, locale, time_zone, settings=settings)
-            if dt is None:
-                return None
-            # Otherwise keep it for timezone processing.
-            if time_zone is not None:
-                dt = dt.replace(tzinfo=time_zone)
-    
-        elif locale is None:
-        # else:
-            print(f"Yes pattern, no locale. Use pattern only, value = {value}, pattern: {pattern}")
-            # Pattern provided, no locale (use pattern only)
+        Returns: 
+            The parsed ``datetime`` object.
+        
+        Changes from Java:
+            This function does not exist in Java. It was created to mimic the logic in our
+            ``_get_format()``, since we need the logic but cannot use the function.
+            (See documentation for ``_parse()`` for a more detailed explanation.)
+        """
+        if GenericValidator.is_blank_or_null(pattern) or locale is None:
             try:
-                dt = dt_help.try_again(value, pattern)
-                if dt is None:
-                    return None
+                # No pattern, use locale only (which may or may not be the default).
+                if GenericValidator.is_blank_or_null(pattern):
+                    date_format = self.__int2str_style.get(self.__date_style, 'short')
+                    dt = dt_help.ldml2strpdate(
+                        value=value, 
+                        style_format=date_format, 
+                        locale=locale
+                    )
+                # Pattern provided, no locale (use pattern only)
+                elif locale is None:
+                    dt = dt_help.parse_pattern_flexible(value, pattern)
+                
                 if time_zone is not None:
                     dt = dt.replace(tzinfo=time_zone)
+                
+                return dt
             except Exception as e:
-                print(f"TRY AGAIN FAILED: {e}")
+                # print(f"TRY AGAIN FAILED: {e}")
                 return None
-
-            # dt = parse(date_string=value, date_formats=[pattern], settings=settings)
-        else:
-            print(f"Locale and pattern BOTH given; use both with bulky parse: locale: {locale}, pattern: {pattern}, value: {value}")
-            # TODO: Want to Use Strptime because of flexibility with short formatting, but can't bc it doesn't respect locales.
-            # dt = dt_help.try_again(value, pattern)
-            # if dt is None:
-            #     return None
-            # if time_zone is not None:
-            #     dt = dt.replace(tzinfo=time_zone)
-            if True:
-            # if False:
-                dp_locale = dt_help.locale_reg2dp(locale)
-                dt = parse(date_string=value, date_formats=[pattern], locales=[dp_locale], settings=settings)
-                if dt is None:
-                    if "_" in locale:
-                        lang, country = locale.split("_")
-                        dt = parse(value, date_formats = [pattern], languages = [lang], settings=settings)
-                        if dt is None:
-                            dt = parse(value, date_formats = [pattern], region=country, settings=settings)
-                    else:
-                        # Try language only
-                        dt = parse(value, languages = [dp_locale], settings=settings)
-                        if dt is None:
-                            # Try country only
-                            dt = parse(value, region = dp_locale, settings=settings)
+        
+        print(f"Locale and pattern BOTH given; use both with bulky parse: locale: {locale}, pattern: {pattern}, value: {value}")
+        # TODO: Want to Use strptime because it's more accurate with short formatting, but can't because it doesn't respect locales.
+        dp_locale = dt_help.locale_reg2dp(locale)
+        dt = parse(date_string=value, date_formats=[pattern], locales=[dp_locale], settings=settings)
         if dt is None:
-            print(f"ABSTRACT.PARSE date FAILED, returning None")
-            return None
-        # else:
-        #     if time_zone is not None:
-        #         dt = dt.replace(tzinfo=time_zone)
-        print(f"ABSTRACT.PARSE date retruning {dt}")
+            if "_" in locale:
+                lang, country = locale.split("_")
+                dt = parse(value, date_formats = [pattern], languages = [lang], settings=settings)
+                if dt is None:
+                    dt = parse(value, date_formats = [pattern], region=country, settings=settings)
+            else:
+                # Try language only
+                dt = parse(value, languages = [dp_locale], settings=settings)
+                if dt is None:
+                    # Try country only
+                    dt = parse(value, region = dp_locale, settings=settings)
         return dt
 
 
     def __parse_time(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
-        # parsing time only
-        # return 0
-        print(f"ABSTRACT: PARSING TIME ONLY")
-        def parse_time_locale(value:str, locale:Union[str, Locale] = None, time_zone:tzinfo=None, settings=None) -> object:
-            """
-            Returns the ``time`` object based on the passed in locale.
-            Uses system default if ``None``.
-            Only called if there is no pattern.
+        # TODO: Improve documentation
+        """
+        Returns the ``datetime`` object parsed from the value stirng based on the passed in locale and timezone.
+        Sets the year, month, day to the epoch (Jan 1, 1970), so the ``datetime`` represents time.
+        Uses system default for the locale and timezone if any of them are ``None``.
 
-            Args:
-                locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
-                time_zone (tzinfo): The timezone to parse the object to.
+        Args:
+            value (str): TODO
+            pattern (str): TODO
+            locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
+            time_zone (tzinfo): The timezone to parse the object to.
+            settings (dict): TODO
 
-            Returns: 
-                The parsed ``time`` object.
+        Returns: 
+            The parsed ``datetime`` object that represents the timestring value by seting the 
+            datetime fields: (year, month, day) to the epoch: (1970, Jan, 1).
+        
+        Changes from Java:
+            This function does not exist in Java. It was created to mimic the logic in our
+            ``_get_format()``, since we need the logic but cannot use the function.
+            (See documentation for ``_parse()`` for a more detailed explanation.)
+        """
+        try:
+            # No pattern providee; Use locale only (which may or may not be the default).
+            if GenericValidator.is_blank_or_null(pattern):
+                time_format = self.__int2str_style.get(self.__time_style, 'short')
+                dt_time = dt_help.ldml2strptime(
+                    value=value,
+                    style_format=time_format,
+                    locale=locale
+                )
+            # Pattern provided, No locale (use pattern only)
+            elif locale is None:
+                dt_time = dt_help.parse_pattern_strict(value, pattern)
             
-            Changes from Java:
-                This function does not exist in Java. It was created to mimic the logic in our
-                ``_get_format()``, since we need the logic but cannot use the function.
-                (See documentation for ``_parse()`` for a more detailed explanation.)
-            """
-            # Only called if we are parsing a time AND pattern is not given
-            time_format = self.__int2str_style.get(self.__time_style, 'short')
-            if locale is None:
-                # Pattern AND locale is None
-                # babel.parse_time() keeps parsing date strings as times, but parses time find.
-                    # Locale does not do anything
-                    # Getting a pattern based on locale...
-                # dateparser.parse() keeps parsing date strings as dates, setting time to zero
-                    # But parses time strings fine
-                    # putting a locale doesn't do anything
-                    # Does not really respect formats
-                try:
-                    used_format = dt_help.ldml2strptime(style_format=time_format)
-                    dt = datetime.strptime(value, used_format)
-                except Exception as e:
-                    print(f"INVALID ARGS: no pattern, no locale {e}")
-                    dt = None
-                print(f"PARSED TiME no Locale: {dt}")
-                return dt
+            # Pattern AND locale provided. Use both.
             else:
-                # Use provided locale AND initialized style
-                try:
-                    used_format = dt_help.ldml2strptime(style_format=time_format, locale=locale)
-                    print(f"format: {used_format}, and value: {value}")
-                    dt = datetime.strptime(value, used_format)
-                    print(f"Got dt: {dt}")
-                except Exception as e:
-                    print(f"INVALID ARGS: no pattern, Yes locale {e}, usedPfomrat: {used_format}, value: {value}")
-                    dt = None
-                # For now, just return dt
-                print(f"PARSED TiME Yes Locale: {dt}")
-                return dt
-
-        if GenericValidator.is_blank_or_null(pattern):
-            # No pattern, use locale only (which may or may not be the default).
-            t = parse_time_locale(value, locale, time_zone)
-            if t is None:
-                return None
-
-        # strptime_format = dt_help.fmt_java2py(pattern)
-        # If pattern is given, prioritize pattern above locale.
-        elif locale is None:
-            # Pattern provided, no locale (use pattern only)
-            try:
-                # strptime_format = dt_help.ldml2strptime(pattern, locale)
-
+                # Technically the same code as `locale is None` branch, but this case is kept separate
+                # for easier debugging, in case of future issues.
                 strptime_format = dt_help.fmt_java2py(pattern)
-                t = datetime.strptime(value, strptime_format)
-            except Exception as e:
-                print(f"INValid args: pattern and no locale: {e}")
-                return None
-            # t = parse(date_string=value, date_formats=[pattern])
-        else:
-            # Locale and pattern BOTH given; use both
-            try:
-                # strptime_format = dt_help.ldml2strptime(pattern, locale)
-                strptime_format = dt_help.fmt_java2py(pattern)
-                t = datetime.strptime(value, strptime_format)
-            except Exception as e:
-                print(f"INValid args: pattern and locale: {e}")
-                return None
-        epoch_date = date(1970, 1, 1)
-        t = datetime.combine(epoch_date, t.time(), tzinfo=time_zone)
-        print(f"Parsing time got: Resetting to epoch: Got: {t}")
-        return t
+                dt_time = datetime.strptime(value, strptime_format)
+            
+            # Remove the (year, month, day) component, and represent the datetime in terms of time only.
+            if dt_time is not None:
+                epoch_date = date(1970, 1, 1)
+                return datetime.combine(epoch_date, dt_time.time(), tzinfo=time_zone)
+                
+        except Exception as e:
+            return None
 
 
     def _process_parsed_value(self, value:object, formatter):

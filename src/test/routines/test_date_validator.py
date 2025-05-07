@@ -28,9 +28,13 @@ Changes:
 import pytest
 from datetime import datetime, tzinfo
 from dateutil.tz import gettz
-from typing import Optional, Final, Callable
+from typing import Optional
 from src.main.routines.date_validator import DateValidator
-from src.main.util.datetime_helpers import J2PyLocale, debug, date_get_time
+from src.main.util.datetime_helpers import (
+    JavaToPyLocale, 
+    date_get_time, 
+    obj_to_str
+)
 from src.test.routines.test_abstract_calendar_validator import TestAbstractCalendarValidator
 from src.test.util.test_timezones import TestTimeZones
 
@@ -109,7 +113,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
     def test_compare_funcs(self, compare_func:str, value:datetime, compare_dt:datetime, input_tz:tzinfo, expected_output:int, assert_msg:str, expected_time:int) -> None:
         """ Tests the ``DateValidator.compare_dates()`` method.  Added a test to ensure the date was intialized correctly"""
         func = getattr(self.date_validator, compare_func)
-        assert expected_time == date_get_time(compare_dt), debug(compare_dt)
+        assert expected_time == date_get_time(compare_dt), obj_to_str(compare_dt)
         assert func(value, compare_dt, input_tz) == expected_output, assert_msg
 
 
@@ -172,7 +176,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
         """Datetime with a different tzinfo that the system default."""
         return self._create_calendar(zone=zone, date=20051231, time=0)
 
-    locale = J2PyLocale.GERMAN
+    locale = JavaToPyLocale.GERMAN
     pattern = "yyyy-MM-dd"
     patternVal = "2005-12-31"
     germanPattern = "dd MMM yyyy"
@@ -194,7 +198,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
             ("dt", patternVal, pattern, default_locale, "validate(A) pattern "),
             ("dt", patternVal, pattern, None, "validate(A) pattern, no locale "),   # Added test case, truly passing in no locale
 
-            ("dt", germanVal, germanPattern, J2PyLocale.GERMAN, "validate(A) both"),
+            ("dt", germanVal, germanPattern, JavaToPyLocale.GERMAN, "validate(A) both"),
             (None, xxxx, None, default_locale, "validate(B) default"),
             (None, xxxx, None, None, "validate(B) default, no locale "),   # Added test case, truly passing in no locale
             
@@ -202,7 +206,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
             (None, xxxx, pattern, default_locale, "validate(B) pattern"),
             (None, xxxx, pattern, None, "validate(B) pattern, no locale "),   # Added test case, truly passing in no locale
 
-            (None, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "validate(B) both")
+            (None, "31 Dec 2005", germanPattern, JavaToPyLocale.GERMAN, "validate(B) both")
         ]
     )
     def test_validate(self, assert_type:Optional[str], expected_dt:datetime, input_val:str, input_pattern:str, input_locale:str, assert_msg:str) -> None:
@@ -225,7 +229,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
             (localeValJava, None, locale, "validate(C) locale "),
             (patternVal, pattern, default_locale, "validate(C) pattern "),
             (patternVal, pattern, None, "validate(C) pattern, no locale "),   # Added test case, truly passing in no locale
-            (germanVal, germanPattern, J2PyLocale.GERMAN, "validate(C) both"),  
+            (germanVal, germanPattern, JavaToPyLocale.GERMAN, "validate(C) both"),  
         ]
     )
     def test_validate_timezone(self, expected_dt:datetime, expected_zone:datetime, zone:tzinfo, input_val, input_pattern:str, input_locale, assert_msg:str) -> None:
@@ -235,8 +239,8 @@ class TestDateValidator(TestAbstractCalendarValidator):
         """
         # Check to make sure testing datetimes were initialized correctly.
         assert expected_dt.tzinfo != expected_zone.tzinfo, f"default/EET same {zone}"
-        assert 1136005200000 == date_get_time(expected_dt), f"Messed up expected date \n {debug(1136005200000,expected_dt)}"
-        assert 1135980000000 == date_get_time(expected_zone), f"Messed up timezone creation \n {debug(1136005200000,expected_zone)}"
+        assert 1136005200000 == date_get_time(expected_dt), f"Messed up expected date \n {obj_to_str(1136005200000,expected_dt)}"
+        assert 1135980000000 == date_get_time(expected_zone), f"Messed up timezone creation \n {obj_to_str(1136005200000,expected_zone)}"
         output_dt = DateValidator.get_instance().validate(value=input_val, pattern=input_pattern, locale=input_locale, time_zone=zone)
         assert date_get_time(expected_zone) == date_get_time(output_dt), assert_msg
 
@@ -251,7 +255,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
             (True, patternVal, pattern, default_locale, "isValid(A) pattern "),
             (True, patternVal, pattern, None, "isValid(A) pattern, no locale "),   # Added test case, truly passing in no locale
 
-            (True, germanVal, germanPattern, J2PyLocale.GERMAN, "isValid(A) both"),
+            (True, germanVal, germanPattern, JavaToPyLocale.GERMAN, "isValid(A) both"),
             # False
             (False, xxxx, None, default_locale, "is_valid(B) default"),
             (False, xxxx, None, None, "is_valid(B) default, no locale "),   # Added test case, truly passing in no locale
@@ -260,7 +264,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
             (False, xxxx, pattern, default_locale, "is_valid(B) pattern"),
             (False, xxxx, pattern, None, "is_valid(B) pattern, no locale "),   # Added test case, truly passing in no locale
 
-            (False, "31 Dec 2005", germanPattern, J2PyLocale.GERMAN, "is_valid(B) both")
+            (False, "31 Dec 2005", germanPattern, JavaToPyLocale.GERMAN, "is_valid(B) both")
         ]
     )
     def test_is_valid(self, assert_type:bool, input_val:str, input_pattern:str, input_locale:str, assert_msg:str) -> None:
@@ -269,6 +273,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
         # Also includes test cases in `test`AbstractCalendarValidatorTest.java`.
         """
         assert assert_type == DateValidator.get_instance().is_valid(value=input_val, pattern=input_pattern, locale=input_locale), assert_msg
+
 
     # -------- Test cases inherited from TestAbstractCalendarValidator ----------:
 
@@ -281,7 +286,7 @@ class TestDateValidator(TestAbstractCalendarValidator):
         test = self._validator._parse(value="2005-11-28", pattern="yyyy-MM-dd", locale=None, time_zone=None)
         assert test is not None, "Test Date"
         assert "28.11.05" == self._validator.format(value=test, pattern="dd.MM.yy"), "Format pattern"   #pattern=fmt_java2py("dd.MM.yy")
-        assert "11/28/05" == self._validator.format(value=test, locale=J2PyLocale.US), "Format locale"
+        assert "11/28/05" == self._validator.format(value=test, locale=JavaToPyLocale.US), "Format locale"
         assert self._validator.format(value=None) is None, "None"
 
 
@@ -292,10 +297,10 @@ class TestDateValidator(TestAbstractCalendarValidator):
         """
         for i, invalid_locale in enumerate(self._locale_invalid):
             text = f"{i} value=[{invalid_locale}] passed "
-            date:object = self._validator._parse(value=invalid_locale, pattern=None, locale=J2PyLocale.US, time_zone=None)
+            date:object = self._validator._parse(value=invalid_locale, pattern=None, locale=JavaToPyLocale.US, time_zone=None)
             print(f"Created date: {date} from string: {invalid_locale}")
             assert date is None, f"validateObj() {text}"
-            assert self._validator.is_valid(value=invalid_locale,locale=J2PyLocale.US) == False, f"is_valid() {text}"
+            assert self._validator.is_valid(value=invalid_locale,locale=JavaToPyLocale.US) == False, f"is_valid() {text}"
     
 
     def test_locale_valid(self) -> None:
@@ -305,9 +310,9 @@ class TestDateValidator(TestAbstractCalendarValidator):
         """
         for i, valid_locale in enumerate(self._locale_valid):
             text = f"{i} value=[{valid_locale}] failed "
-            date:object = self._validator.validate(value=valid_locale, pattern=None, locale=J2PyLocale.US, time_zone=None)
+            date:object = self._validator.validate(value=valid_locale, pattern=None, locale=JavaToPyLocale.US, time_zone=None)
             assert date is not None, f"validateObj() {text} {date}"
-            assert self._validator.is_valid(value=valid_locale, locale=J2PyLocale.US) == True, f"is_valid() {text}"
+            assert self._validator.is_valid(value=valid_locale, locale=JavaToPyLocale.US) == True, f"is_valid() {text}"
             if isinstance(date, datetime):
                 assert date_get_time(self._pattern_expect[i]) == date_get_time(date), f"compare {text}"
 

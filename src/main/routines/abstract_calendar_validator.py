@@ -31,14 +31,31 @@ Changes:
     Implemented ``parse()`` in the concrete subclasses instead.
 
 """
-from typing import Union, Optional, Callable
-
+from babel import Locale
+from babel.dates import (
+    format_datetime, 
+    format_time, 
+    format_date
+)
 from datetime import datetime, timezone, tzinfo, date
 from dateparser import parse
-from babel import Locale
-from babel.dates import format_datetime, format_time, format_date
-import src.main.util.datetime_helpers as dt_help
-from src.main.util.utils import integer_compare, to_lower
+from typing import Union, Optional, Callable
+
+from src.main.util.datetime_helpers import (
+    get_default_tzinfo, 
+    get_default_locale, 
+    get_tzname, 
+    fuzzy_parse, 
+    ldml2strpdate, 
+    ldml2strptime, 
+    parse_pattern_flexible, 
+    parse_pattern_strict, 
+    ldml_to_strptime_format
+)
+from src.main.util.utils import (
+    integer_compare, 
+    to_lower
+)
 from src.main.util.Locale import Locale
 from src.main.generic_validator import GenericValidator
 from src.main.routines.abstract_format_validator import AbstractFormatValidator
@@ -100,60 +117,62 @@ class AbstractCalendarValidator(AbstractFormatValidator):
         return integer_compare(getattr(value, field), getattr(compare, field))
 
 
-    # def __calculate_quarter(self, datetime:datetime, month_of_first_quarter:int) ->int:
-    #     """
-    #     Calculate the quarter for the specified datetime.
+    def __calculate_quarter(self, calendar:datetime, month_of_first_quarter:int) ->int:
+        """
+        Calculate the quarter for the specified datetime.
 
-    #     Args:
-    #         datetime (datetime): The datetime value
-    #         month_of_first_quarter: (int): The month that the first quarter starts.
+        Args:
+            datetime (datetime): The datetime value
+            month_of_first_quarter: (int): The month that the first quarter starts.
 
-    #     Returns:
-    #         The calculated quarter.
-    #     """
-    #     # year = datetime.get(datetime.Field.YEAR)
-    #     year = datetime.
+        Returns:
+            The calculated quarter.
+        """
+        year = calendar.year
+        month = calendar.month
+        
+        if month > month_of_first_quarter:
+            relative_month = month - month_of_first_quarter
+        else:
+            relative_month = month + 12 - month_of_first_quarter
+        
+        quarter = relative_month // 3 + 1
 
-    #     month:Final[int] = datetime.get(datetime.Field.MONTH) + 1
-    #     relative_month:Final[int] = month-month_of_first_quarter if month >= month_of_first_quarter else month + 12 - month_of_first_quarter
-    #     # relative_month = month-month_of_first_quarter
-    #     # if not (month >= month_of_first_quarter):
-    #     #     month += 12
-
-    #     quarter:Final[int] = (relative_month//3) + 1
-    #     if month < month_of_first_quarter:
-    #         year-=1
-
-    #     return (year*10) + quarter  
+        if month < month_of_first_quarter:
+            year -= 1
+        
+        return (year * 10) + quarter
 
 
     def _compare(self, value:datetime, compare:datetime, field:str) -> int:
         """
         Compares a datetime value to another, indicating whether it is equal, less than or more than at a specified level.
         
-        **Note**:
-        In Java's ``AbstractCalendarValidator.compare(), the ``field`` parameter is an integer representing
-        the enum mapping to Java's Calendar's fields.  Python's datetime class properties are not mapped to an enum, so the translation
-        in this file has users pass in the name of the datetime property they want to compare.  This is more consistent
-        with Python's datetime module, and will prevent confusion.
-        
-        We also removed attributes from Java's ``AbstractCalendarValidator.compare()`` that are not part of Python's datetime class.
-        Removed comparing: ``Calendar.WEEK_OF_YEAR``, ``Calendar.DAY_OF_YEAR``, and ``Calendar.WEEK_OF_MONTH``, ``Calendar.DATE``, ``Calendar.DAY_OF_WEEK``, and ``Calendar.DAY_OF_WEEK_IN_MONTH``.
-        Added comparing: ``datetime.day``
         Args:
             value (datetime): The datetime value.
             compare (datetime): The datetime to check the value against.
             field (int): The name of the datetime attribute to compare.
-                For example, ``field = "year"`` will compare ``value.year`` and ``compare.year``.
-                Case and space insensitive; "YEAR", "Year", " Year ", etc. will all work.
+                For example: ``field = "year"`` will compare ``value.year`` and ``compare.year``.
+                Case and space insensitive: "YEAR", "Year", " Year ", etc. will all work.
 
         Returns:
             0 if the first value is equal to the second.
             -1 if the first value is less than the second.
             1 if the first value is greater than the second.
+
+        **Changes from Java**:
+            In Java's ``AbstractCalendarValidator.compare()``, the ``field`` parameter is an integer representing
+            the enum mapping to Java's Calendar's fields.  Python's datetime class properties are not mapped to an enum, so the translation
+            in this file has users pass in the name of the datetime property they want to compare.  This is more consistent
+            with Python's datetime module, and will prevent confusion.
         """ 
         # process field
         field = to_lower(field)
+
+        # Cover edge case of weeks
+        if field == "week":
+            return self.compare_weeks(value, compare)
+            
         # Compare Year
         result = self.__calculate_compare_result(value, compare, field)
         if result != 0 or field == "year":
@@ -188,10 +207,10 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             -1 if the first quarter is less than the second.
             1 if the first quarter is greater than the second.
         """
-        raise NotImplementedError("python's datetime does not have quarters. Will implement if time permits.")
-    #     value_quarter = self.__calculate_quarter(value, month_of_first_quarter)
-    #     compare_quarter = self.__calculate_quarter(compare, month_of_first_quarter)
-    #     return integer_compare(value_quarter, compare_quarter)
+        value_quarter = self.__calculate_quarter(value, month_of_first_quarter)
+        compare_quarter = self.__calculate_quarter(compare, month_of_first_quarter)
+        print(f"Value: {value_quarter}, compare; {compare_quarter}")
+        return integer_compare(value_quarter, compare_quarter)
 
 
     def _compare_time(self, value:datetime, compare:datetime, field:int) -> int:
@@ -221,7 +240,7 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             1 if the first value is greater than the second.
    
         Raises:
-            ValueError if the field is invalid
+            ``ValueError`` if the field is invalid
         """
         # process field
         field = to_lower(field)
@@ -295,7 +314,7 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             if isinstance(value, datetime):
                 time_zone = value.tzinfo
             else:
-                time_zone = dt_help.get_default_tzinfo()
+                time_zone = get_default_tzinfo()
         # If the timezone is given, update the value's timezone to match.
         else:
             if isinstance(value, datetime):
@@ -321,7 +340,7 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             The function to format the object based on the pattern, locale, or the system default.
         """
         if locale is None:
-            locale = dt_help.get_default_locale()
+            locale = get_default_locale()
 
        
         def get_format_no_pattern(locale:Union[str, Locale]) -> Callable:
@@ -398,8 +417,6 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             there is a ``parse()`` function that accepts a ``DateFormat``.
             For Python, we will use DateParser.parse(), which does NOT accept a callable or a formatter.
         """
-        print(f"IN SUPER ABS FORMATPASE: value: {value}, pattern: {pattern}, locale: {locale}, time_zone: {time_zone}")
-
         if GenericValidator.is_blank_or_null(value):
             return None
       
@@ -407,11 +424,11 @@ class AbstractCalendarValidator(AbstractFormatValidator):
         # And set the time_zone to the system default if `None`.
         settings = {'RETURN_AS_TIMEZONE_AWARE': True}
         if time_zone is None:
-            time_zone = dt_help.get_default_tzinfo()
+            time_zone = get_default_tzinfo()
         else:
             # If we are not using default, we need to tell dateparser parse to the passed in tzinfo
-            settings.update({'TIMEZONE' : dt_help.get_tzname(time_zone)})
-        settings.update({'TO_TIMEZONE' : dt_help.get_tzname(time_zone)})
+            settings.update({'TIMEZONE' : get_tzname(time_zone)})
+        settings.update({'TO_TIMEZONE' : get_tzname(time_zone)})
         
         # Call the correct parser
         if self.__time_style >= 0 and self.__date_style >= 0:
@@ -422,7 +439,7 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             return self.__parse_time(value, pattern, locale, time_zone, settings)
         else:
             # Parsing date only (by process of elimination)
-            assert (self.__date_style < 0 and self.__time_style < 0) is False, f"ERROR, no specified DATE or TIME validation??"
+            assert (self.__date_style < 0 and self.__time_style < 0) is False, f"ERROR: No specified date or time validation."
             return self.__parse_date(value, pattern, locale, time_zone, settings)
     
 
@@ -430,105 +447,12 @@ class AbstractCalendarValidator(AbstractFormatValidator):
         """
         A use case was not implemented in Java's Validator, so this function is untested.
         """
-        return 0
-        dt_date:datetime = self.__parse_date(value, pattern, locale, time_zone, settings)
-        dt_time:datetime = self.__parse_time(value, pattern, locale, time_zone, settings)
-        try:
-            return datetime.combine(dt_date.date(), dt_time.time(), tzinfo=dt_date.tzinfo)
-        except Exception as e:
-            return None
-
-
-    # def __parse_datetime(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
-    #     return 0
-    #     def parse_datetime_locale(value:str, locale:Union[str, Locale] = None, settings:dict=None) -> object:
-        #     """
-        #     Returns the ``datetime`` or ``time`` object based on the passed in locale.
-        #     Uses system default if ``None``.
-        #     Only called if there is no pattern.
-
-        #     Args:
-        #         locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
-        #         time_zone (tzinfo): The timezone to parse the object to.
-
-        #     Returns: 
-        #         The parsed ``datetime`` or ``time`` object.
-            
-        #     Changes from Java:
-        #         This function does not exist in Java. It was created to mimic the logic in our
-        #         ``_get_format()``, since we need the logic but cannot use the function.
-        #         (See documentation for ``_parse()`` for a more detailed explanation.)
-        #     """
-        #     # Only called if pattern is None
-        #     # Formatting a datetime or date
-        #     if locale is None:
-        #         # Pattern AND locale is None
-        #         dt = parse(date_string=value, settings=settings)
-        #         print(f"abstract.__dtparser used default locale: {dt}")
-
-        #         # dt = dt_help.babel_parse_datetime(value, locale, pattern, time_zone)
-        #         # date = parse_date(string=value, locale=locale, format=pattern)
-        #         # time = parse_time(string=value, locale=locale, format=pattern)
-        #         # dt = datetime.combine(date, time, tzinfo = time_zone)
-        #         # Use system default for locale
-        #         # formatter = lambda dt:format_datetime(dt, format = datetime_format_style)
-        #     else:
-        #         # Use provided locale AND initialized style
-        #         dt = dt_help.babel_parse_datetime(value=value, locale=locale, pattern=None, time_zone=time_zone)
-        #         if dt is None:
-        #             dp_locale = dt_help.locale_reg2dp(locale)
-        #             dt = parse(date_string=value, locales=[dp_locale], settings=settings)
-        #             if dt is None:
-        #                 print(f"REGULAR PARSE FAILED, {value}")
-        #             # TODO: refactor bulky parse
-        #                 if "_" in locale:
-        #                     lang, country = locale.split("_")
-        #                     dt = parse(value, languages = [lang], settings=settings)
-        #                     if dt is None:
-        #                         dt = parse(value, region=country, settings=settings)
-        #                 else:
-        #                     # Try language only
-        #                     dt = parse(value, languages = [dp_locale], settings=settings)
-        #                     if dt is None:
-        #                         # Try country only
-        #                         dt = parse(value, region = dp_locale, settings=settings)
-        #         if dt is None:
-        #             print(f"ABSTRACT.PARSE_HELPER failed; returning None.")
-        #         else:
-        #             print(f"Abstract.parse_locale, dt: {dt}")
-        #         return dt
-
-        # if GenericValidator.is_blank_or_null(pattern):
-        #     # No pattern, use locale only (which may or may not be the default).
-        #     dt = parse_datetime_locale(value, locale, settings=settings)
-        #     return dt
-        # elif locale is None:
-        #     # Pattern provided, no locale (use pattern only)
-        #     dt = parse(date_string=value, date_formats=[pattern], settings=settings)
-        #     print(f"ABSTRACT.PARSE, No locale: Value: {value}, settings: {settings}, result: {dt}")
-
-        # else:
-        #     print(f"Locale and pattern BOTH given; use both")
-        #     # TODO: Figure bulky parse
-        #     dp_locale = dt_help.locale_reg2dp(locale)
-        #     dt = parse(date_string=value, date_formats=[pattern], locales=[dp_locale], settings=settings)
-        #     if dt is None:
-        #         if "_" in locale:
-        #             lang, country = locale.split("_")
-        #             dt = parse(value, date_formats = [pattern], languages = [lang], settings=settings)
-        #             if dt is None:
-        #                 dt = parse(value, date_formats = [pattern], region=country, settings=settings)
-        #         else:
-        #             # Try language only
-        #             dt = parse(value, languages = [dp_locale], settings=settings)
-        #             if dt is None:
-        #                 # Try country only
-        #                 dt = parse(value, region = dp_locale, settings=settings)
-        #         if dt is None:
-        #             print(f"ABSTRACT.PARSE FAILED, returning None")
-        #             # return None
-        #         print(f"ABSTRACT.PARSE, Locale and Pattern given: Value: {value}, settings: {settings}, result: {dt}")
-        #         return dt
+        if GenericValidator.is_blank_or_null(pattern):
+            pattern = ""
+        if locale is None:
+            return parse(date_string=value, date_formats=[pattern], settings=settings)
+        else:
+            return fuzzy_parse(value=value, pattern=pattern, locale=locale, settings=settings)
 
       
     def __parse_date(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
@@ -557,40 +481,25 @@ class AbstractCalendarValidator(AbstractFormatValidator):
                 # No pattern, use locale only (which may or may not be the default).
                 if GenericValidator.is_blank_or_null(pattern):
                     date_format = self.__int2str_style.get(self.__date_style, 'short')
-                    dt = dt_help.ldml2strpdate(
+                    dt = ldml2strpdate(
                         value=value, 
                         style_format=date_format, 
                         locale=locale
                     )
                 # Pattern provided, no locale (use pattern only)
                 elif locale is None:
-                    dt = dt_help.parse_pattern_flexible(value, pattern)
+                    dt = parse_pattern_flexible(value, pattern)
                 
+                # Configure timezone
                 if time_zone is not None:
                     dt = dt.replace(tzinfo=time_zone)
                 
                 return dt
             except Exception as e:
-                # print(f"TRY AGAIN FAILED: {e}")
                 return None
-        
-        print(f"Locale and pattern BOTH given; use both with bulky parse: locale: {locale}, pattern: {pattern}, value: {value}")
-        # TODO: Want to Use strptime because it's more accurate with short formatting, but can't because it doesn't respect locales.
-        dp_locale = dt_help.locale_reg2dp(locale)
-        dt = parse(date_string=value, date_formats=[pattern], locales=[dp_locale], settings=settings)
-        if dt is None:
-            if "_" in locale:
-                lang, country = locale.split("_")
-                dt = parse(value, date_formats = [pattern], languages = [lang], settings=settings)
-                if dt is None:
-                    dt = parse(value, date_formats = [pattern], region=country, settings=settings)
-            else:
-                # Try language only
-                dt = parse(value, languages = [dp_locale], settings=settings)
-                if dt is None:
-                    # Try country only
-                    dt = parse(value, region = dp_locale, settings=settings)
-        return dt
+
+        # Parsing with locale and pattern (note, this is a last resort and not fully accurate).
+        return fuzzy_parse(value=value, pattern=pattern, locale=locale, settings=settings)
 
 
     def __parse_time(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
@@ -620,20 +529,20 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             # No pattern providee; Use locale only (which may or may not be the default).
             if GenericValidator.is_blank_or_null(pattern):
                 time_format = self.__int2str_style.get(self.__time_style, 'short')
-                dt_time = dt_help.ldml2strptime(
+                dt_time = ldml2strptime(
                     value=value,
                     style_format=time_format,
                     locale=locale
                 )
             # Pattern provided, No locale (use pattern only)
             elif locale is None:
-                dt_time = dt_help.parse_pattern_strict(value, pattern)
+                dt_time = parse_pattern_strict(value, pattern)
             
             # Pattern AND locale provided. Use both.
             else:
                 # Technically the same code as `locale is None` branch, but this case is kept separate
                 # for easier debugging, in case of future issues.
-                strptime_format = dt_help.fmt_java2py(pattern)
+                strptime_format = ldml_to_strptime_format(pattern)
                 dt_time = datetime.strptime(value, strptime_format)
             
             # Remove the (year, month, day) component, and represent the datetime in terms of time only.

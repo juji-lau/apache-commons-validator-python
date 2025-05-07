@@ -27,7 +27,7 @@ Changes:
 """
 from __future__ import annotations
 from datetime import datetime, date, time, tzinfo
-from typing import Optional, Final, Callable
+from typing import Optional, Callable
 
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
 

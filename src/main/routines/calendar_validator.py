@@ -45,6 +45,8 @@ from typing import Optional, Callable
 
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
 from src.main.util.datetime_helpers import timezone_has_same_rules
+from src.main.util.utils import integer_compare
+
 
 class CalendarValidator(AbstractCalendarValidator):
     """
@@ -145,7 +147,6 @@ class CalendarValidator(AbstractCalendarValidator):
         return datetime(year, month, day, hour, minute, second, microsecond, tzinfo=time_zone)
 
 
-
     @classmethod
     def get_instance(cls):
         """ Returns the singleton instance of the CalendarValidator. """
@@ -215,9 +216,13 @@ class CalendarValidator(AbstractCalendarValidator):
             -1 if the first week is less than the second.
             +1 if the first week is greater than the second.
         """
-        pass    # week_of_year not implemented in _compare
-        # return self._compare(value, compare, "week_of_year")
-
+        if self._compare(value, compare, "year") != 0:
+            return self._compare(value, compare, "year")
+    
+        value_week = value.isocalendar()[1]
+        compare_week = compare.isocalendar()[1]
+        return integer_compare(value_week, compare_week)
+        
 
     def compare_years(self, value:datetime, compare:datetime) -> int:
         """
@@ -244,11 +249,8 @@ class CalendarValidator(AbstractCalendarValidator):
             formatter (st): The format to parse the value with.
         
         Returns:
-            The parsed value  converted to a `datetime`.
+            The parsed value  converted to a `datetime`, with all time fields set to 0.
         """
-        # TODO: Needs review
-        # value = parse(value, formatter)
-        # return datetime.fromisoformat()
         return datetime.combine(value, time())
             
     

@@ -27,7 +27,7 @@ from typing import Final, Optional, Union
 from datetime import date, time, tzinfo, timedelta, timezone, datetime
 
 # from src.main.util.calendar_wrapper import Calendar
-from src.main.util.datetime_helpers import get_default_tzinfo, J2PyLocale
+from src.main.util.datetime_helpers import get_default_tzinfo, JavaToPyLocale
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
 import locale
 
@@ -118,7 +118,6 @@ class TestAbstractCalendarValidator:
         "1/1/2005",
         "1/1/05"
     ]
-
     _pattern_expect:list[datetime] = [
        _create_date(None, 20050101, 0), 
        _create_date(None, 20051231, 0), 
@@ -128,7 +127,6 @@ class TestAbstractCalendarValidator:
        _create_date(None, 20050101, 0), 
        _create_date(None, 20050101, 0)
     ]
-
     _pattern_invalid:list[str] = [
         "2005-00-01"    # zero month
         "2005-01-00",   # zero day
@@ -169,6 +167,7 @@ class TestAbstractCalendarValidator:
         """
         return _create_calendar(zone, date, time)
     
+
     @classmethod
     def _create_date(self, zone:tzinfo, date:int, time:int) -> datetime:
         """
@@ -177,7 +176,6 @@ class TestAbstractCalendarValidator:
 
         """
         return _create_date(zone, date, time)
-
 
     
     def setup_method(self) -> None:
@@ -189,6 +187,9 @@ class TestAbstractCalendarValidator:
         print(f"Calling teardown: abstract")
         self._validator = None
 
+
+    # -------- Tests moved to implementing test classes ----------:
+
     def test_format(self) -> None:
         """ 
         Tests ``validator.format()``.
@@ -196,11 +197,6 @@ class TestAbstractCalendarValidator:
             ``test_date_validator.py``.
         """
         pass
-        # create a datetime or Calendar.
-        # test = self._validator._parse("2005-11-28", "yyyy-MM-dd", None, None)
-        # assert test is not None, "Test Date"
-        # assert "28.11.05" == self._validator.format(test, "dd.MM.yy"), "Format pattern"
-        # assert "11/28/05" == self._validator.format(test, J2PyLocale.US), "Format locale"
 
 
     def test_locale_invalid(self) -> None:
@@ -212,12 +208,6 @@ class TestAbstractCalendarValidator:
             ``test_date_validator.py``.
         """
         pass
-        # locale = Locale(language="en", country="US")
-        # for i, invalid_locale in enumerate(self._locale_invalid):
-        #     text = f"{i} value=[{invalid_locale}] passed "
-        #     date = self._validator._parse(invalid_locale, None, locale, None)
-        #     assert date is not None, f"validate_obj() {text}{date}"
-        #     assert self._validator.is_valid(invalid_locale, locale) is False, f"is_valid() {text}"
 
         
     def test_locale_valid(self) -> None:
@@ -230,16 +220,6 @@ class TestAbstractCalendarValidator:
         """
         pass
 
-    #     locale = Locale(language="en", country="US")
-    #     for i, valid_locale in enumerate(self._locale_valid):
-    #         text = f"{i} value=[{valid_locale}] failed "
-    #         date = self._validator._parse(valid_locale, None, locale, None)
-    #         assert date is not None, f"validate_obj() {text}{date}"
-    #         assert self._validator.is_valid(valid_locale, locale) is True, f"is_valid() {text}"
-    #         if isinstance(date, datetime):
-    #             date = date.date()
-    #         assert self._pattern_expect[i] == date, f"compare {text}"
-
 
     def test_pattern_invalid(self) -> None:
         """
@@ -251,11 +231,6 @@ class TestAbstractCalendarValidator:
         """
         pass
 
-    #     for i, invalid_pattern in enumerate(self._pattern_invalid):
-    #         text = f"{i} value=[{invalid_pattern}] pased "
-    #         date = self._validator._parse(invalid_pattern, "yy-MM-dd", None, None) 
-    #         assert date is None, f"validate_obj() {text} {date}"
-    #         assert self._validator.is_valid(invalid_pattern, "yy-MM-dd") is False, f"is_valid() {text}"
 
     def test_pattern_valid(self) -> None:
         """ 
@@ -266,17 +241,7 @@ class TestAbstractCalendarValidator:
             ``test_date_validator.py``.
         """
         pass
-    # def test_pattern_valid(self) -> None:
-    #     """Test Valid Dates with 'pattern' validation."""
-    #     for i, valid_pattern in enumerate(self._pattern_valid):
-    #         text = f"{i} value=[{valid_pattern}] failed "
-    #         date = self._validator._parse(valid_pattern, "yy-MM-dd", None, None) 
-    #         assert date is not None, f"validate_obj() {text} {date}"
-    #         assert self._validator.is_valid(valid_pattern, "yy-MM-dd") is True, f"is_valid() {text}"
-    #         if isinstance(date, datetime):
-    #             date = date.date()
-    #         assert self._pattern_expect[i] == date, f"compare {text}"
-    
+
 
     def test_serialization(self) -> None:
         """ Test validator serialization (We did not implement serialization."""

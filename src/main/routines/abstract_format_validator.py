@@ -90,8 +90,6 @@ class AbstractFormatValidator(ABC):
             parsed_value = formatter(value)
         except ValueError:
             return None
-
-        # TODO: I don't know how to handle strict
         
         if parsed_value is not None:
             parsed_value = self._process_parsed_value(value, formatter)

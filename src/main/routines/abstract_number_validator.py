@@ -19,7 +19,8 @@ from typing import Final, override
 import locale as Locale
 import re
 from ..routines.abstract_format_validator import AbstractFormatValidator
-# from ..GenericValidator import GenericValidator
+from ..generic_validator import GenericValidator
+from ..util.decimal_places import max_decimal_places
 
 class AbstractNumberValidator(AbstractFormatValidator):
     """
@@ -60,12 +61,11 @@ class AbstractNumberValidator(AbstractFormatValidator):
         except Locale.Error:
             return None
         
-        if pattern is None:
-        # if GenericValidator.is_blank_or_null(pattern):
+        if GenericValidator.is_blank_or_null(pattern):
             if self.format_type == self.PERCENT_FORMAT:
                 pattern = "%.2f%" if self.allow_fractions else "%d%"
             elif self.format_type == self.STANDARD_FORMAT:
-                pattern = "%.2f" if self.allow_fractions else "%d" # TODO: maybe change pattern to allow more decimal places
+                pattern = "%.1f" if self.allow_fractions else "%d" # TODO: considering changing pattern to allow more decimal places?
         
         if self.format_type == self.CURRENCY_FORMAT:
             return Locale.currency(value, grouping=True)
@@ -96,17 +96,15 @@ class AbstractNumberValidator(AbstractFormatValidator):
         
         locale_info = Locale.localeconv()
         
-        if pattern is None:
-        # if GenericValidator.is_blank_or_null(pattern):
+        if GenericValidator.is_blank_or_null(pattern):
             if self.format_type == self.CURRENCY_FORMAT:
                 return locale_info['frac_digits']
             elif self.format_type == self.STANDARD_FORMAT:
                 return -1
             else:
                 return 2
-
-        decimal_place = locale_info['decimal_point']
-        return len(pattern.split(decimal_place)[1].replace('\\', '')) # TODO: support differrent regex patterns
+        
+        return max_decimal_places(pattern)
     
     @override
     def _get_format(self, pattern: str, locale: str):
@@ -196,6 +194,9 @@ class AbstractNumberValidator(AbstractFormatValidator):
         :param locale: The locale to use for the format.
         :return: True if the value follows the specified pattern.
         """
+        if self.strict and not re.fullmatch(pattern, value):
+            return None
+        
         match = re.search(pattern, value)
         if not bool(match):
             return None
@@ -222,15 +223,14 @@ class AbstractNumberValidator(AbstractFormatValidator):
         :return: The parsed value if valid or None if invalid.
         """
         value = value.strip() if value is not None else None
-        if value is None or value == '':
-        # if GenericValidator.is_blank_or_null(value):
+        if GenericValidator.is_blank_or_null(value):
             return None
-        if pattern is not None and value != '':
-        # if not GenericValidator.is_blank_or_null(pattern):
+        
+        if not GenericValidator.is_blank_or_null(pattern):
             value = self._check_pattern(value, pattern, locale)
             if value is None:
                 return None
-        formatter = self._get_format(pattern, locale)
+        formatter = self._get_format(pattern=pattern, locale=locale)
         return super()._parse(value, formatter)
     
     @override

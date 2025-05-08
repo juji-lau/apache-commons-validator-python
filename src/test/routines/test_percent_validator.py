@@ -16,8 +16,13 @@
 """
 
 from src.main.routines.percent_validator import PercentValidator
+from src.main.routines.abstract_number_validator import AbstractNumberValidator
 
 class TestPercentValidator:
+
+    def test_format_type(self):
+        assert PercentValidator.get_instance().format_type == 2
+        assert PercentValidator.get_instance().format_type == AbstractNumberValidator.PERCENT_FORMAT
 
     def test_invalid(self):
         validator = PercentValidator()
@@ -37,7 +42,8 @@ class TestPercentValidator:
         assert validator.is_valid("(12%)", locale="en_US") is False, f"FAILED: is_valid('(12%)', locale='en_US') expected False but got True"
     
     def test_valid(self):
-        validator = PercentValidator(strict=False)
+        validator = PercentValidator.get_instance()
+        validator_not_strict = PercentValidator(False)
         expected = 0.12
         negative = -0.12
         hundred = 1.00
@@ -46,7 +52,7 @@ class TestPercentValidator:
         assert validator.validate("12%") == expected, f"FAILED: validate('12%') expected {expected} but got {validator.validate('12%')}"
         assert validator.validate("-12%") == negative, f"FAILED: validate('-12%') expected {negative} but got {validator.validate('-12%')}"
         assert validator.validate("100%") == hundred, f"FAILED: validate('100%') expected {hundred} but got {validator.validate('100%')}"
-        assert validator.validate("12.5%") == frac, f"FAILED: validate('12.5%') expected {frac} but got {validator.validate('12.5%')}"
+        assert validator_not_strict.validate("12.5%") == frac, f"FAILED: validate('12.5%') expected {frac} but got {validator_not_strict.validate('12.5%')}"
 
         # Valid UK
         assert validator.validate("12%", locale="en_GB") == expected, f"FAILED: validate('12%', locale='en_GB') expected {expected} but got {validator.validate('12%', locale='en_GB')}"

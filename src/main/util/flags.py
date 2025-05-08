@@ -1,22 +1,4 @@
 """
-<<<<<<< Updated upstream
-    Licensed to the Apache Software Foundation (ASF) under one or more
-    contributor license agreements.  See the NOTICE file distributed with
-    this work for additional information regarding copyright ownership.
-    The ASF licenses this file to You under the Apache License, Version 2.0
-    (the "License"); you may not use this file except in compliance with
-    the License.  You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-"""
-
-=======
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements.  See the NOTICE file distributed with
 this work for additional information regarding copyright ownership.
@@ -32,9 +14,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-
->>>>>>> Stashed changes
 class Flags:
     """
     Represents a collection of 64 boolean (on/off) flags.  Individual flags
@@ -64,19 +43,11 @@ class Flags:
         Turns off all flags. This is a synonym for `turnOffAll()`
         """
         self._flags = 0
-<<<<<<< Updated upstream
-    
-    def __copy__(self):
-        """
-        Clone this Flags object.
-    
-=======
 
     def __copy__(self):
         """
         Clone this Flags object.
 
->>>>>>> Stashed changes
         :return: a copy of this object.
         """
         return Flags(self._flags)
@@ -90,22 +61,12 @@ class Flags:
         """
         if not isinstance(other, Flags):
             return False
-<<<<<<< Updated upstream
-        
-=======
-
->>>>>>> Stashed changes
         return self._flags == other._flags
 
     @property
     def flags(self):
         """
         Returns the current flags.
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
         :return: collection of boolean flags represented.
         """
         return self._flags
@@ -117,11 +78,6 @@ class Flags:
         :return: the hash code for this object.
         """
         return hash(self._flags)
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
     def is_off(self, flag):
         """
         Tests whether the given flag is off. If the flag is not a power of 2
@@ -131,92 +87,49 @@ class Flags:
         :return: whether the specified flag value is off.
         """
         return (self._flags & flag) == 0
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
     def is_on(self, flag):
         """
         Tests whether the given flag is on. If the flag is not a power of 2
         for example, 3) this tests whether the combination of flags is on.
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
         :param flag: Flag value to check.
         :return: whether the specified flag value is on.
         """
         return (self._flags & flag) == flag
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
     def __str__(self):
         """
         Returns a 64 length String with the first flag on the right and the
         64th flag on the left. A 1 indicates the flag is on, a 0 means it's
         off.
-<<<<<<< Updated upstream
-    
-        :return: string representation of this object.
-        """
-        return str(bin(self._flags)[2:]).zfill(64) # convert to binary then pad string to 64 chars by prepending 0s
-=======
 
         :return: string representation of this object.
         """
         return str(bin(self._flags)[2:]).zfill(
             64
         )  # convert to binary then pad string to 64 chars by prepending 0s
->>>>>>> Stashed changes
 
     def turn_off(self, flag):
         """
         Turns off the given flag. If the flag is not a power of 2 (for example, 3) this
         turns off multiple flags.
-<<<<<<< Updated upstream
-    
-        :param flag: Flag value to turn off.
-        """
-        self._flags &= ~flag
-    
-=======
 
         :param flag: Flag value to turn off.
         """
         self._flags &= ~flag
 
->>>>>>> Stashed changes
     def turn_off_all(self):
         """
         Turn off all flags.
         """
         self._flags = 0
-<<<<<<< Updated upstream
-    
-=======
-
->>>>>>> Stashed changes
     def turn_on(self, flag):
         """
         Turns on the given flag. If the flag is not a power of 2 (for example, 3) this
         turns on multiple flags.
-<<<<<<< Updated upstream
-    
-        :param flag: Flag value to turn on.
-        """
-        self._flags |= flag
-    
-=======
 
         :param flag: Flag value to turn on.
         """
         self._flags |= flag
 
->>>>>>> Stashed changes
     def turn_on_all(self):
         """
         Turn on all 64 flags.

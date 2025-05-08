@@ -3,3 +3,9 @@ black
 pylint
 pytest-mock
 pycountry
+dateparser
+numpy
+python-dateutl
+pytz
+pyparsing
+six

@@ -18,16 +18,6 @@ limitations under the License.
 import copy
 from typing import Final, Optional, List, Dict, Any
 import threading
-from src.main.var import Var
-from src.main.msg import Msg
-from src.main.arg import Arg
-from src.main.validator_exception import ValidatorException
-from src.main.util.utils import ValidatorUtils
-from src.main.validator_action import ValidatorAction
-from src.main.validator_results import ValidatorResults
-from src.main.validator_result import ValidatorResult
-from src.main.validator import Validator
-
 
 class Field:
     """
@@ -91,16 +81,16 @@ class Field:
         self.dependency_lock: threading.Lock = threading.Lock()
         #: Lock for __dependency_list
 
-        self._h_vars: Dict[str, Var] = {}
+        self._h_vars: Dict[str, "Var"] = {}
         #: use get_var_map for modifiable Dict and .vars for unmodifiable map
 
-        self._h_msgs: Dict[str, Msg] = {}
+        self._h_msgs: Dict[str, "Msg"] = {}
         #: use get_msg_map for modifiable DIct and .msgs for unmodifiable map
 
-        self._args: List[Dict[str, Arg]] = []
+        self._args: List[Dict[str, "Arg"]] = []
         #: Holds Dicts of arguments. args[0] returns the Dict for the first replacement argument. Starts with a 0 length array so that it will only grow to the size of the highest argument position.
 
-    def add_arg(self, arg: Arg) -> None:
+    def add_arg(self, arg: "Arg") -> None:
         """
         Add an Arg to the replacement argument list.
 
@@ -114,7 +104,7 @@ class Field:
         self.__determine_arg_position(arg)
         self.__ensure_args_capacity(arg)
 
-        arg_map: Dict[str, Arg] = self._args[arg.position]
+        arg_map: Dict[str, "Arg"] = self._args[arg.position]
         if arg_map is None:
             arg_map = {}
             self._args[arg.position] = arg_map
@@ -125,7 +115,7 @@ class Field:
         else:
             arg_map[self.__DEFAULT_ARG] = arg
 
-    def add_msg(self, msg: Msg) -> None:
+    def add_msg(self, msg: "Msg") -> None:
         """
         Add a Msg to the Field.
 
@@ -150,6 +140,7 @@ class Field:
         Example Method Call 2:
             add_var(arg0=name, arg1=value, arg2=jsType)
         """
+        from src.main.var import Var
         if isinstance(arg0, str) and arg1 is not None and arg2 is not None:
             v = Var(name=arg0, value=arg1, js_type=arg2)
             self.get_var_map()[v.name] = v
@@ -166,13 +157,13 @@ class Field:
         """
         field = copy.deepcopy(self)
 
-        temp_map: Dict[str, Arg] = {}
+        temp_map: Dict[str, "Arg"] = {}
         field._args = temp_map
         for i, _ in enumerate(self._args):
             if self._args[i] is None:
                 pass
             else:
-                arg_map: Final[Dict[str, Arg]] = copy.deepcopy(self._args[i])
+                arg_map: Final[Dict[str, "Arg"]] = copy.deepcopy(self._args[i])
                 for validator_name, arg in arg_map.items():
                     arg_map[validator_name] = arg.clone()
                 field._args[i] = arg_map
@@ -185,7 +176,7 @@ class Field:
         field._h_vars = ValidatorUtils.copy_map(self.get_var_map())
         return field
 
-    def __determine_arg_position(self, arg: Arg) -> None:
+    def __determine_arg_position(self, arg: "Arg") -> None:
         """
         Calculate the position of the Arg.
 
@@ -220,7 +211,7 @@ class Field:
         last_position += 1
         arg.position = last_position  # allocate the next position
 
-    def __ensure_args_capacity(self, arg: Arg) -> None:
+    def __ensure_args_capacity(self, arg: "Arg") -> None:
         """
         Ensures that the args array can hold the given arg. Resizes the array
         as necessary
@@ -243,7 +234,7 @@ class Field:
         else:
             self._key = self._property
 
-    def get_arg(self, position: int, key: Optional[str]) -> Optional[Arg]:
+    def get_arg(self, position: int, key: Optional[str]) -> Optional["Arg"]:
         """
         Gets the Arg object at the given position. If the key finds a None value,
         then the default value then the default value will be retrieved.
@@ -263,7 +254,7 @@ class Field:
         else:
             return self._args[position].get(key)
 
-    def get_args(self, key: str) -> List[Optional[Arg]]:
+    def get_args(self, key: str) -> List[Optional["Arg"]]:
         """
         Retrieves the Args for the given validator name.
 
@@ -273,7 +264,7 @@ class Field:
         Returns:
             A List of Args sorted by the Args' positions.
         """
-        arg_list: Final[List[Arg]] = []
+        arg_list: Final[List["Arg"]] = []
 
         for i in range(len(self._args)):
             arg_list.append(self.get_arg(i, key))
@@ -371,7 +362,7 @@ class Field:
             self.generate_key()
         return self._key
 
-    def get_message(self, key: str) -> Optional[Msg]:
+    def get_message(self, key: str) -> Optional["Msg"]:
         """
         Retrieve a message object.
 
@@ -384,12 +375,12 @@ class Field:
         return self.get_msg_map()[key]
 
     @property
-    def msgs(self) -> Dict[str, Msg]:
+    def msgs(self) -> Dict[str, "Msg"]:
         """
         The Field's messages are returned as a copied dictionary so it doesn't modify the original.
 
         Returns:
-            Dict[str, Msg] of validation messages for the field.
+            Dict[str, "Msg"] of validation messages for the field.
         """
         # TODO double check to make sure this doesn't modify original map
         return self._h_msgs.copy()
@@ -404,13 +395,13 @@ class Field:
         Returns:
             A validation message for a specified validator.
         """
-        msg: Final[Msg] = self.get_message(key)
+        msg: Final["Msg"] = self.get_message(key)
         if msg is None:
             return None
         else:
             return msg.key
 
-    def get_msg_map(self) -> Dict[str, Msg]:
+    def get_msg_map(self) -> Dict[str, "Msg"]:
         """
         Returns a Dict of String Msg names to Msg objects.
         """
@@ -426,7 +417,7 @@ class Field:
         """Gets the property name of the field."""
         return self._property
 
-    def get_var(self, main_key: str) -> Optional[Var]:
+    def get_var(self, main_key: str) -> Optional["Var"]:
         """
         Retrieve a variable.
 
@@ -438,18 +429,18 @@ class Field:
         """
         return self.get_var_map()[main_key]
 
-    def get_var_map(self) -> Dict[str, Var]:
+    def get_var_map(self) -> Dict[str, "Var"]:
         """Returns a Map of String Var names to Var objects."""
         return self._h_vars
 
     @property
-    def vars(self) -> Dict[str, Var]:
+    def vars(self) -> Dict[str, "Var"]:
         """
         The Field's variables are returned as a
         copied dictionary so it doesn't modify the original.
 
         Returns:
-            Dict[str, Msg] of Variable's for a field.
+            Dict[str, "Msg"] of Variable's for a field.
         """
         # TODO double check to make sure this doesn't modify original map
         return self._h_vars.copy()
@@ -466,7 +457,7 @@ class Field:
         """
         value: Optional[str] = None
 
-        v: Var = self.get_var_map()[main_key]
+        v: "Var" = self.get_var_map()[main_key]
         if v is not None:
             value = v.value
         return value
@@ -481,6 +472,7 @@ class Field:
 
         Throws: ValidatorException
         """
+        from src.main.validator_exception import ValidatorException
         raise ValidatorException(
             f"No ValidatorAction named {name} found for field {self.field_property}"
         )
@@ -526,6 +518,7 @@ class Field:
             global_constants (Dict[str, str])
             constants (Dict[str, str])
         """
+        from src.main.util.utils import ValidatorUtils
         self.generate_key()
 
         for key1 in constants:
@@ -554,7 +547,7 @@ class Field:
             key2: Final[str] = (
                 self._TOKEN_START + self._TOKEN_VAR + key1 + self._TOKEN_END
             )
-            var: Final[Var] = self.get_var(key1)
+            var: Final["Var"] = self.get_var(key1)
             replace_value: Final[str] = var.value
 
             self.__process_message_components(key2, replace_value)
@@ -567,6 +560,7 @@ class Field:
             key (str):
             replace_value (str):
         """
+        from src.main.util.utils import ValidatorUtils
         for arg_map in self._args:
             if arg_map is None:
                 pass
@@ -583,6 +577,8 @@ class Field:
             key (str);
             replace_value (str):
         """
+        from src.main.util.utils import ValidatorUtils
+
         var_key: Final[str] = self._TOKEN_START + self._TOKEN_VAR
         # process messages
         if key is not None and not key.startswith(var_key):
@@ -599,15 +595,17 @@ class Field:
             key (str);
             replace_value (str);
         """
+        from src.main.util.utils import ValidatorUtils
+
         for var_key in self.get_var_map():
-            var: Final[Var] = self.get_var(var_key)
+            var: Final["Var"] = self.get_var(var_key)
             var.value = ValidatorUtils.replace(var.value, key, replace_value)
 
     def __run_dependent_validators(
         self,
-        va: ValidatorAction,
-        results: ValidatorResults,
-        actions: Dict[str, ValidatorAction],
+        va: 'ValidatorAction',
+        results: 'ValidatorResults',
+        actions: Dict[str, 'ValidatorAction'],
         params: Dict[str, object],
         pos: int,
     ) -> bool:
@@ -627,13 +625,13 @@ class Field:
 
         Throws ValidatorException If there's an error running a validator
         """
-        dependent_validators: List[str] = va.dependency_list
+        dependent_validators: List[str] = va.get_dependencies()
 
         if len(dependent_validators) == 0:
             return True
 
         for depend in dependent_validators:
-            action: Final[ValidatorAction] = actions[depend]
+            action: Final["ValidatorAction"] = actions[depend]
             if action is None:
                 self.__handle_missing_action(depend)
 
@@ -735,8 +733,8 @@ class Field:
         return f"Field: key={self.key}, field_property={self.field_property}, depends={self.depends}"
 
     def validate(
-        self, params: Dict[str, object], actions: Dict[str, ValidatorAction]
-    ) -> ValidatorResults:
+        self, params: Dict[str, object], actions: Dict[str, "ValidatorAction"]
+    ) -> "ValidatorResults":
         """
         Run the configured validations on this field.  Run all validations
         in the depends clause over each item in turn, returning when the first
@@ -752,21 +750,21 @@ class Field:
         Throws:
             ValidatorException If an error occurs during validation.
         """
+        from src.main.validator_results import ValidatorResults
         if self.depends is None:
             return ValidatorResults()
 
-        all_results: Final[ValidatorResults] = ValidatorResults()
-        bean = params.get(Validator.BEAN_PARAM)
+        all_results: Final["ValidatorResults"] = ValidatorResults()
         number_of_fields_to_validate = (
             self.__get_indexed_property_size(bean) if self.is_indexed() else 1
         )
 
         for field_number in range(number_of_fields_to_validate):
-            results: Final[ValidatorResults] = ValidatorResults()
+            results: Final["ValidatorResults"] = ValidatorResults()
 
             with self.dependency_lock: # in java implementation there is a synchronized{dependencyList} here\
                 for depend in self.dependency_list:
-                    action: Final[ValidatorAction] = actions[depend]
+                    action: Final["ValidatorAction"] = actions[depend]
                     if action is None:
                         self.__handle_missing_action(depend)
 
@@ -783,9 +781,9 @@ class Field:
 
     def __validate_for_rule(
         self,
-        va: ValidatorAction,
-        results: ValidatorResults,
-        actions: Dict[str, ValidatorAction],
+        va: "ValidatorAction",
+        results: "ValidatorResults",
+        actions: Dict[str, "ValidatorAction"],
         params: Dict[str, object],
         pos: int,
     ) -> bool:
@@ -795,11 +793,11 @@ class Field:
         Returns:
             True if the validation succeeded.
         """
-        result: Final[ValidatorResult] = results.get_validator_result(self.key)
+        result: Final["ValidatorResult"] = results.get_validator_result(self.key)
         if result is not None and result.contains_action(va.name):
             return result.is_valid(va.name)
 
         if not self.__run_dependent_validators(va, results, actions, params, pos):
             return False
 
-        return va.execute_validation_method(self, params, results, pos)
+        return va.execute_validation_method(self, params)

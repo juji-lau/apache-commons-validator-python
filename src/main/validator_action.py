@@ -1,120 +1,102 @@
-"""
-Licensed to the Apache Software Foundation (ASF) under one or more
-contributor license agreements.  See the NOTICE file distributed with
-this work for additional information regarding copyright ownership.
-The ASF licenses this file to You under the Apache License, Version 2.0
-(the "License"); you may not use this file except in compliance with
-the License.  You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
-import logging
 import importlib
-from types import ModuleType
-from typing import Optional, Any, Final, Type, Callable, List, Dict
-
+from typing import Optional
 
 class ValidatorAction:
-     """
-     Contains the information to dynamically create and run a validation method. 
-     This is the class representation of a pluggable validator that can be
-     defined in an xml file with the <validator> element. 
+    def __init__(self):
+        self.__name: Optional[str] = None
+        self.__class_name: Optional[str] = None
+        self.__method: Optional[str] = None
+        self.__depends: Optional[str] = None
+        self.__js_function: Optional[str] = None
+        self.__validator_class: Optional[object] = None  # Loaded class/module
 
-     Note: the original implementation was assumed to be thread safe. I can't 
-     make the same guarantee here. 
-     """
-     pass
-     # def __init__(self):
+    # ------------ Setters / Getters ------------
 
-     #      self.__log: Optional[logging.Logger] = logging.getLogger(__name__) 
-     #      #: Logger
+    @property
+    def name(self):
+        return self.__name
 
-     #      self.__name: Optional[str] = None
-     #      #: The name of the validation
+    @name.setter
+    def name(self, value):
+        self.__name = value
 
-     #      self.__class_name: Optional[str] = None
-     #      #: The full class name of the class containing the validation method associated with this action.
+    @property
+    def class_name(self):
+        return self.__class_name
 
-     #      self.__validation_class: Optional[Type] = None
-     #      #: The Class object loaded from the class name. 
+    @class_name.setter
+    def class_name(self, value):
+        self.__class_name = value
 
-     #      self.__method: str = None
-     #      #: the full method name of the validation to be performed. (method should be thread safe)
+    @property
+    def method(self):
+        return self.__method
 
-     #      self.__validation_method: Optional[Callable[...,Any]] = None
-     #      #: The method object loaded from the method name
+    @method.setter
+    def method(self, value):
+        self.__method = value
 
-     #      self.__method_params: List[str] = None
-     #      """
-     #      The method signature of the validation method. This should be a comma-delimited list of the full class names of each parameter in the correct order that the method takes.
+    @property
+    def depends(self):
+        return self.__depends
 
-     #      object is reserved for the JavaBean that is being validated. The `ValidatorAction` and `Field` that
-     #      are associated with a field's validation will automatically be populated if they are specified in the method signature.
-     #      """
+    @depends.setter
+    def depends(self, value):
+        self.__depends = value
 
-     #      self.__parameter_classes: Optional[List[type]] = None
-     #      #: The Class objects for each entry in methodParameterList.
+    def setJavascript(self, js_function):
+        self.__js_function = js_function
 
-     #      self.__depends: Optional[str] = None
-     #      #: The other ValidatorAction's that this one depends on. If any errors occur in an action that this one depends on, this action will not be processed.
+    def getJavascript(self):
+        return self.__js_function
 
-     #      self.__msg: Optional[str] = None
-     #      #: The default error message associated with this action.
+    # ------------ Initialization ------------
 
-     #      self.__js_function_name: Optional[str] = None
-     #      #: An optional field to contain the name to be used if JavaScript is generated. 
+    def init(self):
+        """Dynamically load the validator class/module."""
+        if not self.__class_name:
+            raise ValueError("class_name must be set before init()")
 
-     #      self.__js_function: Optional[str] = None
-     #      #: An optional field to contain the class path to be used to retrieve the JavaScript function.
+        try:
+            module_name, class_name = self.__class_name.rsplit(".", 1)
+            module = importlib.import_module(module_name)
+            self.__validator_class = getattr(module, class_name)
+        except: 
+            raise Exception(f"{self.__class_name} can't be imported. ")
 
-     #      self.__javascript: Optional[str] = None
-     #      #: An optional field to containing a JavaScript representation of the Java method associated with this action.
+    # ------------ Execution ------------
 
-     #      self.__instance: Optional[Any] = None
-     #      #: If the Java method matching the correct signature isn't static, the instance is stored in the action. This assumes the method is thread safe.
+    def execute_validation_method(self, validator, params):
+        """
+        Executes the validation method.
 
-     #      self.__dependency_list: Final[List[str]] = []
-     #      #:  An internal List representation of the other ValidatorActions this one depends on (if any). This List gets updated whenever setDepends() gets called. This is synchronized so a call to setDepends() (which clears the List) won't interfere with a call to isDependency().
+        Args:
+            validator: Validator instance (context).
+            params: Validation parameters.
 
-     #      self.__method_parameter_list: Final[List[str]] = []
-     #      #: An internal List representation of all the validation method's parameters defined in the methodParams String.
+        Returns:
+            Result of the validation (e.g., True/False).
+        """
+        if self.__validator_class is None:
+            raise Exception("Validator class not initialized. Call init() first.")
 
-     # def execute_validation_method(self, field: Field, params: Dict[str, object], results: ValidatorResults, pos: int) -> bool | ValidatorException:
-     #      """
-     #      Dynamically runs the validation method for this validator and returns true if the data is valid. 
-          
-     #      Args:
-     #           field (Field)
-     #           params (Dict[str, object]) - a dict of class names to parameter values
-     #           results (ValidatorResults)
-     #           pos (int) - the index of the list property to validate if it's indexed
+        instance = (
+            self.__validator_class() if callable(self.__validator_class) else self.__validator_class
+        )
 
-     #      Returns:
-     #           True if the data is valid. Throws ValidatorException.
-     #      """
-     #      raise NotImplementedError
-     
-     # def load_validation_class():
-     #      raise NotImplementedError
-     
-     # def load_validation_method(): 
-     #      raise NotImplementedError
-     
-     # def get_parameter_values():
-     #      raise NotImplementedError
-     
-     # def is_valid(): 
-     #      raise NotImplementedError
-     
-     # def handle_indexed_field(): 
-     #      raise NotImplementedError
-     
-     # def is_dependency(): 
-     #      raise NotImplementedError
-     
+        method = getattr(instance, self.__method)
+        return method(validator, params)
+
+    # ------------ Dependency Parsing ------------
+
+    def get_dependencies(self):
+        """Returns dependencies as a list."""
+        if self.__depends:
+            return [dep.strip() for dep in self.__depends.split(",")]
+        return []
+
+    def __str__(self):
+        return (
+            f"ValidatorAction(name={self.__name}, class_name={self.__class_name}, "
+            f"method={self.__method}, depends={self.__depends})"
+        )

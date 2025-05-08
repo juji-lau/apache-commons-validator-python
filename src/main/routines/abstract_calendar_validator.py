@@ -56,7 +56,7 @@ from src.main.util.utils import (
     integer_compare, 
     to_lower
 )
-from src.main.util.Locale import Locale
+from src.main.util.locale import Locale
 from src.main.generic_validator import GenericValidator
 from src.main.routines.abstract_format_validator import AbstractFormatValidator
 

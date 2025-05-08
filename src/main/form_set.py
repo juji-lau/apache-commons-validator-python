@@ -17,8 +17,6 @@ limitations under the License.
 
 import logging
 from typing import Dict, Optional, Final
-from src.main.form import Form
-
 
 class FormSet:
     """
@@ -77,7 +75,7 @@ class FormSet:
         self.__variant: Optional[str] = None
         #: Variant component
 
-        self.__forms: Final[Dict[str, Form]] = {}
+        self.__forms: Final[Dict[str, "Form"]] = {}
         #: Map of forms by their names
 
         self.__constants: Final[Dict[str, str]] = {}
@@ -102,7 +100,7 @@ class FormSet:
         else:
             self.__constants[name] = value
 
-    def add_form(self, f: Form) -> None:
+    def add_form(self, f: "Form") -> None:
         """
         Adds a Form to the FormSet.
 
@@ -141,7 +139,7 @@ class FormSet:
         return self.__country
     
 
-    def get_form(self, form_name: str) -> Optional[Form]:
+    def get_form(self, form_name: str) -> Optional["Form"]:
         """
         Retrieves a Form from the FormSet by its name.
 
@@ -153,7 +151,7 @@ class FormSet:
         """
         return self.__forms.get(form_name)
     
-    def get_forms(self) -> Dict[str, Form]:
+    def get_forms(self) -> Dict[str, "Form"]:
         """
         A dict of forms is returned as an unmodifiable dict with the key
         based on the for name.

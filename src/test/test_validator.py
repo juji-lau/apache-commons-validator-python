@@ -1,111 +1,94 @@
 import pytest
-from src.main.Validator import Validator
-from src.main.validator_exception import ValidatorException
+from src.main.validator import Validator
 from src.main.validator_results import ValidatorResults
+from src.main.validator_exception import ValidatorException
 from src.main.validator_resources import ValidatorResources
+from src.main.form import Form
+from src.main.field import Field
+from src.main.validator_action import ValidatorAction
+from src.main.validator_result import ValidatorResult
 
 
-class TestBean:
-    __test__ = False
-
-    def __init__(self):
-        self.letter = None
-        self.date = None
-
-    def get_date(self):
-        return self.date
-
-    def get_letter(self):
-        return self.letter
-
-    def set_date(self, date):
-        self.date = date
-
-    def set_letter(self, letter):
-        self.letter = letter
+class DummyValidator:
+    def validate(self, field, params, results, pos):
+        result = ValidatorResult(field)
+        result.add("required", True, "ok")
+        results[field.key] = result
+        return True
 
 
-def format_date(bean, field):
-    """Formats a string to a date. Returns None if validation fails."""
-    value = getattr(bean, field.property, None)
-    if not value:
-        return None
-    try:
-        from datetime import datetime
-
-        return datetime.strptime(value, "%m/%d/%Y")
-    except ValueError:
-        return None
-
-
-def is_cap_letter(bean, field, errors):
-    """Checks if the field is one upper-case letter between 'A' and 'Z'."""
-    value = getattr(bean, field.property, None)
-    if not value or len(value) != 1 or not ("A" <= value <= "Z"):
-        errors.append("Error")
-        return False
-    return True
-
-
-def test_manual_boolean():
+@pytest.fixture
+def validator_resources_with_form():
     resources = ValidatorResources()
-    bean = TestBean()
-    bean.set_letter("A")
 
-    validator = Validator(resources, "testForm")
-    validator.set_parameter(Validator.BEAN_PARAM, bean)
-    validator.set_parameter("java.util.List", [])
+    # Create form, field, and action
+    form = Form()
+    field = Field()
+    field.field_property = "username"
+    field.depends = "required"
 
-    try:
-        validator.validate()
-    except Exception:
-        pytest.fail("Validator.validate() raised an exception unexpectedly!")
+    action = ValidatorAction()
+    action.name = "required"
+    action.method = "validate"
+    action._ValidatorAction__validator_class = DummyValidator
+
+    form.add_field(field)
+
+    # Patch internal structures directly
+    locale_key = resources.__build_locale_key("en", "US", None, "testForm")
+    resources._forms[locale_key] = form
+    resources._validator_actions["required"] = action
+
+    return resources
 
 
-def test_manual_object():
+def test_get_result_success(validator_resources_with_form):
+    validator = Validator(validator_resources_with_form, "testForm", {
+        "java.lang.Object": {"username": "value"}
+    })
+
+    result = validator.get_result()
+    assert isinstance(result, ValidatorResults)
+    assert result.get_validator_result("username").is_valid("required")
+
+
+def test_get_result_raises_exception_if_form_missing():
     resources = ValidatorResources()
-    bean = TestBean()
-    bean.set_date("2/3/1999")
+    validator = Validator(resources, "missingForm")
 
-    validator = Validator(resources, "testForm")
-    validator.set_parameter(Validator.BEAN_PARAM, bean)
+    with pytest.raises(ValidatorException) as exc_info:
+        validator.get_result()
 
-    try:
-        results = validator.validate()
-        assert results is not None
-        result = results.get_validator_result("date")
-        assert result is not None
-        assert result.contains_action("date")
-        assert result.is_valid("date")
-    except Exception:
-        pytest.fail("Validator.validate() raised an exception unexpectedly!")
+    assert "Form 'missingForm' not found" in str(exc_info.value)
 
 
-def test_only_return_errors():
-    resources = ValidatorResources()
-    bean = TestBean()
-    bean.set_date("2/3/1999")
+def test_validate_field_specific(validator_resources_with_form):
+    validator = Validator(validator_resources_with_form, "testForm", {
+        "java.lang.Object": {"username": "value"}
+    })
 
-    validator = Validator(resources, "testForm")
-    validator.set_parameter(Validator.BEAN_PARAM, bean)
+    result = validator.validate_field("username")
+    assert isinstance(result, ValidatorResults)
+    assert result.get_validator_result("username").is_valid("required")
 
-    results = validator.validate()
-    assert results is not None
-    assert "date" in results.property_names
 
+def test_set_and_get_parameter(validator_resources_with_form):
+    validator = Validator(validator_resources_with_form, "testForm")
+    validator.set_parameter("key", 123)
+    assert validator.get_parameter("key") == 123
+
+
+def test_locale_affects_form_resolution(validator_resources_with_form):
+    validator = Validator(validator_resources_with_form, "testForm")
+    validator.set_locale("en", "US")
+    result = validator.get_result()
+    assert isinstance(result, ValidatorResults)
+
+
+def test_set_page_and_error_flag(validator_resources_with_form):
+    validator = Validator(validator_resources_with_form, "testForm")
+    validator.set_page(1)
     validator.set_only_return_errors(True)
-    results = validator.validate()
-    assert "date" not in results.property_names
 
-
-def test_only_validate_field():
-    resources = ValidatorResources()
-    bean = TestBean()
-    bean.set_date("2/3/1999")
-
-    validator = Validator(resources, "testForm", "date")
-    validator.set_parameter(Validator.BEAN_PARAM, bean)
-
-    results = validator.validate()
-    assert results is not None
-    assert "date" in results.property_names
+    assert validator._page == 1
+    assert validator._only_return_errors is True

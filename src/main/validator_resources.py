@@ -21,12 +21,6 @@ from urllib.request import urlopen
 import locale
 from typing import IO, Dict, List, Optional, Final, Union
 
-# from src.main.validator_action import ValidatorAction
-# from src.main.form_set import FormSet
-from src.main.form_set_factory import FormSetFactory
-from src.main.util.digester import Digester
-
-
 class ValidatorResources:
     """
     General purpose class for storing FormSet objects based on their associated locale.
@@ -64,6 +58,7 @@ class ValidatorResources:
             if not isinstance(sources, list):
                 sources = [sources]
 
+            from src.main.util.digester import Digester
             digester = Digester(root_object=self)
             digester.load_rules(self.__VALIDATOR_RULES)
 

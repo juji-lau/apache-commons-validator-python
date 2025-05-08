@@ -15,7 +15,7 @@ class Digester(xml.sax.ContentHandler):
         super().__init__()
         self.rules: Dict[str, Dict[str, Any]] = {}
         self.object_stack: list[Any] = []
-        self.current_path: list[str] = []  # Track current XML path
+        self.current_path: list[str] = []
         self.root_object: 'ValidatorResources' = root_object
         self.class_mapping: Dict[str, Type] = {
             "FormSetFactory": FormSetFactory,
@@ -25,11 +25,11 @@ class Digester(xml.sax.ContentHandler):
             "Var": Var,
             "Msg": Msg,
             "ValidatorAction": ValidatorAction,
-            "Arg": Arg,
+            "Arg": "Arg",
         }
         self.object_stack.append(self.root_object)
-        self.current_params: list[str] = []  # For call-method-rule
-        self.text_buffer: str = ""  # Buffer for accumulating character data
+        self.current_params: list[str] = []
+        self.text_buffer: str = ""
 
     def load_rules(self, rules_file: str) -> None:
         tree = ET.parse(rules_file)
@@ -88,6 +88,8 @@ class Digester(xml.sax.ContentHandler):
         self.current_path.append(name)
         path = "/".join(self.current_path)
         self.text_buffer = ""  # Reset text buffer
+        # print(f"Start Element: {path}")
+
         if path in self.rules:
             rule = self.rules[path]
             if "factory-create-rule" in rule:
@@ -96,19 +98,25 @@ class Digester(xml.sax.ContentHandler):
                 obj = factory_instance.create_object(attrs, self.root_object)
                 if "set-properties-rule" in rule:
                     for attr in attrs.keys():
-                        setattr(obj, attr, attrs[attr])
+                        mapped_attr = attr
+                        if attr == "classname":
+                            mapped_attr = "class_name"
+                        setattr(obj, mapped_attr, attrs[attr])
                 self.object_stack.append(obj)
             elif "object-create-rule" in rule:
                 obj_class = rule["object-create-rule"]
                 obj = obj_class()
                 if "set-properties-rule" in rule:
                     for attr in attrs.keys():
-                        setattr(obj, attr, attrs[attr])
+                        mapped_attr = attr
+                        if attr == "classname":
+                            mapped_attr = "class_name"
+                        setattr(obj, mapped_attr, attrs[attr])
                 self.object_stack.append(obj)
+
 
     def endElement(self, name: str) -> None:
         path = "/".join(self.current_path)
-        # Flush text buffer for call-param-rule
         if self.text_buffer.strip():
             for rule_path, rule in self.rules.items():
                 if "call-param-rule" in rule:

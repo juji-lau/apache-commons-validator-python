@@ -20,7 +20,6 @@ from typing import Optional
 
 from src.main.form_set import FormSet
 
-
 class FormSetFactory:
     """
     Factory class used to create FormSet instances.
@@ -36,11 +35,11 @@ class FormSetFactory:
 
     def create_form_set(
         self,
-        resources: 'ValidatorResources',
+        resources: "ValidatorResources",
         language: Optional[str],
         country: Optional[str],
         variant: Optional[str],
-    ) -> 'FormSet':
+    ) -> "FormSet":
         """
         Creates or retrieves a FormSet based on the locale attributes.
 
@@ -62,6 +61,7 @@ class FormSetFactory:
                 self.__get_log().debug(f"FormSet[{form_set.display_key()}] found - merging.")
             return form_set
 
+        from src.main.form_set import FormSet
         # Create a new FormSet instance
         if form_set is None:
             form_set = FormSet()
@@ -79,8 +79,8 @@ class FormSetFactory:
         return form_set
 
     def create_object(
-        self, attributes, resources: 'ValidatorResources'
-    ) -> 'FormSet':
+        self, attributes, resources: "ValidatorResources"
+    ) -> "FormSet":
         """
         Creates or retrieves a FormSet based on XML attributes.
 
@@ -91,7 +91,6 @@ class FormSetFactory:
         Returns:
             FormSet: The created or retrieved FormSet instance.
         """
-        print("FormSetFactory: creating FormSet")
         language = attributes.get("language")
         country = attributes.get("country")
         variant = attributes.get("variant")

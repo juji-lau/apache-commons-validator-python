@@ -17,11 +17,6 @@ limitations under the License.
 
 from collections import OrderedDict  # If strict order is required
 from typing import List, Dict, Optional
-from src.main.field import Field
-from src.main.validator import Validator
-from src.main.validator_exception import ValidatorException
-from src.main.validator_results import ValidatorResults
-
 
 class Form:
     """
@@ -42,10 +37,10 @@ class Form:
         self._name: str = None
         #: The name/key that the set of validation rules is stored under.
 
-        self._l_fields: List[Field] = []  # List of Field objects
+        self._l_fields: List["Field"] = []  # List of Field objects
         #: List of `Field`s. Used to maintain the order they were added in. Individual `Field`s can be retrieved using _h_fields
 
-        self._h_fields: Dict[str, Field] = OrderedDict()
+        self._h_fields: Dict[str, "Field"] = OrderedDict()
         #: Dict of `Field`s keyed on their property value. Use get_field_map() to access.
 
         self._inherit: str = None
@@ -54,7 +49,7 @@ class Form:
         self._processed: bool = False
         #: Whether or not this `Form` was processed for replacing variables in strings with their values.
 
-    def add_field(self, field: Field) -> None:
+    def add_field(self, field: "Field") -> None:
         """
         Add a `Field` to the `Form`.
 
@@ -85,7 +80,7 @@ class Form:
         """
         return self._inherit
 
-    def get_field(self, field_name: str) -> Optional[Field]:
+    def get_field(self, field_name: str) -> Optional["Field"]:
         """
         Returns the Field with the given name or None if this Form has
         no such field.
@@ -98,7 +93,7 @@ class Form:
         """
         return self.get_field_map().get(field_name)
 
-    def get_field_map(self) -> Dict[str, Field]:
+    def get_field_map(self) -> Dict[str, "Field"]:
         """
         Returns a dict of str field keys to Field objects.
 
@@ -108,7 +103,7 @@ class Form:
         return self._h_fields
 
     @property
-    def fields(self) -> List[Field]:
+    def fields(self) -> List["Field"]:
         """
         A copy of list of `Field`s is returned.
         """
@@ -215,7 +210,7 @@ class Form:
 
     def validate(
         self, params: dict, actions: dict, page: int, field_name: str = None
-    ) -> ValidatorResults:
+    ) -> "ValidatorResults":
         """
         Validates the fields of the form and returns the validation results.
 
@@ -238,6 +233,10 @@ class Form:
             ValidatorException: If the specified `field_name` does not correspond to a valid field
                                 in the form.
         """
+        from src.main.validator_results import ValidatorResults
+        from src.main.validator import Validator
+        from src.main.validator_exception import ValidatorException
+        
         results = ValidatorResults()
         params[Validator.VALIDATOR_RESULTS_PARAM] = results
 

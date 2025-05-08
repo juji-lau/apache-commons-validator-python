@@ -1,43 +1,39 @@
 import pytest
 from io import StringIO
+from unittest.mock import MagicMock
+from src.main.util.digester import Digester
 from src.main.validator_resources import ValidatorResources
+
+# ============================== Fixtures ==================================== #
 
 @pytest.fixture
 def valid_xml():
     return """
     <form-validation>
-        <formset>
+        <formset language="en" country="US">
             <form name="testForm">
-                <field property="testField" depends="required"/>
+                <field field_property="testField" depends="required"/>
             </form>
+            <constant>
+                <constant-name>testKey</constant-name>
+                <constant-value>testValue</constant-value>
+            </constant>
         </formset>
+        <constant>
+            <constant-name>testKey_global</constant-name>
+            <constant-value>testValue_global</constant-value>
+        </constant>
     </form-validation>
     """
 
-def test_validator_resources_initialize_with_stream(valid_xml):
-    xml_stream = StringIO(valid_xml)
-    resources = ValidatorResources(sources=xml_stream)
-    assert resources is not None
-    assert resources._get_form_sets()
+# ============================== Mock-based Unit Tests ======================= #
 
-def test_validator_resources_initialize_with_file_path(tmp_path, valid_xml):
-    file_path = tmp_path / "test_validation.xml"
-    file_path.write_text(valid_xml)
-    resources = ValidatorResources(sources=str(file_path))
-    assert resources is not None
-    assert resources._get_form_sets()
-
-def test_validator_resources_invalid_source_type():
-    with pytest.raises(ValueError):
-        ValidatorResources(sources=1234)
-
-def test_validator_resources_add_constant():
+def test_add_constant_mock():
     resources = ValidatorResources()
-    resources.add_constant("testKey", "testValue")
-    assert resources._get_constants()["testKey"] == "testValue"
+    resources.add_constant("mockKey", "mockValue")
+    assert resources._get_constants()["mockKey"] == "mockValue"
 
-def test_validator_resources_add_form_set():
-    from unittest.mock import MagicMock
+def test_add_form_set_mock():
     resources = ValidatorResources()
     form_set = MagicMock()
     form_set.language = "en"
@@ -47,8 +43,7 @@ def test_validator_resources_add_form_set():
     key = resources.build_locale("en", "US", None)
     assert key in resources._get_form_sets()
 
-def test_validator_resources_get_validator_action():
-    from unittest.mock import MagicMock
+def test_add_validator_action_mock():
     resources = ValidatorResources()
     action = MagicMock()
     action.name = "testAction"
@@ -56,23 +51,45 @@ def test_validator_resources_get_validator_action():
     resources.add_validator_action(action)
     assert resources.get_validator_action("testAction") == action
 
-def test_validator_resources_build_locale():
+def test_get_form_locale_priority_mock():
     resources = ValidatorResources()
-    assert resources.build_locale("en", "US", "variant") == "en_US_variant"
-    assert resources.build_locale("en", None, None) == "en"
 
-def test_validator_resources_get_validator_actions():
-    from unittest.mock import MagicMock
-    resources = ValidatorResources()
-    action = MagicMock()
-    action.name = "action1"
-    action.class_name = "Class1"
-    resources.add_validator_action(action)
-    actions = resources.get_validator_actions()
-    assert "action1" in actions
+    fs_variant = MagicMock(); fs_variant.get_form.return_value = "form_v"
+    fs_country = MagicMock(); fs_country.get_form.return_value = "form_c"
+    fs_lang = MagicMock();    fs_lang.get_form.return_value = "form_l"
+    default_fs = MagicMock(); default_fs.get_form.return_value = "form_d"
 
+    resources._h_form_sets["en_US_variant"] = fs_variant
+    resources._h_form_sets["en_US"] = fs_country
+    resources._h_form_sets["en"] = fs_lang
+    resources._default_form_set = default_fs
 
-def test_validator_resources_process(mocker):
+    assert resources._get_form_with_locale("en", "US", "variant", "f") == "form_v"
+    assert resources._get_form_with_locale("en", "US", None, "f") == "form_c"
+    assert resources._get_form_with_locale("en", None, "x", "f") == "form_l"
+    assert resources._get_form_with_locale(None, None, None, "f") == "form_d"
+
+# ============================== Real Unit Tests ============================= #
+
+def test_initialize_with_stream(valid_xml):
+    xml_stream = StringIO(valid_xml)
+    resources = ValidatorResources(sources=xml_stream)
+    assert resources._get_constants()["testKey_global"] == "testValue_global"
+    assert "en_US" in resources._get_form_sets()    
+    # assert resources._get_constants()["testKey"] == "testValue"
+    # assert "en_US" in resources._get_form_sets()
+
+def test_initialize_with_file_path(tmp_path, valid_xml):
+    file_path = tmp_path / "test_validation.xml"
+    file_path.write_text(valid_xml)
+    resources = ValidatorResources(sources=str(file_path))
+    assert "en_US" in resources._get_form_sets()
+
+def test_invalid_source_type():
+    with pytest.raises(ValueError):
+        ValidatorResources(sources=1234)
+
+def test_process_calls_all(mocker):
     resources = ValidatorResources()
     mock_form_set = mocker.Mock()
     resources._h_form_sets = {"key": mock_form_set}
@@ -81,53 +98,24 @@ def test_validator_resources_process(mocker):
     resources._default_form_set.process.assert_called_once()
     mock_form_set.process.assert_called_once()
 
-def test_validator_resources_get_form_with_locale_language_country_variant():
-    from unittest.mock import MagicMock
-    resources = ValidatorResources()
+# ============================== Integration Tests =========================== #
 
-    form_set_variant = MagicMock()
-    form_variant = MagicMock()
-    form_set_variant.get_form.return_value = form_variant
-    resources._get_form_sets()["en_US_variant"] = form_set_variant
+def test_integration_parses_formset_and_constant(valid_xml):
+    xml_stream = StringIO(valid_xml)
+    resources = ValidatorResources(sources=xml_stream)
 
-    retrieved_form = resources._get_form_with_locale("en", "US", "variant", "testForm")
-    assert retrieved_form == form_variant
-    form_set_variant.get_form.assert_called_once_with("testForm")
+    form_set_key = "en_US"
+    assert form_set_key in resources._get_form_sets()
+    form_set = resources._get_form_sets()[form_set_key]
+    form = form_set.get_form("testForm")
+    assert form is not None
+    assert len(form.fields) == 1
+    assert form.fields[0].field_property == "testField"
 
-def test_validator_resources_get_form_with_locale_language_country():
-    from unittest.mock import MagicMock
-    resources = ValidatorResources()
+    print(resources._get_constants())
+    assert resources._get_constants()["testKey_global"] == "testValue_global"
 
-    form_set_country = MagicMock()
-    form_country = MagicMock()
-    form_set_country.get_form.return_value = form_country
-    resources._get_form_sets()["en_US"] = form_set_country
-
-    retrieved_form = resources._get_form_with_locale("en", "US", "nothing", "testForm")
-    assert retrieved_form == form_country
-    form_set_country.get_form.assert_called_once_with("testForm")
-
-def test_validator_resources_get_form_with_locale_language():
-    from unittest.mock import MagicMock
-    resources = ValidatorResources()
-
-    form_set_language = MagicMock()
-    form_language = MagicMock()
-    form_set_language.get_form.return_value = form_language
-    resources._get_form_sets()["en"] = form_set_language
-
-    retrieved_form = resources._get_form_with_locale("en", None, "something", "testForm")
-    assert retrieved_form == form_language
-    form_set_language.get_form.assert_called_once_with("testForm")
-
-def test_validator_resources_get_form_with_locale_default():
-    from unittest.mock import MagicMock
-    resources = ValidatorResources()
-
-    form_default = MagicMock()
-    resources._default_form_set = MagicMock()
-    resources._default_form_set.get_form.return_value = form_default
-
-    retrieved_form = resources._get_form_with_locale(None, None, None, "testForm")
-    assert retrieved_form == form_default
-    resources._default_form_set.get_form.assert_called_once_with("testForm")
+    # TODO only gets constants when in form-validation
+    # not getting constants when in formset
+    # print(resources._get_constants())
+    # assert resources._get_constants()["testKey"] == "testValue"

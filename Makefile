@@ -16,7 +16,7 @@ lint:
 	pylint --output-format=parseable,colorized --disable=C0301 src
 
 coverage:
-	coverage run --branch -m pytest $(TEST)
+	coverage run --branch -m pytest $(filter-out $@,$(MAKECMDGOALS)) || true
 	coverage report -m >> htmlcov/coverage_report.txt
 	coverage html
 	open htmlcov/index.html

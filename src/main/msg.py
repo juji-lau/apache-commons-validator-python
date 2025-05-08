@@ -38,7 +38,7 @@ class Msg:
         self._name: Optional[str] = None  #: Dependency name (optional)
         self._resource: bool = True  #: Whether the key is a resource (default is True)
 
-    def clone(self) -> 'Msg':
+    def clone(self) -> "Msg":
         """
         Creates and returns a deep copy of the current Msg instance using serialization.
         This method utilizes `pickle` to serialize and deserialize the object.

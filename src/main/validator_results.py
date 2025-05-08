@@ -14,105 +14,110 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-# TODO: add typing annotations for type
-
-from src.main.validator_result import ValidatorResult
-
+from typing import Dict, Set, Optional, Any
+from types import MappingProxyType
 
 class ValidatorResults:
     """
-    This class contains the results of a set of validation rules processed
-    on a JavaBean. This is a Python adaptation of the Java version from
-    Apache Commons Validator.
+    Contains the results of a set of validation rules processed on a JavaBean.
     """
 
     def __init__(self):
-        # Internal dictionary mapping a field key (string) to a ValidatorResult.
-        self._h_results = {}
-        self.serializable = False
-        self.cloneable = False
+        self._results: Dict[str, 'ValidatorResult'] = {}
 
-    def add(self, field: "Field", validator_name, result, value=None):
+    def add(self, field: 'Field', validator_name: str, result: bool, value: Optional[Any] = None):
         """
         Add the result of a validator action.
 
         Args:
-            field: The field validated. Expected to have an attribute 'key'.
+            field (Field): The field that was validated.
             validator_name (str): The name of the validator.
             result (bool): The result of the validation.
-            value (object, optional): An optional value returned by the validator.
+            value (Any, optional): The value returned by the validator.
         """
-        # Retrieve the key from the field.
-        # TODO: double check Field when implementeds
+        from src.main.validator_result import ValidatorResult
+        
         key = field.key
-        validator_result = self.get_validator_result(key)
-        if validator_result is None:
-            # Assuming ValidatorResult takes the field as an initializer argument.
-            validator_result = ValidatorResult(field)
-            self._h_results[key] = validator_result
+        if key not in self._results:
+            self._results[key] = ValidatorResult(field)
+        self._results[key].add(validator_name, result, value)
 
-        # Add the validation result to the ValidatorResult.
-        validator_result.add(validator_name, result, value)
+    def get_validator_result(self, key: str) -> Optional["ValidatorResult"]:
+        """
+        Gets the ValidatorResult associated with the key.
+
+        Args:
+            key (str): The key generated from Field (often just the field name).
+
+        Returns:
+            ValidatorResult: The result of a specified key.
+        """
+        return self._results.get(key)
+
+    def get_property_names(self) -> Set[str]:
+        """
+        Gets the set of property names for which at least one message has been recorded.
+
+        Returns:
+            Set[str]: An unmodifiable set of the property names.
+        """
+        return set(self._results.keys())
+
+    def get_result_value_map(self) -> Dict[str, Any]:
+        """
+        Gets a map of any objects returned from validation routines.
+
+        Returns:
+            Dict[str, Any]: Map of objects returned by validators.
+        """
+        result_map = {}
+        for key, validator_result in self._results.items():
+            for action_name in validator_result.get_actions():
+                result_map[f"{key}.{action_name}"] = validator_result.get_result(action_name)
+        return result_map
+
+    def is_empty(self) -> bool:
+        """
+        Gets true if there are no messages recorded in this collection.
+
+        Returns:
+            bool: Whether these results are empty.
+        """
+        return not self._results
 
     def clear(self):
         """
         Clear all results recorded by this object.
         """
-        self._h_results.clear()
+        self._results.clear()
 
-    @property
-    def property_names(self):
+    def merge(self, other: 'ValidatorResults'):
         """
-        Get the set of property names for which at least one message has been recorded.
-
-        Returns:
-            frozenset: An unmodifiable set of property names.
-        """
-        return frozenset(self._h_results.keys())
-
-    def get_result_value_map(self):
-        """
-        Gets a dictionary of any objects returned from validation routines.
-
-        Returns:
-            dict: A dictionary mapping property keys to the corresponding validator result object
-                  (only if the result is not None and not a boolean).
-        """
-        results = {}
-        for property_key, validator_result in self._h_results.items():
-            for action_key in validator_result.get_actions():
-                res = validator_result.get_result(action_key)
-                if res is not None and not isinstance(res, bool):
-                    results[property_key] = res
-        return results
-
-    def get_validator_result(self, key):
-        """
-        Gets the ValidatorResult associated with the given key.
+        Merge another ValidatorResults into this one.
 
         Args:
-            key (str): The key generated from the Field (often just the field name).
-
-        Returns:
-            ValidatorResult or None: The result associated with the key, if present.
+            other (ValidatorResults): ValidatorResults to merge.
         """
-        return self._h_results.get(key)
+        for key, other_result in other._results.items():
+            if key not in self._results:
+                self._results[key] = other_result
+            else:
+                for action_name in other_result.get_actions():
+                    result = other_result.is_valid(action_name)
+                    value = other_result.get_result(action_name)
+                    self._results[key].add(action_name, result, value)
 
-    def is_empty(self):
+    def get_action_map(self, key: str) -> Optional[MappingProxyType]:
         """
-        Determines if there are no messages recorded in this collection.
-
-        Returns:
-            bool: True if there are no results, False otherwise.
-        """
-        return not self._h_results
-
-    def merge(self, other):
-        """
-        Merge another ValidatorResults instance into this one.
+        Gets an unmodifiable mapping of validator actions for a specific field key.
 
         Args:
-            other (ValidatorResults): Another instance whose results will be merged in.
+            key (str): The key generated from Field.
+
+        Returns:
+            MappingProxyType: A read-only dictionary mapping validator names to ResultStatus objects.
         """
-        self._h_results.update(other._h_results)
+        validator_result = self._results.get(key)
+        if validator_result:
+            return validator_result.get_action_map()
+        return None

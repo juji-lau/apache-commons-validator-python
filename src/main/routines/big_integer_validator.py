@@ -131,7 +131,4 @@ class BigIntegerValidator(AbstractNumberValidator):
         if val is None:
             return val
         
-        scale = self._determine_scale(pattern, locale)
-        if scale >= 0:
-            val = round(val, scale)
         return val

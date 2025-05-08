@@ -20,6 +20,8 @@ import locale as Locale
 from src.main.routines.currency_validator import CurrencyValidator
 from src.main.routines.abstract_number_validator import AbstractNumberValidator
 
+original = Locale.setlocale(Locale.LC_ALL, None)
+
 class TestBigCurrencyValidator:
 
     Locale.setlocale(Locale.LC_MONETARY, "en_GB")
@@ -155,3 +157,6 @@ class TestBigCurrencyValidator:
         assert validator.validate(uk_plus_1decimal, locale="en_GB") == one_decimal
         assert validator.validate(uk_plus_3decimal, locale="en_GB") == (expected + 0.01) # Will round if truncated unlike original
         assert validator.validate("1,234.56", locale="en_GB") == expected
+    
+    def test_change_locale_to_default(self):
+        Locale.setlocale(Locale.LC_ALL, original)

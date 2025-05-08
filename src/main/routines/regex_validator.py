@@ -206,6 +206,8 @@ class RegexValidator:
             matches = pattern.fullmatch(value)
             if matches is not None:
                 groups = matches.groups()
+                if not groups:
+                    return matches.group(0)  # fallback to full match if there are no groups so we do not return an empty string
                 return "".join(filter(None, groups))
         return None
 

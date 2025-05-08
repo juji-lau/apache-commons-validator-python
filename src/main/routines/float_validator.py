@@ -116,6 +116,8 @@ class FloatValidator(AbstractNumberValidator):
         """
         try:
             val = formatter(value)
+            if val == 0:
+                return val
             pos_val = val * -1 if val < 0 else val
             if self.is_in_range(pos_val, self.FLOAT_MIN, self.FLOAT_MAX):
                 return val

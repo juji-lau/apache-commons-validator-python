@@ -40,12 +40,13 @@ Changes:
 
 """
 from __future__ import annotations            
-from dateparser import parse
 from datetime import datetime, date, time, tzinfo
 from typing import Optional, Callable
 
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
-from src.main.util.datetime_helpers import timezone_has_same_rules, locale_reg2dp
+from src.main.util.datetime_helpers import timezone_has_same_rules
+from src.main.util.utils import integer_compare
+
 
 class CalendarValidator(AbstractCalendarValidator):
     """
@@ -98,10 +99,10 @@ class CalendarValidator(AbstractCalendarValidator):
     """
     __VALIDATOR:CalendarValidator = None
     # Attributes to manage serialization and cloning capabilities
-    serializable = True    # class is serializable
-    cloneable = False      # class is not cloneable
+    serializable = True    # Class extends AbstracCalendarvalidator which is serializable
+    cloneable = False      # Class extends AbstracCalendarvalidator which is not cloneable
 
-    def __init__(self, *, strict:bool = True, date_style:int = 3):
+    def __init__(self, *, strict:bool = True, date_style:int=3):
         """
         Constructs an instance of the CalendarValidator with the specified params.
 
@@ -144,7 +145,6 @@ class CalendarValidator(AbstractCalendarValidator):
         microsecond = value.microsecond
         
         return datetime(year, month, day, hour, minute, second, microsecond, tzinfo=time_zone)
-
 
 
     @classmethod
@@ -216,9 +216,13 @@ class CalendarValidator(AbstractCalendarValidator):
             -1 if the first week is less than the second.
             +1 if the first week is greater than the second.
         """
-        pass    # week_of_year not implemented in _compare
-        # return self._compare(value, compare, "week_of_year")
-
+        if self._compare(value, compare, "year") != 0:
+            return self._compare(value, compare, "year")
+    
+        value_week = value.isocalendar()[1]
+        compare_week = compare.isocalendar()[1]
+        return integer_compare(value_week, compare_week)
+        
 
     def compare_years(self, value:datetime, compare:datetime) -> int:
         """
@@ -235,7 +239,7 @@ class CalendarValidator(AbstractCalendarValidator):
         """
         return self._compare(value, compare, "year")
 
-    # @override
+
     def _process_parsed_value(self, value:date, formatter:Callable) -> datetime:
         """
         Convert the parsed ``date`` to a `datetime`.
@@ -245,11 +249,8 @@ class CalendarValidator(AbstractCalendarValidator):
             formatter (st): The format to parse the value with.
         
         Returns:
-            The parsed value  converted to a `datetime`.
+            The parsed value  converted to a `datetime`, with all time fields set to 0.
         """
-        # TODO: Needs review
-        # value = parse(value, formatter)
-        # return datetime.fromisoformat()
         return datetime.combine(value, time())
             
     
@@ -268,20 +269,4 @@ class CalendarValidator(AbstractCalendarValidator):
         Returns:
             The parsed `datetime` if valid or ``None`` if invalid.
         """
-        if pattern is None:
-            return self._parse(value=value)
-        
-        if locale is None:
-            dt = self._parse(value=value)
-        else:
-            dt = self._parse(value, locale = locale)
-            if dt is None:
-                return None
-        # Set the timezone
-        if time_zone is None:
-            # TODO: get default time zone
-            dt = dt.replace(tzinfo=time_zone)
-        else:
-            dt = dt.astimezone(time_zone)
-        
-        return dt
+        return self._parse(value, pattern, locale, time_zone)

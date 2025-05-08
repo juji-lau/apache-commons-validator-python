@@ -14,18 +14,47 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 """
-
+import pytest
 from typing import Final
 from src.main.routines.byte_validator import ByteValidator
+from .test_abstract_number_validator import TestAbstractNumberValidator
 
-class TestByteValidator:
+class TestByteValidator(TestAbstractNumberValidator):
 
     _BYTE_MIN_VAL: Final[int] = -128
     _BYTE_MAX_VAL: Final[int] = 127
     _BYTE_MAX: Final[str] = "127"
     _BYTE_MAX_1: Final[str] = "128"
+    _BYTE_MAX_0 = "127.99999999999999999999999"
     _BYTE_MIN: Final[str] = "-128"
     _BYTE_MIN_1: Final[str] = "-129"
+    _BYTE_MIN_0 = "-128.99999999999999999999999"
+
+    @pytest.fixture(autouse=True)
+    def set_up(self):
+        self._validator = ByteValidator(strict=False)
+        self._strict_validator = ByteValidator()
+        self._test_pattern = r"^-?\,?(\d{1,3}(,\d{3})+|\d+)$"
+        self._max = ByteValidator.BYTE_MAX
+        self._max_plus_one = ByteValidator.BYTE_MAX + 1
+        self._min = ByteValidator.BYTE_MIN
+        self._min_minus_one = ByteValidator.BYTE_MIN - 1
+        self._invalid = [None, '', 'X', "X12", self._BYTE_MAX_1, self._BYTE_MIN_1]
+        self._invalid_strict = [None, '', 'X', "X12", "12X", "1X2", "1.2", self._BYTE_MAX_1, self._BYTE_MIN_1, self._BYTE_MAX_0, self._BYTE_MIN_0]
+        self._test_number = 123
+        self._test_zero = 0
+        self._valid_strict = ['0', "123", ",123", self._BYTE_MAX, self._BYTE_MIN]
+        self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL]
+        # self._valid = ['0', "123", ",123", ",123.5", "123X", self._BYTE_MAX, self._BYTE_MIN, self._BYTE_MAX_0, self._BYTE_MIN_0]
+        self._valid = ['0', "123", ",123", self._BYTE_MAX, self._BYTE_MIN]
+        # self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL]
+        self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL]
+        self._test_string_us = ",123"
+        self._test_string_de = ".123"
+        self._locale_value = self._test_string_de
+        self._locale_pattern = r"\d.\d\d\d"
+        self._test_locale = "de_DE"
+        self._locale_expected = self._test_number
 
     def test_format(self):
         validator = ByteValidator()
@@ -70,6 +99,36 @@ class TestByteValidator:
         assert validator.max_value(number19, max) is True  # less than max
         assert validator.max_value(number20, max) is True  # equal to max
         assert validator.max_value(number21, max) is False # greater than max
+    
+    def test_byte_validator_methods(self):
+        locale = "de_DE"
+        pattern = r"^\d,\d\d"
+        pattern_val = "1,23"
+        german_pattern_val = "1.23"
+        locale_val = ".123"
+        default_val  = ",123"
+        xxxx = "XXXX"
+        expected = 123
+
+        assert ByteValidator.get_instance().validate(default_val) == expected
+        assert ByteValidator.get_instance().validate(value=locale_val, locale=locale) == expected
+        assert ByteValidator.get_instance().validate(value=pattern_val, pattern=pattern) == expected
+        # assert ByteValidator.get_instance().validate(value=german_pattern_val, pattern=pattern, locale=locale) == expected
+
+        assert ByteValidator.get_instance().is_valid(default_val) is True
+        assert ByteValidator.get_instance().is_valid(value=locale_val, locale=locale) is True
+        assert ByteValidator.get_instance().is_valid(value=pattern_val, pattern=pattern) is True
+        # assert ByteValidator.get_instance().is_valid(value=german_pattern_val, pattern=pattern, locale=locale) is True
+
+        assert ByteValidator.get_instance().validate(xxxx) is None
+        assert ByteValidator.get_instance().validate(value=xxxx, locale=locale) is None
+        assert ByteValidator.get_instance().validate(value=xxxx, locale=pattern) is None
+        assert ByteValidator.get_instance().validate(value=pattern_val, pattern=pattern, locale=locale) is None
+
+        assert ByteValidator.get_instance().is_valid(xxxx) is False
+        assert ByteValidator.get_instance().is_valid(value=xxxx, locale=locale) is False
+        assert ByteValidator.get_instance().is_valid(value=xxxx, locale=pattern) is False
+        assert ByteValidator.get_instance().is_valid(value=pattern_val, pattern=pattern, locale=locale) is False
     
     def test_validate(self):
         locale = "de_DE"

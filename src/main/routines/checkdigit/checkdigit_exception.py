@@ -51,5 +51,6 @@ class CheckDigitException(Exception):
             cause (Exception, optional): The underlying cause of the error.
         """
         super().__init__(msg)
+        self.value = msg  # Makes it compatible with Java-style `.value` access
         if isinstance(cause, BaseException):
             self.__cause__ = cause

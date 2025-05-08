@@ -84,6 +84,7 @@ class ModulusCheckDigit(AbstractCheckDigit):
     #     self.__modulus__ = 10
     
     # concrete method
+    @staticmethod #so do not pass self when calling self.sum_digits in test_isin_checkdigit
     def sum_digits(number:int) -> int:
         """
         Add together the individual digits in a number.

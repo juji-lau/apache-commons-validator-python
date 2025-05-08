@@ -15,9 +15,31 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import threading
 
-class ValidatorException(Exception):
-    serializable = True  # Corresponds to implementing Serializable in Java
+class SynchronizedList:
+    """
+    Python implementation of Java's Collections.synchronizedList.
+    """
+    def __init__(self):
+        self._list = []
+        self._lock = threading.Lock()
 
-    def __init__(self, message=None):
-        super().__init__(message)
+    def __len__(self):
+        with self._lock:
+            return len(self._list)
+
+    def append(self, item):
+        """Append item to end of synchronized list."""
+        with self._lock:
+            self._list.append(item)
+
+    def get(self, index):
+         """Get item at index from synchronized list"""
+         with self._lock:
+            return self._list[index]
+
+    def remove(self, item):
+        """Remove item from synchronized list"""
+        with self._lock:
+            self._list.remove(item)

@@ -49,7 +49,7 @@ class CurrencyValidator(BigDecimalValidator):
 
     _VALIDATOR = None
 
-    def __init__(self, strict: bool=True):
+    def __init__(self, strict: bool=True, allow_fractions: bool=True):
         """
         Construct an instance with the specified strict setting and format type or a strict instance by default.
         The format_type specifies what type of number format is created - valid types are:
@@ -58,9 +58,9 @@ class CurrencyValidator(BigDecimalValidator):
             <li>AbstractNumberValidator.PERCENT_FORMAT  - to create percent number formats.</li>
 
         :param strict: True if strict format parsing should be used.
-        :param format_type: The number format type to create for validation, default is CURRENCY_FORMAT.
+        :param allow_fractions: True if fractions are allowed or False if integers only.
         """
-        super().__init__(strict, AbstractNumberValidator.CURRENCY_FORMAT, True)
+        super().__init__(strict, AbstractNumberValidator.CURRENCY_FORMAT, allow_fractions)
     
     @classmethod
     def get_instance(cls):
@@ -89,6 +89,9 @@ class CurrencyValidator(BigDecimalValidator):
         """
         if value is None or value == '':
             return None
+        
+        if value.startswith('[') and value.endswith(']'):
+            value = '-' + value[1:-1]
         
         # initial parse of the value
         parsed_value = super()._parse(value, pattern, locale)

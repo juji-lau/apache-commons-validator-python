@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<digester-rules>
+
+    <!-- Root FormSetFactory under ValidatorResources -->
+    <pattern value="form-validation/formset">
+        <factory-create-rule classname="FormSetFactory" />
+        <set-next-rule methodname="add_form_set" paramtype="FormSet" />
+    </pattern>
+
+    <!-- Constants under global -->
+    <pattern value="form-validation/constant">
+        <call-method-rule methodname="add_constant" paramcount="2" />
+        <call-param-rule pattern="constant-name" paramnumber="0" />
+        <call-param-rule pattern="constant-value" paramnumber="1" />
+    </pattern>
+
+    <!-- ValidatorActions under global -->
+    <pattern value="form-validation/validator">
+        <object-create-rule classname="ValidatorAction" />
+        <set-properties-rule/>
+        <set-next-rule methodname="add_validator_action" paramtype="ValidatorAction" />
+    </pattern>
+
+    <!-- Forms under formset -->
+    <pattern value="form-validation/formset/form">
+        <object-create-rule classname="Form" />
+        <set-properties-rule/>
+        <set-next-rule methodname="add_form" paramtype="Form" />
+    </pattern>
+
+    <!-- Fields under forms -->
+    <pattern value="form-validation/formset/form/field">
+        <object-create-rule classname="Field" />
+        <set-properties-rule/>
+        <set-next-rule methodname="add_field" paramtype="Field" />
+    </pattern>
+
+    <!-- Vars under fields -->
+    <pattern value="form-validation/formset/form/field/var">
+        <object-create-rule classname="Var" />
+        <set-properties-rule/>
+        <set-next-rule methodname="add_var" paramtype="Var" />
+    </pattern>
+
+    <!-- Msgs under fields -->
+    <pattern value="form-validation/formset/form/field/msg">
+        <object-create-rule classname="Msg" />
+        <set-properties-rule/>
+        <set-next-rule methodname="add_msg" paramtype="Msg" />
+    </pattern>
+
+    <!-- Args under fields -->
+    <pattern value="form-validation/formset/form/field/arg">
+        <object-create-rule classname="Arg" />
+        <set-properties-rule/>
+        <set-next-rule methodname="add_arg" paramtype="Arg" />
+    </pattern>
+
+</digester-rules>

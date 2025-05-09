@@ -4,3 +4,4 @@ pylint
 pycountry
 babel==2.11.0
 dateparser
+pytest-mock

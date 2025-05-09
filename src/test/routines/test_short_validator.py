@@ -43,7 +43,7 @@ class TestShortValidator(TestAbstractNumberValidator):
         self._test_string_de = "1.234"
         self._locale_value = self._test_string_de
         self._locale_pattern = r"\d.\d\d\d"
-        self._test_locale = "de_DE"
+        self._test_locale = "de_DE.UTF-8"
         self._locale_expected = self._test_number
 
     def test_big_decimal_range_min_max(self):
@@ -76,7 +76,7 @@ class TestShortValidator(TestAbstractNumberValidator):
         assert validator.max_value(number21, max) is False # greater than max
 
     def test_integer_validator_methods(self):
-        locale = "de_DE"
+        locale = "de_DE.UTF-8"
         pattern = r"\d,\d\d,\d\d"
         pattern_val = "1,23,45"
         german_pattern_val = "1.23.45"

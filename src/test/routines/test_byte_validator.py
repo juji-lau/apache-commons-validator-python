@@ -53,7 +53,7 @@ class TestByteValidator(TestAbstractNumberValidator):
         self._test_string_de = ".123"
         self._locale_value = self._test_string_de
         self._locale_pattern = r"\d.\d\d\d"
-        self._test_locale = "de_DE"
+        self._test_locale = "de_DE.UTF-8"
         self._locale_expected = self._test_number
 
     def test_format(self):
@@ -101,7 +101,7 @@ class TestByteValidator(TestAbstractNumberValidator):
         assert validator.max_value(number21, max) is False # greater than max
     
     def test_byte_validator_methods(self):
-        locale = "de_DE"
+        locale = "de_DE.UTF-8"
         pattern = r"^\d,\d\d"
         pattern_val = "1,23"
         german_pattern_val = "1.23"
@@ -131,7 +131,7 @@ class TestByteValidator(TestAbstractNumberValidator):
         assert ByteValidator.get_instance().is_valid(value=pattern_val, pattern=pattern, locale=locale) is False
     
     def test_validate(self):
-        locale = "de_DE"
+        locale = "de_DE.UTF-8"
         pattern = r"^\d,\d\d"
         default_val  = "123"
         neg_val = "-123"

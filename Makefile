@@ -25,3 +25,6 @@ check:
 	$(MAKE) autoformat
 	$(MAKE) lint
 	$(MAKE) coverage
+
+mutation:
+	PYTHONPATH=. mutmut run

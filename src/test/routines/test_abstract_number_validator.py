@@ -41,7 +41,7 @@ class TestAbstractNumberValidator(ABC):
     _test_string_de = ''
     _locale_value = ''
     _locale_pattern = ''
-    _test_locale = 'de_DE'
+    _test_locale = 'de_DE.UTF-8'
     _locale_expected = None
 
     def test_format(self):
@@ -49,12 +49,12 @@ class TestAbstractNumberValidator(ABC):
 
         if self._strict_validator.allow_fractions:
             assert self._strict_validator.format(value=number, locale="en_US") == "1,234.5"
-            assert self._strict_validator.format(value=number, locale="de_DE") == "1.234,5"
+            assert self._strict_validator.format(value=number, locale="de_DE.UTF-8") == "1.234,5"
             assert self._strict_validator.format(value=number, pattern="%.2f") == "1,234.50"
         else:
             number = 1234.5
             assert self._strict_validator.format(value=number, locale="en_US") == "1,234"
-            assert self._strict_validator.format(value=number, locale="de_DE") == "1.234"
+            assert self._strict_validator.format(value=number, locale="de_DE.UTF-8") == "1.234"
 
     def test_format_type(self):
         assert self._validator.format_type == 0
@@ -116,8 +116,8 @@ class TestAbstractNumberValidator(ABC):
         # assert self._strict_validator._parse(self._test_string_de, None, "en_US") is None
 
         # test German locale
-        assert self._strict_validator._parse(self._test_string_de, None, "de_DE") == self._test_number
-        # assert self._strict_validator._parse(self._test_string_us, None, "de_DE") is None
+        assert self._strict_validator._parse(self._test_string_de, None, "de_DE.UTF-8") == self._test_number
+        # assert self._strict_validator._parse(self._test_string_us, None, "de_DE.UTF-8") is None
 
         # test default locale (should be US)
         assert self._strict_validator._parse(self._test_string_us, None, None) == self._test_number

@@ -23,6 +23,9 @@ __pycache__/
 *.pyo
 *.cpython-*
 
+# Coverage
+*.coverage
+htmlcov/
 
 
 # Reference files
@@ -30,6 +33,7 @@ __pycache__/
 *.txt
 # /src/test/example
 /src/test/routines/compiler.java
+.zshrc
 
 # # Other system files (optional)
 # Thumbs.db

@@ -41,7 +41,7 @@ class ValidatorResources:
     }  #: Mapping of DTD public identifiers to resource paths.
 
     _DEFAULT_LOCALE: str = (
-        locale.getdefaultlocale()[0] or "en_US"
+        locale.getlocale()[0] or "en_US"
     )  #: Default locale based on system settings.
 
     serializable = True

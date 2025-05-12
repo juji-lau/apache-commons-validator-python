@@ -47,7 +47,7 @@ class TestFloatValidator(TestAbstractNumberValidator):
         self._test_string_de = "1.234,5"
         self._locale_value = self._test_string_de
         self._locale_pattern = r"\d.\d\d\d,\d"
-        self._test_locale = "de_DE"
+        self._test_locale = "de_DE.UTF-8"
         self._locale_expected = self._test_number
 
     def test_float_range_min_max(self):
@@ -123,7 +123,7 @@ class TestFloatValidator(TestAbstractNumberValidator):
 
     def test_float_validator_methods(self):
         locale_us = "en_US"
-        locale_de = "de_DE"
+        locale_de = "de_DE.UTF-8"
         locale_fr = "fr_FR"
         pattern = r"\d,\d\d.\d\d"
         partial_pattern = r"\d,\d\d.\d"
@@ -161,7 +161,7 @@ class TestFloatValidator(TestAbstractNumberValidator):
         assert FloatValidator.get_instance().validate(us_val) == expected
 
         us_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='en_US')
-        de_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='de_DE')
+        de_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='de_DE.UTF-8')
         fr_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='fr_FR')
         validator = FloatValidator(strict=False)
 
@@ -177,7 +177,7 @@ class TestFloatValidator(TestAbstractNumberValidator):
         assert validator.validate(pattern_val, pattern=pattern) == expected
         assert validator.validate(pattern_val, pattern=pattern, locale=locale_us) == expected
 
-        locale = "de_DE"
+        locale = "de_DE.UTF-8"
         pattern = pattern = r"\d,\d\d,\d\d"
         pattern_val = "1,23,45"
         locale_val = "12.345"

@@ -1,6 +1,10 @@
 # holds translation from apache.commons.validator.utils.ValidatorUtils class
 import copy
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, Dict
+
+from src.main.var import Var
+from src.main.arg import Arg
+from src.main.msg import Msg
 
 # Generic utility functions
 def integer_compare(a:int, b:int) -> int:
@@ -45,13 +49,14 @@ class ValidatorUtils:
         self.serializable = False
         self.cloneable = False
 
-    def copy_map(map:dict[str, object]) -> dict[str, object]:
+    @classmethod
+    def copy_map(cls, map_param: Dict[str, object]) -> Dict[str, object]:
         """
         Makes and returns a deep copy of a map if the values are Msg, Arg, or Var, 
         and a shallow copy otherwise. 
 
         Args:
-            map (dict[str, object]): The input map to copy
+            map_param (dict[str, object]): The input map to copy
         
         Returns: 
             The copied map, where for each entry, a deepcopy is made if the value 
@@ -60,7 +65,7 @@ class ValidatorUtils:
         new_map = {}
         deep_copy_types = (Var, Arg, Msg)
 
-        for key, val in map.items():
+        for key, val in map_param.items():
             if isinstance(val, deep_copy_types):
                 new_map[key] = copy.deepcopy(val)
             else:
@@ -68,8 +73,8 @@ class ValidatorUtils:
 
         return new_map
 
-
-    def get_value_as_string(bean : object, property : str) -> str:
+    @classmethod
+    def get_value_as_string(cls, bean : object, property : str) -> str:
         """
         Returns the value from the bean property as a string.
         
@@ -101,7 +106,8 @@ class ValidatorUtils:
             return None
 
 
-    def replace(value: str, key:str, replace_value:str) -> str:
+    @classmethod
+    def replace(cls, value: str, key:str, replace_value:str) -> str:
         """
         Replaces a key part of value with replaceValue
 

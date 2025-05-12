@@ -154,7 +154,7 @@ class AbstractCheckDigitTest:
                 assert actual != expected, f"Expected mismatch for {code} expected {expected} actual {actual}."
 
             except CheckDigitException as e:
-                assert(str(e.value).startswith("Invalid "), f"Invalid Character[{i}]={str(e)}")
+                assert str(e.value).startswith("Invalid "), f"Invalid Character[{i}]={str(e)}"
     
 
     # Test: calculate() returns the expected check digit for valid codes
@@ -172,7 +172,7 @@ class AbstractCheckDigitTest:
             except Exception as e:
                 # TODO: find a better way to force a fail message
                 # Java: fail("valid[" + i + "]=" + valid[i] + " threw " + e);
-                assert(True==False, f"valid{i}={valid_code} threw {str(e)}")
+                assert True==False, f"valid{i}={valid_code} threw {str(e)}"
                 # print(f"valid[{i}]={valid_code} threw {str(e)}")
 
 

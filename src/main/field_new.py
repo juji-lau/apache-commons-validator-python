@@ -17,6 +17,7 @@ limitations under the License.
 
 import copy
 from typing import Final, Optional, List, Dict, Any
+from src.main.util.validator_utils import ValidatorUtils
 import threading
 
 class Field:
@@ -193,9 +194,9 @@ class Field:
             return
 
         if arg.name is None:
-            key_name: Final[str] = self.__DEFAULT_ARG
+            key_name = self.__DEFAULT_ARG
         else:
-            key_name: Final[str] = arg.name
+            key_name = arg.name
 
         last_position: int = -1
         last_default: int = -1
@@ -518,12 +519,12 @@ class Field:
             global_constants (Dict[str, str])
             constants (Dict[str, str])
         """
-        from src.main.util.utils import ValidatorUtils
+        from src.main.util.validator_utils import ValidatorUtils
         self.generate_key()
 
         for key1 in constants:
-            key2: Final[str] = self._TOKEN_START + key1 + self._TOKEN_END
-            replace_value: Final[str] = constants[key1]
+            key2:str = self._TOKEN_START + key1 + self._TOKEN_END
+            replace_value:str = constants[key1]
 
             self.field_property = ValidatorUtils.replace(
                 self.field_property, key2, replace_value
@@ -533,8 +534,8 @@ class Field:
             self.__process_message_components(key2, replace_value)
 
         for key1 in global_constants:
-            key2: Final[str] = self._TOKEN_START + key1 + self._TOKEN_END
-            replace_value: Final[str] = global_constants[key1]
+            key2:str = self._TOKEN_START + key1 + self._TOKEN_END
+            replace_value:str = global_constants[key1]
 
             self.field_property = ValidatorUtils.replace(
                 self.field_property, key2, replace_value
@@ -544,11 +545,11 @@ class Field:
             self.__process_message_components(key2, replace_value)
 
         for key1 in self.get_var_map():
-            key2: Final[str] = (
+            key2:str = (
                 self._TOKEN_START + self._TOKEN_VAR + key1 + self._TOKEN_END
             )
             var: Final["Var"] = self.get_var(key1)
-            replace_value: Final[str] = var.value
+            replace_value:str = var.value
 
             self.__process_message_components(key2, replace_value)
 
@@ -560,7 +561,7 @@ class Field:
             key (str):
             replace_value (str):
         """
-        from src.main.util.utils import ValidatorUtils
+        from src.main.util.validator_utils import ValidatorUtils
         for arg_map in self._args:
             if arg_map is None:
                 pass
@@ -577,7 +578,7 @@ class Field:
             key (str);
             replace_value (str):
         """
-        from src.main.util.utils import ValidatorUtils
+        from src.main.util.validator_utils import ValidatorUtils
 
         var_key: Final[str] = self._TOKEN_START + self._TOKEN_VAR
         # process messages
@@ -595,7 +596,7 @@ class Field:
             key (str);
             replace_value (str);
         """
-        from src.main.util.utils import ValidatorUtils
+        from src.main.util.validator_utils import ValidatorUtils
 
         for var_key in self.get_var_map():
             var: Final["Var"] = self.get_var(var_key)

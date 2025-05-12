@@ -28,10 +28,14 @@ __pycache__/
 *.coverage
 htmlcov/
 
+# Mutation Testing
+mutants/
+
 
 # Reference files
 /src/example
 *.txt
+
 # /src/test/example
 /src/test/routines/compiler.java
 .zshrc

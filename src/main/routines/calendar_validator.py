@@ -45,7 +45,7 @@ from typing import Optional, Callable
 
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
 from src.main.util.datetime_helpers import timezone_has_same_rules
-from src.main.util.utils import integer_compare
+from src.main.util.validator_utils import integer_compare
 
 
 class CalendarValidator(AbstractCalendarValidator):

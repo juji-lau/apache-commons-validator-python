@@ -30,7 +30,7 @@ from datetime import datetime, date, time, tzinfo
 from typing import Optional, Final, Callable
 
 from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
-from src.main.util.utils import integer_compare
+from src.main.util.validator_utils import integer_compare
 # from src.main.util.datetime_helpers import get_default_tzinfo, update_tz
 
 class DateValidator(AbstractCalendarValidator):

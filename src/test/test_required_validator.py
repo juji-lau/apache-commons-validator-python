@@ -1,5 +1,3 @@
-# test_required_validator.py
-
 import pytest
 
 from src.main.validator_action import ValidatorAction
@@ -8,12 +6,6 @@ from src.main.form import Form
 from src.main.form_set import FormSet
 from src.main.validator_resources import ValidatorResources
 from src.main.validator import Validator
-
-
-class RequiredValidator:
-    def validate_required(self, field, params):
-        value = params.get(field.field_property)
-        return value is not None and str(value).strip() != ""
 
 
 def test_required_field_validation():

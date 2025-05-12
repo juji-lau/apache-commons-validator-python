@@ -1,94 +1,91 @@
+# test_validator_api.py
+
 import pytest
+
 from src.main.validator import Validator
-from src.main.validator_results import ValidatorResults
-from src.main.validator_exception import ValidatorException
+from src.main.validator_action import ValidatorAction
 from src.main.validator_resources import ValidatorResources
 from src.main.form import Form
 from src.main.field import Field
-from src.main.validator_action import ValidatorAction
-from src.main.validator_result import ValidatorResult
+from src.main.form_set import FormSet
+from src.main.validator_exception import ValidatorException
 
-
-class DummyValidator:
-    def validate(self, field, params, results, pos):
-        result = ValidatorResult(field)
-        result.add("required", True, "ok")
-        results[field.key] = result
-        return True
-
-
-@pytest.fixture
-def validator_resources_with_form():
-    resources = ValidatorResources()
-
-    # Create form, field, and action
-    form = Form()
-    field = Field()
-    field.field_property = "username"
-    field.depends = "required"
-
+def build_resources_with_field(name="email", depends="always", page=1):
+    # ValidatorAction
     action = ValidatorAction()
-    action.name = "required"
-    action.method = "validate"
-    action._ValidatorAction__validator_class = DummyValidator
+    action.name = "always"
+    action.class_name = "src.test.resources.always_pass_validator.AlwaysPassValidator"
+    action.method = "validate_always_pass"
 
+    # Field
+    field = Field()
+    field.field_property = name
+    field.depends = depends
+    field.page = page
+
+    # Form
+    form = Form()
+    form.name = "profileForm"
     form.add_field(field)
 
-    # Patch internal structures directly
-    locale_key = resources.__build_locale_key("en", "US", None, "testForm")
-    resources._forms[locale_key] = form
-    resources._validator_actions["required"] = action
+    # Resources
+    resources = ValidatorResources()
+    resources.add_validator_action(action)
+
+    form_set = FormSet()
+    form_set.language = "en"
+    form_set.add_form(form)
+    resources.add_form_set(form_set)
 
     return resources
 
 
-def test_get_result_success(validator_resources_with_form):
-    validator = Validator(validator_resources_with_form, "testForm", {
-        "java.lang.Object": {"username": "value"}
-    })
+def test_validate_field_within_page():
+    resources = build_resources_with_field(page=0)
 
-    result = validator.get_result()
-    assert isinstance(result, ValidatorResults)
-    assert result.get_validator_result("username").is_valid("required")
+    validator = Validator(resources, "profileForm", {"email": "test@example.com"})
+    validator.set_locale("en")
+    validator.set_page(0)
+
+    results = validator.validate_field("email")
+    assert results.get_validator_result("email").is_valid("always")
 
 
-def test_get_result_raises_exception_if_form_missing():
-    resources = ValidatorResources()
-    validator = Validator(resources, "missingForm")
+def test_validate_field_outside_page_is_skipped():
+    resources = build_resources_with_field(page=2)  # Field is on page 2
 
-    with pytest.raises(ValidatorException) as exc_info:
+    validator = Validator(resources, "profileForm", {"email": "test@example.com"})
+    validator.set_locale("en")
+    validator.set_page(0)  # Validator is set to page 0
+
+    results = validator.validate_field("email")
+    assert results.get_validator_result("email") is None  # Should be skipped
+
+
+def test_get_and_set_parameter():
+    resources = build_resources_with_field()
+    validator = Validator(resources, "profileForm")
+    validator.set_parameter("foo", 123)
+    assert validator.get_parameter("foo") == 123
+
+
+def test_missing_form_raises_exception():
+    resources = ValidatorResources()  # No form added
+
+    validator = Validator(resources, "nonexistentForm")
+    validator.set_locale("en")
+
+    with pytest.raises(ValidatorException) as excinfo:
         validator.get_result()
-
-    assert "Form 'missingForm' not found" in str(exc_info.value)
-
-
-def test_validate_field_specific(validator_resources_with_form):
-    validator = Validator(validator_resources_with_form, "testForm", {
-        "java.lang.Object": {"username": "value"}
-    })
-
-    result = validator.validate_field("username")
-    assert isinstance(result, ValidatorResults)
-    assert result.get_validator_result("username").is_valid("required")
+    assert "nonexistentForm" in str(excinfo.value)
 
 
-def test_set_and_get_parameter(validator_resources_with_form):
-    validator = Validator(validator_resources_with_form, "testForm")
-    validator.set_parameter("key", 123)
-    assert validator.get_parameter("key") == 123
+def test_validate_field_not_found():
+    resources = build_resources_with_field(name="real_field")
 
+    validator = Validator(resources, "profileForm")
+    validator.set_locale("en")
 
-def test_locale_affects_form_resolution(validator_resources_with_form):
-    validator = Validator(validator_resources_with_form, "testForm")
-    validator.set_locale("en", "US")
-    result = validator.get_result()
-    assert isinstance(result, ValidatorResults)
-
-
-def test_set_page_and_error_flag(validator_resources_with_form):
-    validator = Validator(validator_resources_with_form, "testForm")
-    validator.set_page(1)
-    validator.set_only_return_errors(True)
-
-    assert validator._page == 1
-    assert validator._only_return_errors is True
+    with pytest.raises(ValidatorException) as excinfo:
+        validator.validate_field("fake_field")
+    assert "fake_field" in str(excinfo.value)

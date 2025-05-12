@@ -66,7 +66,7 @@ class Field:
         self._depends: Optional[str] = None
         #: a comma separated list of validator's this field depends on.
 
-        self._page: Optional[int] = None
+        self._page: Optional[int] = 0
         #: The page number
 
         self._client_validation: bool = True
@@ -800,4 +800,7 @@ class Field:
         if not self.__run_dependent_validators(va, results, actions, params, pos):
             return False
 
-        return va.execute_validation_method(self, params)
+        from src.main.validator_results import ValidatorResults
+        result_bool = va.execute_validation_method(self, params)
+        results.add(self, va.name, result_bool)
+        return result_bool

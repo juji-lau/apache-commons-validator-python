@@ -1,5 +1,5 @@
 .PHONY: docs clean
-TEST ?= 
+TEST ?= ""
 
 docs: clean
 	sphinx-apidoc -o docs src/
@@ -17,7 +17,7 @@ lint:
 
 coverage:
 	coverage run --branch -m pytest $(TEST)
-	coverage report -m >> htmlcov/coverage_report.txt
+	coverage report -m > htmlcov/coverage_report.txt
 	coverage html
 	open htmlcov/index.html
 

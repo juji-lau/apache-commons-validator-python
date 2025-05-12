@@ -6,6 +6,7 @@
 
 # Sphinx build files
 docs/_build/
+docs/
 
 # VSCode/IDE files
 .vscode/

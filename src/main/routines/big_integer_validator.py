@@ -113,7 +113,7 @@ class BigIntegerValidator(AbstractNumberValidator):
         :return: The parsed value converted to the appropriate type if valid or None if invalid.
         """
         try:
-            return formatter(value)
+            return int(formatter(value))
         except ValueError:
             return None
     

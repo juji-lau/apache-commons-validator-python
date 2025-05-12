@@ -34,7 +34,7 @@ class TestIntegerValidator(TestAbstractNumberValidator):
     def set_up(self):
         self._validator = IntegerValidator(strict=False)
         self._strict_validator = IntegerValidator()
-        self._test_pattern = r"^-?(\d{1,3}(,\d{3})+|\d+)$"
+        self._test_pattern = r"^-?((\d{1,3}(,\d{3})+|\d+)(\.\d+)?)$"
         self._max = IntegerValidator.INT_MAX
         self._max_plus_one = IntegerValidator.INT_MAX + 1
         self._min = IntegerValidator.INT_MIN
@@ -45,10 +45,8 @@ class TestIntegerValidator(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "1234", "1,234", self.INT_MAX, self.INT_MIN]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number, self.INT_MAX_VAL, self.INT_MIN_VAL]
-        # self._valid = ['0', "1234", "1,234", "1,234.5", "1234X", self.INT_MAX, self.INT_MIN, self.INT_MAX_0, self.INT_MIN_0]
-        self._valid = ['0', "1234", "1,234", self.INT_MAX, self.INT_MIN]
-        # self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number, self.INT_MAX_VAL, self.INT_MIN_VAL, self.INT_MAX_VAL, self.INT_MIN_VAL]
-        self._valid_compare = [self._test_zero, self._test_number, self._test_number, self.INT_MAX_VAL, self.INT_MIN_VAL]
+        self._valid = ['0', "1234", "1,234", "1,234.5", "1234X", self.INT_MAX, self.INT_MIN, self.INT_MAX_0, self.INT_MIN_0]
+        self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number, self.INT_MAX_VAL, self.INT_MIN_VAL, self.INT_MAX_VAL, self.INT_MIN_VAL]
         self._test_string_us = "1,234"
         self._test_string_de = "1.234"
         self._locale_value = self._test_string_de

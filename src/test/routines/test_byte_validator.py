@@ -34,7 +34,7 @@ class TestByteValidator(TestAbstractNumberValidator):
     def set_up(self):
         self._validator = ByteValidator(strict=False)
         self._strict_validator = ByteValidator()
-        self._test_pattern = r"^-?\,?(\d{1,3}(,\d{3})+|\d+)$"
+        self._test_pattern = r"^-?\,?((\d{1,3}(,\d{3})+|\d+)(\.\d+)?)$"
         self._max = ByteValidator.BYTE_MAX
         self._max_plus_one = ByteValidator.BYTE_MAX + 1
         self._min = ByteValidator.BYTE_MIN
@@ -45,10 +45,8 @@ class TestByteValidator(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "123", ",123", self._BYTE_MAX, self._BYTE_MIN]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL]
-        # self._valid = ['0', "123", ",123", ",123.5", "123X", self._BYTE_MAX, self._BYTE_MIN, self._BYTE_MAX_0, self._BYTE_MIN_0]
-        self._valid = ['0', "123", ",123", self._BYTE_MAX, self._BYTE_MIN]
-        # self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL]
-        self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL]
+        self._valid = ['0', "123", ",123", ",123.5", "123X", self._BYTE_MAX, self._BYTE_MIN, self._BYTE_MAX_0, self._BYTE_MIN_0]
+        self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL, self._BYTE_MAX_VAL, self._BYTE_MIN_VAL]
         self._test_string_us = ",123"
         self._test_string_de = ".123"
         self._locale_value = self._test_string_de
@@ -63,8 +61,8 @@ class TestByteValidator(TestAbstractNumberValidator):
         
         assert validator.format(123) == expected
         assert validator.format(123, pattern=pattern) == expected
-        assert validator.format(123, locale="en_US") == expected
-        assert validator.format(123, pattern=pattern, locale="en_US") == expected
+        assert validator.format(123, locale="en_US.UTF-8") == expected
+        assert validator.format(123, pattern=pattern, locale="en_US.UTF-8") == expected
 
     def test_byte_range_min_max(self):
         """

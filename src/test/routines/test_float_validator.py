@@ -40,13 +40,13 @@ class TestFloatValidator(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "1234.5", "1,234.5"]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number]
-        # self._valid = ['0', "1234.5", "1,234.5", "1,234.5", "1234.5X"]
-        self._valid = ['0', "1234.5", "1,234.5", "1,234.5"]
+        self._valid = ['0', "1234.5", "1,234.5", "1,234.5", "1234.5X"]
         self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number]
         self._test_string_us = "1,234.5"
         self._test_string_de = "1.234,5"
         self._locale_value = self._test_string_de
         self._locale_pattern = r"\d.\d\d\d,\d"
+        self._test_locale = "de_DE.UTF-8"
         self._test_locale = "de_DE.UTF-8"
         self._locale_expected = self._test_number
 
@@ -122,9 +122,9 @@ class TestFloatValidator(TestAbstractNumberValidator):
         assert FloatValidator.get_instance().is_valid(str_too_large_value) is False
 
     def test_float_validator_methods(self):
-        locale_us = "en_US"
+        locale_us = "en_US.UTF-8"
         locale_de = "de_DE.UTF-8"
-        locale_fr = "fr_FR"
+        locale_fr = "fr_FR.UTF-8"
         pattern = r"\d,\d\d.\d\d"
         partial_pattern = r"\d,\d\d.\d"
         us_val = "123.45"
@@ -160,9 +160,9 @@ class TestFloatValidator(TestAbstractNumberValidator):
         assert FloatValidator.get_instance().is_valid(us_val) is True
         assert FloatValidator.get_instance().validate(us_val) == expected
 
-        us_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='en_US')
+        us_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='en_US.UTF-8')
         de_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='de_DE.UTF-8')
-        fr_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='fr_FR')
+        fr_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='fr_FR.UTF-8')
         validator = FloatValidator(strict=False)
 
         # Test with thousands separator
@@ -177,6 +177,7 @@ class TestFloatValidator(TestAbstractNumberValidator):
         assert validator.validate(pattern_val, pattern=pattern) == expected
         assert validator.validate(pattern_val, pattern=pattern, locale=locale_us) == expected
 
+        locale = "de_DE.UTF-8"
         locale = "de_DE.UTF-8"
         pattern = pattern = r"\d,\d\d,\d\d"
         pattern_val = "1,23,45"

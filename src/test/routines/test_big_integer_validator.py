@@ -20,16 +20,13 @@ from src.main.routines.big_integer_validator import BigIntegerValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestBigInetegerValue(TestAbstractNumberValidator):
-    # Not allowing:
-        # 1. Decimal places (ex: "1,234.5")
-        # 2. Characters (ex: "1234X")
-        # 3. Mismatched thousands/decimal separator in pattern and val
+    # Not allowing: Mismatched thousands/decimal separator in pattern and val
 
     @pytest.fixture(autouse=True)
     def set_up(self):
         self._validator = BigIntegerValidator(strict=False, format_type=0)
         self._strict_validator = BigIntegerValidator()
-        self._test_pattern = r"^(\d{1,3}(,\d{3})+|\d+)$"
+        self._test_pattern = r"^((\d{1,3}(,\d{3})+|\d+)(\.\d+)?$)"
         self._max = None
         self._max_plus_one = None
         self._min = None
@@ -40,8 +37,7 @@ class TestBigInetegerValue(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "1234", "1,234"]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number]
-        # self._valid = ['0', "1234", "1,234", "1,234.5", "1234X"]
-        self._valid = ['0', "1234", "1,234"]
+        self._valid = ['0', "1234", "1,234", "1,234.5", "1234X"]
         self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number]
         self._test_string_us = "1,234"
         self._test_string_de = "1.234"

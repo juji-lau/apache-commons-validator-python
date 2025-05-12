@@ -36,8 +36,7 @@ class TestDoubleValidator(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "1234.5", "1,234.5"]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number]
-        # self._valid = ['0', "1234.5", "1,234.5", "1,234.5", "1234.5X"]
-        self._valid = ['0', "1234.5", "1,234.5", "1,234.5"]
+        self._valid = ['0', "1234.5", "1,234.5", "1,234.5", "1234.5X"]
         self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number]
         self._test_string_us = "1,234.5"
         self._test_string_de = "1.234,5"

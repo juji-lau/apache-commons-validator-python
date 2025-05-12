@@ -42,18 +42,19 @@ class TestAbstractNumberValidator(ABC):
     _locale_value = ''
     _locale_pattern = ''
     _test_locale = 'de_DE.UTF-8'
+    _test_locale = 'de_DE.UTF-8'
     _locale_expected = None
 
     def test_format(self):
         number = 1234.5
 
         if self._strict_validator.allow_fractions:
-            assert self._strict_validator.format(value=number, locale="en_US") == "1,234.5"
+            assert self._strict_validator.format(value=number, locale="en_US.UTF-8") == "1,234.5"
             assert self._strict_validator.format(value=number, locale="de_DE.UTF-8") == "1.234,5"
             assert self._strict_validator.format(value=number, pattern="%.2f") == "1,234.50"
         else:
             number = 1234.5
-            assert self._strict_validator.format(value=number, locale="en_US") == "1,234"
+            assert self._strict_validator.format(value=number, locale="en_US.UTF-8") == "1,234"
             assert self._strict_validator.format(value=number, locale="de_DE.UTF-8") == "1.234"
 
     def test_format_type(self):
@@ -62,15 +63,15 @@ class TestAbstractNumberValidator(ABC):
     
     def test_invalid_not_strict(self):
         for invalid in self._invalid:
-            assert self._validator._parse(invalid, None, "en_US") is None
-            assert self._validator.is_valid(invalid, None, "en_US") is False
+            assert self._validator._parse(invalid, None, "en_US.UTF-8") is None
+            assert self._validator.is_valid(invalid, None, "en_US.UTF-8") is False
             assert self._validator._parse(invalid, self._test_pattern, None) is None
             assert self._validator.is_valid(invalid, self._test_pattern, None) is False
     
     def test_invalid_strict(self):
         for invalid in self._invalid_strict:
-            assert self._strict_validator._parse(invalid, None, "en_US") is None
-            assert self._strict_validator.is_valid(invalid, None, "en_US") is False
+            assert self._strict_validator._parse(invalid, None, "en_US.UTF-8") is None
+            assert self._strict_validator.is_valid(invalid, None, "en_US.UTF-8") is False
             assert self._strict_validator._parse(invalid, self._test_pattern, None) is None
             assert self._strict_validator.is_valid(invalid, self._test_pattern, None) is False
     
@@ -101,7 +102,6 @@ class TestAbstractNumberValidator(ABC):
         assert self._validator.max_value(number20, max) is True  # equal to max
         assert self._validator.max_value(number21, max) is False # greater than max
     
-    # TODO: test serialization
     def test_serialization(self):
         try:
             data = pickle.dumps(self._validator)
@@ -111,9 +111,11 @@ class TestAbstractNumberValidator(ABC):
             pytest.fail(f"Serialization failed: {e}")
 
     def test_validate_locale(self):
+        # Failing lines 118, 122, 126 due to parsing partial string instead of rejecting
+
         # test US locale
-        assert self._strict_validator._parse(self._test_string_us, None, "en_US") == self._test_number
-        # assert self._strict_validator._parse(self._test_string_de, None, "en_US") is None
+        assert self._strict_validator._parse(self._test_string_us, None, "en_US.UTF-8") == self._test_number
+        # assert self._strict_validator._parse(self._test_string_de, None, "en_US.UTF-8") is None
 
         # test German locale
         assert self._strict_validator._parse(self._test_string_de, None, "de_DE.UTF-8") == self._test_number
@@ -132,15 +134,15 @@ class TestAbstractNumberValidator(ABC):
     
     def test_valid_not_strict(self):
         for i, valid in enumerate(self._valid):
-            assert self._validator._parse(valid, None, "en_US") == self._valid_compare[i]
-            assert self._validator.is_valid(valid, None, "en_US") is True
+            assert self._validator._parse(valid, None, "en_US.UTF-8") == self._valid_compare[i]
+            assert self._validator.is_valid(valid, None, "en_US.UTF-8") is True
             assert self._validator._parse(valid, self._test_pattern, None) == self._valid_compare[i]
             assert self._validator.is_valid(valid, self._test_pattern, None) is True
     
     def test_valid_strict(self):
         for i, valid in enumerate(self._valid_strict):
-            assert self._strict_validator._parse(valid, None, "en_US") == self._valid_strict_compare[i]
-            assert self._strict_validator.is_valid(valid, None, "en_US") is True
+            assert self._strict_validator._parse(valid, None, "en_US.UTF-8") == self._valid_strict_compare[i]
+            assert self._strict_validator.is_valid(valid, None, "en_US.UTF-8") is True
             assert self._strict_validator._parse(valid, self._test_pattern, None) == self._valid_strict_compare[i]
             assert self._strict_validator.is_valid(valid, self._test_pattern, None) is True
     

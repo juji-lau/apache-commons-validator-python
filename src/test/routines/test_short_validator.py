@@ -25,7 +25,7 @@ class TestShortValidator(TestAbstractNumberValidator):
     def set_up(self):
         self._validator = ShortValidator(strict=False)
         self._strict_validator = ShortValidator()
-        self._test_pattern = r"^-?(\d{1,3}(,\d{3})+|\d+)$"
+        self._test_pattern = r"^-?((\d{1,3}(,\d{3})+|\d+)(\.\d+)?)$"
         self._max = ShortValidator.SHORT_MAX
         self._max_plus_one = ShortValidator.SHORT_MAX + 1
         self._min = ShortValidator.SHORT_MIN
@@ -36,8 +36,7 @@ class TestShortValidator(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "1234", "1,234"]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number]
-        # self._valid = ['0', "1234", "1,234", "1,234.5", "1234X"]
-        self._valid = ['0', "1234", "1,234"]
+        self._valid = ['0', "1234", "1,234", "1,234.5", "1234X"]
         self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number]
         self._test_string_us = "1,234"
         self._test_string_de = "1.234"

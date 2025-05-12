@@ -35,7 +35,7 @@ class TestLongValidator(TestAbstractNumberValidator):
     def set_up(self):
         self._validator = LongValidator(strict=False)
         self._strict_validator = LongValidator()
-        self._test_pattern = r"^-?(\d{1,3}(,\d{3})+|\d+)$"
+        self._test_pattern = r"^-?((\d{1,3}(,\d{3})+|\d+)(\.\d+)?$)$"
         self._max = None
         self._max_plus_one = None
         self._min = None
@@ -46,10 +46,8 @@ class TestLongValidator(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "1234", "1,234", self.LONG_MAX, self.LONG_MIN]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number, self.LONG_MAX_VAL, self.LONG_MIN_VAL]
-        # self._valid = ['0', "1234", "1,234", "1,234.5", "1234X", self.LONG_MAX, self.LONG_MIN, self.LONG_MAX_0, self.LONG_MIN_0]
-        self._valid = ['0', "1234", "1,234", self.LONG_MAX, self.LONG_MIN]
-        # self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number, self.LONG_MAX_VAL, self.LONG_MIN_VAL, self.LONG_MAX_VAL, self.LONG_MIN_VAL]
-        self._valid_compare = [self._test_zero, self._test_number, self._test_number, self.LONG_MAX_VAL, self.LONG_MIN_VAL]
+        self._valid = ['0', "1234", "1,234", "1,234.5", "1234X", self.LONG_MAX, self.LONG_MIN, self.LONG_MAX_0, self.LONG_MIN_0]
+        self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number, self.LONG_MAX_VAL, self.LONG_MIN_VAL, self.LONG_MAX_VAL, self.LONG_MIN_VAL]
         self._test_string_us = "1,234"
         self._test_string_de = "1.234"
         self._locale_value = self._test_string_de

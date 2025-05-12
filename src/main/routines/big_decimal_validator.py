@@ -115,7 +115,7 @@ class BigDecimalValidator(AbstractNumberValidator):
         :return: The parsed value converted to the appropriate type if valid or None if invalid.
         """
         try:
-            return formatter(value)
+            return float(formatter(value))
         except ValueError:
             return None
     

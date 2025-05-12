@@ -39,17 +39,15 @@ class TestBigDecimalValidator(TestAbstractNumberValidator):
         self._test_zero = 0
         self._valid_strict = ['0', "1234.5", "1,234.5", ".1", "12345.678990"]
         self._valid_strict_compare = [self._test_zero, self._test_number, self._test_number, self._test_number2, self._test_number3]
-        # self._valid = ['0', "1234.5", "1,234.5", "1,234.5", "1234.5X"]
-        self._valid = ['0', "1234.5", "1,234.5", "1,234.5"]
+        self._valid = ['0', "1234.5", "1,234.5", "1,234.5", "1234.5X"]
         self._valid_compare = [self._test_zero, self._test_number, self._test_number, self._test_number, self._test_number]
         self._test_string_us = "1,234.5"
         self._test_string_de = "1.234,5"
         self._locale_value = self._test_string_de
         self._locale_pattern = r"\d.\d\d\d,\d"
         self._test_locale = "de_DE.UTF-8"
+        self._test_locale = "de_DE.UTF-8"
         self._locale_expected = self._test_number
-
-        # TODO: failing lines 116, 120, 124 in test_abstract_number_validator (parsing partial instead of rejecting)
 
     def test_big_decimal_range_min_max(self):
         validator = BigDecimalValidator()
@@ -81,7 +79,7 @@ class TestBigDecimalValidator(TestAbstractNumberValidator):
         assert validator.max_value(number21, max) is False # greater than max
 
     def test_big_decimal_validator_methods(self):
-        locale_us = "en_US"
+        locale_us = "en_US.UTF-8"
         locale_de = "de_DE.UTF-8"
         pattern = r"\d,\d\d,\d.\d\d"
         us_val = "1234.56"
@@ -119,6 +117,7 @@ class TestBigDecimalValidator(TestAbstractNumberValidator):
         assert BigDecimalValidator.get_instance().is_valid(pattern_val, pattern=pattern, locale=locale_us) is True, f"FAILED: is_valid('{us_val}', pattern='{pattern}', locale='{locale_us}') expected True but got False"
         assert BigDecimalValidator.get_instance().validate(pattern_val, pattern=pattern, locale=locale_us) == expected, f"FAILED: valididate('{us_val}', pattern='{pattern}', locale='{locale_us}') expected {expected} but got {BigDecimalValidator.get_instance().validate(pattern_val, pattern=pattern, locale=locale_us)}"
 
+        locale = "de_DE.UTF-8"
         locale = "de_DE.UTF-8"
         pattern = r"\d,\d\d,\d\d"
         pattern_val = "1,23,45"

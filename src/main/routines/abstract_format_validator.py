@@ -16,6 +16,7 @@
 """
 
 from abc import ABC
+from decimal import InvalidOperation
 
 class AbstractFormatValidator(ABC):
     """
@@ -88,7 +89,7 @@ class AbstractFormatValidator(ABC):
 
         try:
             parsed_value = formatter(value)
-        except ValueError:
+        except InvalidOperation:
             return None
         
         if parsed_value is not None:

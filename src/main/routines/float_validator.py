@@ -115,7 +115,7 @@ class FloatValidator(AbstractNumberValidator):
         :return: The parsed value converted to the appropriate type if valid or None if invalid.
         """
         try:
-            val = formatter(value)
+            val = float(formatter(value))
             if val == 0:
                 return val
             pos_val = val * -1 if val < 0 else val

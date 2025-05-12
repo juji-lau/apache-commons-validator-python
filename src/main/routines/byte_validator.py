@@ -115,7 +115,7 @@ class ByteValidator(AbstractNumberValidator):
         :return: The parsed value converted to the appropriate type if valid or None if invalid.
         """
         try:
-            val = formatter(value)
+            val = int(formatter(value))
             if self.is_in_range(val, self.BYTE_MIN, self.BYTE_MAX):
                 return val
         except ValueError:

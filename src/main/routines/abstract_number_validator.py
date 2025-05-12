@@ -18,6 +18,7 @@
 from typing import Final, override
 import locale as Locale
 import re
+from decimal import Decimal
 from ..routines.abstract_format_validator import AbstractFormatValidator
 from ..generic_validator import GenericValidator
 from ..util.decimal_places import max_decimal_places
@@ -119,9 +120,8 @@ class AbstractNumberValidator(AbstractFormatValidator):
             locale = "" if locale is None else locale
             Locale.setlocale(Locale.LC_NUMERIC, locale)
         except Locale.Error:
-            return None
-        
-        return Locale.atof if self.allow_fractions else Locale.atoi
+            return
+        return Decimal
     
     @property
     def format_type(self):
@@ -206,6 +206,8 @@ class AbstractNumberValidator(AbstractFormatValidator):
         except Locale.Error:
             return None
         
+        value = re.sub(r"[A-Za-z]", '', value)
+        
         # check that partial match is valid
         locale_info = Locale.localeconv()
         decimal_point = locale_info["decimal_point"]
@@ -225,11 +227,30 @@ class AbstractNumberValidator(AbstractFormatValidator):
         value = value.strip() if value is not None else None
         if GenericValidator.is_blank_or_null(value):
             return None
-        
+
+        if value[-1].isalpha():
+            if self.strict:
+                return None
+            else:
+                value = value[0:-1]
+
         if not GenericValidator.is_blank_or_null(pattern):
             value = self._check_pattern(value, pattern, locale)
             if value is None:
                 return None
+
+        try:
+            locale = "" if locale is None else locale
+            Locale.setlocale(Locale.LC_NUMERIC, locale)
+        except Locale.Error:
+            return None
+
+        locale_info = Locale.localeconv()
+        decimal_point = locale_info["decimal_point"]
+        if self.strict and (not self.allow_fractions) and value.count(decimal_point) > 0:
+            return None
+
+        value = value.replace(locale_info["thousands_sep"], '').replace(locale_info["decimal_point"], '.')
         formatter = self._get_format(pattern=pattern, locale=locale)
         return super()._parse(value, formatter)
     

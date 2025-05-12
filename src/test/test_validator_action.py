@@ -1,5 +1,5 @@
 import pytest
-from src.main.validator_action import ValidatorAction
+from src.main.validator_action_new import ValidatorAction
 
 # ============================= Mocks ================================ #
 class MockValidator:
@@ -79,7 +79,7 @@ class RequiredValidator:
 def test_validator_action_full_integration():
     """Full integration: Digester -> ValidatorResources -> ValidatorAction.execute."""
 
-    from src.main.validator_resources import ValidatorResources
+    from src.main.validator_resources_new import ValidatorResources
     from src.main.util.digester import Digester
     import io
 

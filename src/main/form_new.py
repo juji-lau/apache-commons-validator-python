@@ -233,9 +233,9 @@ class Form:
             ValidatorException: If the specified `field_name` does not correspond to a valid field
                                 in the form.
         """
-        from src.main.validator_results import ValidatorResults
-        from src.main.validator import Validator
-        from src.main.validator_exception import ValidatorException
+        from src.main.validator_results_new import ValidatorResults
+        from src.main.validator_new import Validator
+        from src.main.validator_exception_new import ValidatorException
         
         results = ValidatorResults()
         params[Validator.VALIDATOR_RESULTS_PARAM] = results

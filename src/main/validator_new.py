@@ -43,7 +43,7 @@ class Validator:
         if self._form is None:
             self._form = self._resolve_form()
 
-        from src.main.validator_exception import ValidatorException
+        from src.main.validator_exception_new import ValidatorException
         if self._form is None:
             raise ValidatorException(f"Form '{self._form_key}' not found.")
 
@@ -73,7 +73,7 @@ class Validator:
         if self._form is None:
             self._form = self._resolve_form()
 
-        from src.main.validator_exception import ValidatorException
+        from src.main.validator_exception_new import ValidatorException
         if self._form is None:
             raise ValidatorException(f"Form '{self._form_key}' not found.")
 

@@ -2,9 +2,9 @@
 import copy
 from typing import Callable, Optional, Union, Dict
 
-from src.main.var import Var
-from src.main.arg import Arg
-from src.main.msg import Msg
+from src.main.var_new import Var
+from src.main.arg_new import Arg
+from src.main.msg_new import Msg
 
 # Generic utility functions
 def integer_compare(a:int, b:int) -> int:

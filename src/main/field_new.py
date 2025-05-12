@@ -29,7 +29,7 @@ class Field:
     Taken from apache.commons.validator.Field;
     """
 
-    __DEFAULT_ARG: Final[str] = "src.main.Field.Field.DEFAULT"
+    __DEFAULT_ARG: Final[str] = "src.main.field_new.Field.DEFAULT"
     #: This is the value that will be used as a key if the Arg name field has no value.
 
     TOKEN_INDEXED: Final[str] = "[]"
@@ -140,7 +140,7 @@ class Field:
         Example Method Call 2:
             add_var(arg0=name, arg1=value, arg2=jsType)
         """
-        from src.main.var import Var
+        from src.main.var_new import Var
         if isinstance(arg0, str) and arg1 is not None and arg2 is not None:
             v = Var(name=arg0, value=arg1, js_type=arg2)
             self.get_var_map()[v.name] = v
@@ -472,7 +472,7 @@ class Field:
 
         Throws: ValidatorException
         """
-        from src.main.validator_exception import ValidatorException
+        from src.main.validator_exception_new import ValidatorException
         raise ValidatorException(
             f"No ValidatorAction named {name} found for field {self.field_property}"
         )
@@ -750,7 +750,7 @@ class Field:
         Throws:
             ValidatorException If an error occurs during validation.
         """
-        from src.main.validator_results import ValidatorResults
+        from src.main.validator_results_new import ValidatorResults
         if self.depends is None:
             return ValidatorResults()
 
@@ -800,7 +800,7 @@ class Field:
         if not self.__run_dependent_validators(va, results, actions, params, pos):
             return False
 
-        from src.main.validator_results import ValidatorResults
+        from src.main.validator_results_new import ValidatorResults
         result_bool = va.execute_validation_method(self, params)
         results.add(self, va.name, result_bool)
         return result_bool

@@ -57,7 +57,7 @@ from src.main.util.utils import (
     to_lower
 )
 from src.main.util.locale import Locale
-from src.main.generic_validator import GenericValidator
+from src.main.generic_validator_new import GenericValidator
 from src.main.routines.abstract_format_validator import AbstractFormatValidator
 
 

@@ -20,7 +20,7 @@ import locale as Locale
 import re
 from decimal import Decimal
 from ..routines.abstract_format_validator import AbstractFormatValidator
-from ..generic_validator import GenericValidator
+from ..generic_validator_new import GenericValidator
 from ..util.decimal_places import max_decimal_places
 
 class AbstractNumberValidator(AbstractFormatValidator):

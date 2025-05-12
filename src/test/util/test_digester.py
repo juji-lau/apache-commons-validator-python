@@ -2,12 +2,12 @@ import pytest
 import io
 import xml.sax
 from src.main.util.digester import Digester
-from src.main.validator_resources import ValidatorResources
-from src.main.form_set import FormSet
-from src.main.form import Form
-from src.main.field import Field
-from src.main.var import Var
-from src.main.msg import Msg
+from src.main.validator_resources_new import ValidatorResources
+from src.main.form_set_new import FormSet
+from src.main.form_new import Form
+from src.main.field_new import Field
+from src.main.var_new import Var
+from src.main.msg_new import Msg
 
 @pytest.fixture
 def digester():

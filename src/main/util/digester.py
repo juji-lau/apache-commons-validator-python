@@ -1,14 +1,14 @@
 import xml.sax
 import xml.etree.ElementTree as ET
 from typing import Any, Dict, Optional, Type
-from src.main.form_set import FormSet
-from src.main.form import Form
-from src.main.field import Field
-from src.main.var import Var
-from src.main.msg import Msg
-from src.main.arg import Arg
-from src.main.form_set_factory import FormSetFactory
-from src.main.validator_action import ValidatorAction
+from src.main.form_set_new import FormSet
+from src.main.form_new import Form
+from src.main.field_new import Field
+from src.main.var_new import Var
+from src.main.msg_new import Msg
+from src.main.arg_new import Arg
+from src.main.form_set_factory_new import FormSetFactory
+from src.main.validator_action_new import ValidatorAction
 
 class Digester(xml.sax.ContentHandler):
     def __init__(self, root_object: ['ValidatorResources']):

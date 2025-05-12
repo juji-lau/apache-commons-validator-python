@@ -1,8 +1,8 @@
 import pytest
 from types import MappingProxyType
 
-from src.main.validator_results import ValidatorResults
-from src.main.field import Field
+from src.main.validator_results_new import ValidatorResults
+from src.main.field_new import Field
 
 @pytest.fixture
 def sample_field():

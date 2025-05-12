@@ -2,7 +2,7 @@ import pytest
 from io import StringIO
 from unittest.mock import MagicMock
 from src.main.util.digester import Digester
-from src.main.validator_resources import ValidatorResources
+from src.main.validator_resources_new import ValidatorResources
 
 # ============================== Fixtures ==================================== #
 

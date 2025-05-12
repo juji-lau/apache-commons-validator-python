@@ -30,7 +30,7 @@ Changes:
 from typing import Final, Optional
 from src.main.routines.code_validator import CodeValidator
 from src.main.routines.regex_validator import RegexValidator
-from src.main.generic_validator import GenericValidator
+from src.main.generic_validator_new import GenericValidator
 from src.main.routines.checkdigit.checkdigit import CheckDigit
 from src.main.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
 

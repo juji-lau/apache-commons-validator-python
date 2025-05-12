@@ -18,7 +18,7 @@ limitations under the License.
 import logging
 from typing import Optional
 
-from src.main.form_set import FormSet
+from src.main.form_set_new import FormSet
 
 class FormSetFactory:
     """
@@ -61,7 +61,7 @@ class FormSetFactory:
                 self.__get_log().debug(f"FormSet[{form_set.display_key()}] found - merging.")
             return form_set
 
-        from src.main.form_set import FormSet
+        from src.main.form_set_new import FormSet
         # Create a new FormSet instance
         if form_set is None:
             form_set = FormSet()

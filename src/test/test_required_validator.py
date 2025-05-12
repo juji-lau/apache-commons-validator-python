@@ -1,11 +1,11 @@
 import pytest
 
-from src.main.validator_action import ValidatorAction
-from src.main.field import Field
-from src.main.form import Form
-from src.main.form_set import FormSet
-from src.main.validator_resources import ValidatorResources
-from src.main.validator import Validator
+from src.main.validator_action_new import ValidatorAction
+from src.main.field_new import Field
+from src.main.form_new import Form
+from src.main.form_set_new import FormSet
+from src.main.validator_resources_new import ValidatorResources
+from src.main.validator_new import Validator
 
 
 def test_required_field_validation():

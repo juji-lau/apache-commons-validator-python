@@ -1,0 +1,30 @@
+[project]
+name = "apache-commons-validator-python"
+version = "0.0.1"
+description = "A Python translation of Apache Commons Validator"
+authors = [
+  { name="Alicia Chu", email="ac2872@cornell.edu" }, 
+  { name="Juji Lau", email="jal499@cornell.edu" },
+  { name="Sanjana Nandi", email="sn523@cornell.edu" },
+  { name="Jessica Breuhaus", email="jb2784@cornell.edu" }
+]
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.12"
+
+# Only list what’s needed at runtime:
+dependencies = [
+  "babel==2.11.0",
+  "pycountry",
+  "dateparser"
+]
+
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.urls]
+Homepage = "https://github.coecis.cornell.edu/sn523/apache-commons-validator-python"

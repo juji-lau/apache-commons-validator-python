@@ -67,7 +67,7 @@ class ValidatorResources:
 
     __VALIDATOR_RULES: Final[List[str]] = [
         "src/apache_commons_validator_python/resources/digester-rules.xml",  #: Path to the XML rules file used by the digester. (local)
-        "resources/digester-rules.xml" #: path to the XML file by the digester. (package)
+        "apache_commons_validator_python/resources/digester-rules.xml" #: path to the XML file by the digester. (package)
     ]
 
     __REGISTRATIONS: Final[Dict[str, str]] = {

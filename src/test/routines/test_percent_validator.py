@@ -15,8 +15,8 @@
     limitations under the License.
 """
 
-from src.main.routines.percent_validator import PercentValidator
-from src.main.routines.abstract_number_validator import AbstractNumberValidator
+from src.apache_commons_validator_python.routines.percent_validator import PercentValidator
+from src.apache_commons_validator_python.routines.abstract_number_validator import AbstractNumberValidator
 
 class TestPercentValidator:
 

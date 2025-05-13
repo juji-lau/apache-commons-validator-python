@@ -1,5 +1,5 @@
 import pytest
-from src.main.validator_result_new import ValidatorResult
+from src.apache_commons_validator_python.validator_result_new import ValidatorResult
 
 def test_add_and_get_result():
     result = ValidatorResult(field="testField")

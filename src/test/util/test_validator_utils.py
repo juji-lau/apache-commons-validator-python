@@ -28,7 +28,7 @@ License (Taken from apache.commons.validator.routines.ValidatorTestUtils):
 
 import pytest
 from typing import Optional, Union
-from src.main.routines.regex_validator import RegexValidator
+from src.apache_commons_validator_python.routines.regex_validator import RegexValidator
 
 def test_copy_map():
   """ Tests validator_utils.py"""

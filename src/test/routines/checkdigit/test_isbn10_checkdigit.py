@@ -25,7 +25,7 @@ License (Taken from apache.commons.validator.routines.checkdigit.ISBN10CheckDigi
     limitations under the License.
 """
 
-from src.main.routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
 from src.test.routines.checkdigit.test_abstract_checkdigit import AbstractCheckDigitTest
 
 

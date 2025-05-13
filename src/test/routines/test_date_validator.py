@@ -29,8 +29,8 @@ import pytest
 from datetime import datetime, tzinfo
 from dateutil.tz import gettz
 from typing import Optional
-from src.main.routines.date_validator import DateValidator
-from src.main.util.datetime_helpers import (
+from src.apache_commons_validator_python.routines.date_validator import DateValidator
+from src.apache_commons_validator_python.util.datetime_helpers import (
     JavaToPyLocale, 
     date_get_time, 
     obj_to_str

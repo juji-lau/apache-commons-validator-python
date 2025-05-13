@@ -1,5 +1,5 @@
 import pytest
-from src.main.validator_action_new import ValidatorAction
+from src.apache_commons_validator_python.validator_action_new import ValidatorAction
 
 # ============================= Mocks ================================ #
 class MockValidator:
@@ -79,14 +79,14 @@ class RequiredValidator:
 def test_validator_action_full_integration():
     """Full integration: Digester -> ValidatorResources -> ValidatorAction.execute."""
 
-    from src.main.validator_resources_new import ValidatorResources
-    from src.main.util.digester import Digester
+    from src.apache_commons_validator_python.validator_resources_new import ValidatorResources
+    from src.apache_commons_validator_python.util.digester import Digester
     import io
 
     # Step 1: Setup ValidatorResources and Digester
     resources = ValidatorResources()
     digester = Digester(root_object=resources)
-    digester.load_rules("src/resources/digester-rules.xml")  # Adjust if needed
+    digester.load_rules("src/apache_commons_validator_python/resources/digester-rules.xml")  # Adjust if needed
 
     # Step 2: Parse a minimal XML with a <validator>
     validation_xml = io.StringIO(

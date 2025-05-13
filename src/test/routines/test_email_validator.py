@@ -15,8 +15,8 @@
     limitations under the License.
 """
 import pytest
-from src.main.routines.email_validator import EmailValidator
-from src.main.routines.domain_validator import DomainValidator
+from src.apache_commons_validator_python.routines.email_validator import EmailValidator
+from src.apache_commons_validator_python.routines.domain_validator import DomainValidator
 
 class TestEmailValidator:
 

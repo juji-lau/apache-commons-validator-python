@@ -16,10 +16,10 @@
 """
 from typing import Final
 import pytest
-from src.main.routines.credit_card_validator import CreditCardValidator
-from src.main.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
-from src.main.routines.regex_validator import RegexValidator
-from src.main.routines.code_validator import CodeValidator
+from src.apache_commons_validator_python.routines.credit_card_validator import CreditCardValidator
+from src.apache_commons_validator_python.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
+from src.apache_commons_validator_python.routines.regex_validator import RegexValidator
+from src.apache_commons_validator_python.routines.code_validator import CodeValidator
 
 
 # Valid credit card numbers (correct Luhn check digits)

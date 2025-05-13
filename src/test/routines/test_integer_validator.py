@@ -17,7 +17,7 @@
 
 import pytest
 from typing import Final
-from src.main.routines.integer_validator import IntegerValidator
+from src.apache_commons_validator_python.routines.integer_validator import IntegerValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestIntegerValidator(TestAbstractNumberValidator):

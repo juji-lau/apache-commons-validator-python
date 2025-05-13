@@ -25,7 +25,7 @@ License (Taken from apache.commons.validator.routines.checkdigit.ISINCheckDigitT
 """
 import pytest
 from src.test.routines.checkdigit.test_abstract_checkdigit import AbstractCheckDigitTest
-from src.main.routines.checkdigit.isin_checkdigit import ISINCheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.isin_checkdigit import ISINCheckDigit
 
 
 class TestISINCheckDigit(AbstractCheckDigitTest):

@@ -23,7 +23,7 @@ Changes:
 """
 import pytest
 from typing import Final, Optional
-from src.main.routines.isin_validator import ISINValidator
+from src.apache_commons_validator_python.routines.isin_validator import ISINValidator
 
 class TestISINValidator:
     """

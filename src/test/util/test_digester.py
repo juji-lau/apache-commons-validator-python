@@ -1,13 +1,13 @@
 import pytest
 import io
 import xml.sax
-from src.main.util.digester import Digester
-from src.main.validator_resources_new import ValidatorResources
-from src.main.form_set_new import FormSet
-from src.main.form_new import Form
-from src.main.field_new import Field
-from src.main.var_new import Var
-from src.main.msg_new import Msg
+from src.apache_commons_validator_python.util.digester import Digester
+from src.apache_commons_validator_python.validator_resources_new import ValidatorResources
+from src.apache_commons_validator_python.form_set_new import FormSet
+from src.apache_commons_validator_python.form_new import Form
+from src.apache_commons_validator_python.field_new import Field
+from src.apache_commons_validator_python.var_new import Var
+from src.apache_commons_validator_python.msg_new import Msg
 
 @pytest.fixture
 def digester():
@@ -15,7 +15,7 @@ def digester():
     digester = Digester(root_object=resources)
 
     # Load digester rules from the real digester-rules.xml file
-    digester.load_rules("src/resources/digester-rules.xml")
+    digester.load_rules("src/apache_commons_validator_python/resources/digester-rules.xml")
     return digester, resources
 
 def test_digester_parse_validation_xml(digester):

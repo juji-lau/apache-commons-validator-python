@@ -41,8 +41,8 @@ import pytest
 from datetime import datetime, tzinfo
 from dateutil.tz import gettz
 from typing import Final
-from src.main.routines.time_validator import TimeValidator
-from src.main.util.datetime_helpers import JavaToPyLocale, date_get_time
+from src.apache_commons_validator_python.routines.time_validator import TimeValidator
+from src.apache_commons_validator_python.util.datetime_helpers import JavaToPyLocale, date_get_time
 from src.test.routines.test_abstract_calendar_validator import TestAbstractCalendarValidator
 from src.test.util.test_timezones import TestTimeZones
 import locale

@@ -18,7 +18,7 @@
 import pytest
 import pickle
 from abc import ABC
-from src.main.routines.abstract_number_validator import AbstractNumberValidator
+from src.apache_commons_validator_python.routines.abstract_number_validator import AbstractNumberValidator
 
 class TestAbstractNumberValidator(ABC):
 

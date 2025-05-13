@@ -16,7 +16,7 @@
 """
 
 import pytest
-from src.main.routines.double_validator import DoubleValidator
+from src.apache_commons_validator_python.routines.double_validator import DoubleValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestDoubleValidator(TestAbstractNumberValidator):

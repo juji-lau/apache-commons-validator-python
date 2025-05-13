@@ -2,13 +2,13 @@
 
 import pytest
 
-from src.main.validator_new import Validator
-from src.main.validator_action_new import ValidatorAction
-from src.main.validator_resources_new import ValidatorResources
-from src.main.form_new import Form
-from src.main.field_new import Field
-from src.main.form_set_new import FormSet
-from src.main.validator_exception_new import ValidatorException
+from src.apache_commons_validator_python.validator_new import Validator
+from src.apache_commons_validator_python.validator_action_new import ValidatorAction
+from src.apache_commons_validator_python.validator_resources_new import ValidatorResources
+from src.apache_commons_validator_python.form_new import Form
+from src.apache_commons_validator_python.field_new import Field
+from src.apache_commons_validator_python.form_set_new import FormSet
+from src.apache_commons_validator_python.validator_exception_new import ValidatorException
 
 def build_resources_with_field(name="email", depends="always", page=1):
     # ValidatorAction

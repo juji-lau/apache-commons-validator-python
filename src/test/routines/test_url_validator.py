@@ -16,9 +16,9 @@
 """
 
 import pytest
-from src.main.routines.url_validator import UrlValidator
-from src.main.routines.regex_validator import RegexValidator
-from src.main.routines.domain_validator import DomainValidator
+from src.apache_commons_validator_python.routines.url_validator import UrlValidator
+from src.apache_commons_validator_python.routines.regex_validator import RegexValidator
+from src.apache_commons_validator_python.routines.domain_validator import DomainValidator
 
 class TestUrlValidator:
 

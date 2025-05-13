@@ -23,8 +23,8 @@ License (Taken from apache.commons.validator.routines.ISBNValidatorTest):
 Changes:
 """
 import pytest
-from src.main.util.regex import Regex
-from src.main.routines.isbn_validator import ISBNValidator
+from src.apache_commons_validator_python.util.regex import Regex
+from src.apache_commons_validator_python.routines.isbn_validator import ISBNValidator
 
 # Constants
 valid_isbn10_format = [

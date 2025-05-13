@@ -16,7 +16,7 @@
 """
 
 import pytest
-from src.main.routines.big_decimal_validator import BigDecimalValidator
+from src.apache_commons_validator_python.routines.big_decimal_validator import BigDecimalValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestBigDecimalValidator(TestAbstractNumberValidator):

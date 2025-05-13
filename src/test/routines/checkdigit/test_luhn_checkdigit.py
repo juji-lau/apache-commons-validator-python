@@ -24,7 +24,7 @@ License (Taken from apache.commons.validator.routines.checkdigit.LuhnCheckDigitT
     limitations under the License.
 """
 
-from src.main.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
 from src.test.routines.checkdigit.test_abstract_checkdigit import AbstractCheckDigitTest
 
 

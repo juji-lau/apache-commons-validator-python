@@ -15,7 +15,7 @@
     limitations under the License.
 """
 
-from src.main.util.flags import Flags
+from src.apache_commons_validator_python.util.flags import Flags
 from typing import Final
 import copy
 

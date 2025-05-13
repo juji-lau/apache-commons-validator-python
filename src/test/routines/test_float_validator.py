@@ -17,7 +17,7 @@
 
 import pytest
 from typing import Final
-from src.main.routines.float_validator import FloatValidator
+from src.apache_commons_validator_python.routines.float_validator import FloatValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestFloatValidator(TestAbstractNumberValidator):

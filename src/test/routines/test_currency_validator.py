@@ -17,8 +17,8 @@
 
 import pytest
 import locale as Locale
-from src.main.routines.currency_validator import CurrencyValidator
-from src.main.routines.abstract_number_validator import AbstractNumberValidator
+from src.apache_commons_validator_python.routines.currency_validator import CurrencyValidator
+from src.apache_commons_validator_python.routines.abstract_number_validator import AbstractNumberValidator
 
 original = Locale.setlocale(Locale.LC_ALL, None)
 

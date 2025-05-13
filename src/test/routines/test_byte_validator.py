@@ -16,7 +16,7 @@
 """
 import pytest
 from typing import Final
-from src.main.routines.byte_validator import ByteValidator
+from src.apache_commons_validator_python.routines.byte_validator import ByteValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestByteValidator(TestAbstractNumberValidator):

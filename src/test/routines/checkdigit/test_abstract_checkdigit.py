@@ -10,12 +10,12 @@ import pytest
 import logging
 from typing import Final, Optional, Union
 
-from src.main.routines.checkdigit.abstract_checkdigit import AbstractCheckDigit
-from src.main.routines.checkdigit.checkdigit_exception import CheckDigitException
+from src.apache_commons_validator_python.routines.checkdigit.abstract_checkdigit import AbstractCheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.checkdigit_exception import CheckDigitException
 
-from src.main.routines.checkdigit.checkdigit import CheckDigit
-from src.main.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
-from src.main.routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.checkdigit import CheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
 
 # Setup logging
 logging.basicConfig(

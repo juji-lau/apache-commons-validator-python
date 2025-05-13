@@ -29,9 +29,9 @@ License (Taken from apache.commons.validator.routines.CodeValidatorTest.java):
 
 import pytest
 from typing import Optional, Union
-from src.main.routines.code_validator import CodeValidator
-from src.main.routines.regex_validator import RegexValidator
-from src.main.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
+from src.apache_commons_validator_python.routines.code_validator import CodeValidator
+from src.apache_commons_validator_python.routines.regex_validator import RegexValidator
+from src.apache_commons_validator_python.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
 
 # Checkdigit constructor
 EAN13_CHECKDIGIT = EAN13CheckDigit.EAN13_CHECK_DIGIT

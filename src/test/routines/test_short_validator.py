@@ -16,7 +16,7 @@
 """
 
 import pytest
-from src.main.routines.short_validator import ShortValidator
+from src.apache_commons_validator_python.routines.short_validator import ShortValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestShortValidator(TestAbstractNumberValidator):

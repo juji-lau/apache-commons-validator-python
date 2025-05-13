@@ -25,7 +25,7 @@ License (Taken from apache.commons.validator.routines.checkdigit.EAN13CheckDigit
     limitations under the License.
 """
 
-from src.main.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
+from src.apache_commons_validator_python.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
 from src.test.routines.checkdigit.test_abstract_checkdigit import AbstractCheckDigitTest
 
 

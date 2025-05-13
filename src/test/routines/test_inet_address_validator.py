@@ -15,7 +15,7 @@
     limitations under the License.
 """
 
-from src.main.routines.inet_address_validator import InetAddressValidator
+from src.apache_commons_validator_python.routines.inet_address_validator import InetAddressValidator
 
 class TestInetAddressValidator:
     

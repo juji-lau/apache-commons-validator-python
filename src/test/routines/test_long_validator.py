@@ -17,7 +17,7 @@
 
 import pytest
 from typing import Final
-from src.main.routines.long_validator import LongValidator
+from src.apache_commons_validator_python.routines.long_validator import LongValidator
 from .test_abstract_number_validator import TestAbstractNumberValidator
 
 class TestLongValidator(TestAbstractNumberValidator):

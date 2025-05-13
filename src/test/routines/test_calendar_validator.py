@@ -37,15 +37,15 @@ from datetime import tzinfo, datetime
 from typing import Final, Optional
 from zoneinfo import ZoneInfo
 
-from src.main.util.datetime_helpers import (
+from src.apache_commons_validator_python.util.datetime_helpers import (
     JavaToPyLocale, 
     date_get_time, 
     timezone_has_same_rules, 
     obj_to_str, 
     get_default_tzinfo
 )
-from src.main.routines.abstract_calendar_validator import AbstractCalendarValidator
-from src.main.routines.calendar_validator import CalendarValidator
+from src.apache_commons_validator_python.routines.abstract_calendar_validator import AbstractCalendarValidator
+from src.apache_commons_validator_python.routines.calendar_validator import CalendarValidator
 from src.test.routines.test_abstract_calendar_validator import TestAbstractCalendarValidator
 from src.test.util.test_timezones import TestTimeZones
 

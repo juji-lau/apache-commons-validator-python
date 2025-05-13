@@ -24,7 +24,8 @@ License (Taken from apache.commons.validator.routines.CurrencyValidator.java):
 """
 
 from typing import override
-import locale as Locale
+from babel.numbers import get_currency_symbol, get_territory_currencies
+from babel.core import Locale
 from ..routines.big_decimal_validator import BigDecimalValidator
 from ..routines.abstract_number_validator import AbstractNumberValidator
 
@@ -105,13 +106,12 @@ class CurrencyValidator(BigDecimalValidator):
         
         # get currency symbol
         try:
-            locale = "" if locale is None else locale
-            Locale.setlocale(Locale.LC_MONETARY, locale)
-        except Locale.Error:
+            locale = "en_US" if locale is None else locale
+            l = Locale.parse(locale)
+        except Exception:
             return None
         
-        locale_info = Locale.localeconv()
-        currency_symbol = locale_info['currency_symbol']
+        currency_symbol = get_currency_symbol((get_territory_currencies(l.territory))[0], locale=locale)
         
         # reparse without the currency symbol
         if value.find(currency_symbol) >= 0:

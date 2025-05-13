@@ -19,9 +19,12 @@ class ValidatorResults:
     """Contains the results of a set of validation rules processed on a JavaBean."""
 
     def __init__(self):
+        """ValidatorResults constructor.
+        """
         self._results: Dict[str, 'ValidatorResult'] = {}
+        #: Map of ValidatorResults
 
-    def add(self, field: 'Field', validator_name: str, result: bool, value: Optional[Any] = None):
+    def add(self, field: 'Field', validator_name: str, result: bool, value: Optional[Any] = None) -> None:
         """Add the result of a validator action.
 
         Args:

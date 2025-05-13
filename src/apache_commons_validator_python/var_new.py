@@ -13,24 +13,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-# TODO: add typing annotations for type
-
 import copy
 from typing import Final
 
 
 class Var:
+
     JSTYPE_INT: Final[str] = "int"
+    #: int constant for javascript type. This can be used when autogenerating javascript.
+
     JSTYPE_STRING: Final[str] = "string"
+    #: String constant for javascript type. This can be used when autogenerating javascript. 
+    
     JSTYPE_REGEXP: Final[str] = "regexp"
+    #: Regular Expressions constant for javascript type. This can be used when autogenerating javascript. 
+
+    serializable = True
+    #: whether the class is serializable
+
+    cloneable = True
+    #: whether the class is cloneable
 
     def __init__(self, name=None, value=None, js_type=None):
         """Initialize a Var instance.
 
         Args:
-            name (str, optional): The variable's name.
-            value (str, optional): The variable's value.
-            js_type (str, optional): The variable's JavaScript type.
+            name (str, optional): The variable's name. Default None.
+            value (str, optional): The variable's value. Default None.
+            js_type (str, optional): The variable's JavaScript type. Default None.
         """
         self._name: str = name  # The name of the variable.
         self._value: str = value  # The key or value of the variable.
@@ -39,8 +49,6 @@ class Var:
             False  # Whether the variable is a resource (default: False).
         )
         self._bundle: str = None  # The bundle name (used when resource is True).
-        self.serializable = True
-        self.cloneable = True
 
     def clone(self):
         """Create and return a shallow copy of this Var instance.
@@ -52,11 +60,12 @@ class Var:
 
     @property
     def name(self):
-        """Get or set the name of the variable."""
+        """Get the name of the variable."""
         return self._name
 
     @name.setter
     def name(self, name):
+        """Set the name of the variable."""
         self._name = name
 
     @property

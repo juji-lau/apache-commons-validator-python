@@ -11,12 +11,35 @@ from src.apache_commons_validator_python.form_set_factory_new import FormSetFact
 from src.apache_commons_validator_python.validator_action_new import ValidatorAction
 
 class Digester(xml.sax.ContentHandler):
+    """Custom SAX-based XML parser that interprets digester rule files and applies them 
+    to dynamically construct and wire objects such as FormSet, Form, Field, etc., 
+    based on the XML structure.
+
+    This class mimics Apache Commons Digester by using SAX parsing combined with 
+    pattern-based rule interpretation, creating a hierarchy of validation resources.
+    """
+    
     def __init__(self, root_object: ['ValidatorResources']):
+        """Initializes the Digester with a root object into which parsed data is injected.
+
+        Args:
+            root_object (ValidatorResources): The root object (usually ValidatorResources) 
+                to which created objects will be attached.
+        """
         super().__init__()
+
         self.rules: Dict[str, Dict[str, Any]] = {}
+        #: Mapping from XML element path strings to associated digester rule configurations.
+
         self.object_stack: list[Any] = []
+        #: Stack to maintain the hierarchy of objects as XML elements are parsed.
+
         self.current_path: list[str] = []
+        #: Tracks the current XML element path during parsing.
+
         self.root_object: 'ValidatorResources' = root_object
+        #: The top-level object that will receive created sub-objects and method calls.
+
         self.class_mapping: Dict[str, Type] = {
             "FormSetFactory": FormSetFactory,
             "FormSet": FormSet,
@@ -26,12 +49,22 @@ class Digester(xml.sax.ContentHandler):
             "Msg": Msg,
             "ValidatorAction": ValidatorAction,
             "Arg": "Arg",
-        }
+        } #: Maps class names (as strings) to their actual Python class types for dynamic instantiation.
+
         self.object_stack.append(self.root_object)
+        
         self.current_params: list[str] = []
+        #: Temporary storage for parameters used in call-method-rule.
+
         self.text_buffer: str = ""
+        #: Buffer for accumulating text content within XML elements.
 
     def load_rules(self, rules_file: str) -> None:
+        """Parses the digester rules XML file and loads all patterns and rule bindings.
+
+        Args:
+            rules_file (str): Path to the XML file defining the digester rules.
+        """
         tree = ET.parse(rules_file)
         root = tree.getroot()
 
@@ -85,6 +118,16 @@ class Digester(xml.sax.ContentHandler):
         load_patterns(root)
 
     def startElement(self, name: str, attrs: xml.sax.xmlreader.AttributesImpl) -> None:
+        """Handles logic for start of an XML element during SAX parsing.
+
+        Applies any factory-create-rule or object-create-rule for the current path,
+        sets properties, and pushes the created object onto the object stack.
+
+        Args:
+            name (str): Name of the XML tag.
+            attrs (AttributesImpl): Attributes associated with the tag.
+        """
+        
         self.current_path.append(name)
         path = "/".join(self.current_path)
         self.text_buffer = ""  # Reset text buffer
@@ -116,6 +159,15 @@ class Digester(xml.sax.ContentHandler):
 
 
     def endElement(self, name: str) -> None:
+        """Handles logic for end of an XML element during SAX parsing.
+
+        Applies call-method-rule if present and wires the current object to its parent
+        via set-next-rule. Also processes call-param-rule for nested values.
+
+        Args:
+            name (str): Name of the XML tag.
+        """
+
         path = "/".join(self.current_path)
         if self.text_buffer.strip():
             for rule_path, rule in self.rules.items():
@@ -146,9 +198,22 @@ class Digester(xml.sax.ContentHandler):
         self.current_path.pop()
 
     def characters(self, content: str) -> None:
+        """Appends character data between start and end tags to the text buffer.
+
+        Args:
+            content (str): Character data within an XML tag.
+        """
         self.text_buffer += content
 
-    def parse(self, xml_file: str) -> None:
+    def parse(self, xml_file: str) -> Any:
+        """Parses the input XML file using this digester instance.
+
+        Args:
+            xml_file (str): Path to the XML file to parse.
+
+        Returns:
+            Any: The root object with attached parsed structure (usually ValidatorResources).
+        """
         parser = xml.sax.make_parser()
         parser.setContentHandler(self)
         parser.parse(xml_file)

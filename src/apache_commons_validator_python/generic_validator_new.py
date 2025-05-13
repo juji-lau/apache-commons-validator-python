@@ -12,12 +12,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-#from src.apache_commons_validator_python.routines.credit_card_validator import CreditCardValidator
-#from src.apache_commons_validator_python.routines.date_validator import DateValidator
-#from src.apache_commons_validator_python.routines.email_validator import EmailValidator
-#from src.apache_commons_validator_python.routines.url_validator import UrlValidator
-#from src.apache_commons_validator_python.generic_type_validator import GenericTypeValidator
 from typing import Final
 import re
 import locale
@@ -30,7 +24,6 @@ class GenericValidator:
     is_in_range).
     """
 
-
     @staticmethod
     def is_blank_or_null(value: str) -> bool:
         """Checks if the field isn't null and the length of the field is greater than
@@ -39,5 +32,5 @@ class GenericValidator:
 
 
     def __init__(self):
-        # Constructor, not needed in Python but keeping it for compatibility
+        """Constructor. not needed in Python but keeping it for compatibility"""
         pass

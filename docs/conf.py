@@ -5,7 +5,16 @@
 
 import os
 import sys
+import shutil 
+
 sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath('../src'))
+sys.path.insert(0, os.path.abspath('../src/main'))
+
+
+# Check that pdflatex is downloaded so pdf builds will work.
+if not shutil.which("pdflatex"):
+    print("⚠️  Warning: pdflatex not found. PDF builds will fail.")
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information

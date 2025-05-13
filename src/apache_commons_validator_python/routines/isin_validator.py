@@ -33,14 +33,6 @@ from src.apache_commons_validator_python.routines.checkdigit.isin_checkdigit imp
 class ISINValidator:
     """Validates ISIN (International Securities Identifying Number) codes.
 
-    Attributes:
-        _check_country_code (bool): Whether to validate the ISO country code prefix.
-
-    Constants:
-        _ISIN_REGEX (str): Regex to match 12-character ISIN codes.
-        _VALIDATOR (CodeValidator): Internal validator using ISIN regex and check digit.
-        _CCODES (list[str]): Sorted list of standard ISO country codes.
-        _SPECIALS (list[str]): Sorted list of extended or historical country codes.
 
     Methods:
         get_instance(check_country_code): Returns a singleton instance of the validator.

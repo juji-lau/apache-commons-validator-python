@@ -42,15 +42,19 @@ class Flags:
     def __copy__(self):
         """Clone this Flags object.
 
-        :return: a copy of this object.
+        Returns:
+            a copy of this object.
         """
         return Flags(self._flags)
 
     def __eq__(self, other):
         """Tests if two Flags objects are in the same state.
 
-        :param other: object being tested
-        :return: whether the flags are equal.
+        Args:
+            other: object being tested
+        
+        Returns:
+            whether the flags are equal.
         """
         if not isinstance(other, Flags):
             return False
@@ -60,22 +64,27 @@ class Flags:
     def flags(self):
         """Returns the current flags.
 
-        :return: collection of boolean flags represented.
+        Returns:
+            collection of boolean flags represented.
         """
         return self._flags
 
     def __hash__(self):
         """The hash code is based on the current state of the flags.
 
-        :return: the hash code for this object.
+        Returns:
+            the hash code for this object.
         """
         return hash(self._flags)
     def is_off(self, flag):
         """Tests whether the given flag is off. If the flag is not a power of 2 (for
         example, 3) this tests whether the combination of flags is off.
 
-        :param flag: Flag value to check.
-        :return: whether the specified flag value is off.
+        Args:
+            flag: Flag value to check.
+        
+        Returns:
+            whether the specified flag value is off.
         """
         return (self._flags & flag) == 0
     def is_on(self, flag):
@@ -83,15 +92,20 @@ class Flags:
 
         If the flag is not a power of 2 for example, 3) this tests whether the
         combination of flags is on.
-        :param flag: Flag value to check.
-        :return: whether the specified flag value is on.
+
+        Args:
+            flag: Flag value to check.
+        
+        Returns:
+            whether the specified flag value is on.
         """
         return (self._flags & flag) == flag
     def __str__(self):
         """Returns a 64 length String with the first flag on the right and the 64th flag
         on the left. A 1 indicates the flag is on, a 0 means it's off.
 
-        :return: string representation of this object.
+        Returns:
+            string representation of this object.
         """
         return str(bin(self._flags)[2:]).zfill(
             64
@@ -101,18 +115,21 @@ class Flags:
         """Turns off the given flag. If the flag is not a power of 2 (for example, 3)
         this turns off multiple flags.
 
-        :param flag: Flag value to turn off.
+        Args
+            flag: Flag value to turn off.
         """
         self._flags &= ~flag
 
     def turn_off_all(self):
         """Turn off all flags."""
         self._flags = 0
+
     def turn_on(self, flag):
         """Turns on the given flag. If the flag is not a power of 2 (for example, 3)
         this turns on multiple flags.
 
-        :param flag: Flag value to turn on.
+        Args:
+            flag: Flag value to turn on.
         """
         self._flags |= flag
 

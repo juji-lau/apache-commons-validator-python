@@ -220,26 +220,56 @@ class CreditCardValidator:
     @staticmethod
     def valid_length(value_length: int, range: CreditCardRange) -> bool:
         """Checks whether a given length is valid based on either an explicit list or a
-        min/max range for the credit card."""
+        min/max range for the credit card.
+
+        Args:
+            value_length: The length of the credit card number.
+            range: The CreditCardRange to validate against.
+
+        Returns:
+            True if the length is valid, False otherwise.
+        """
         if range.lengths:
             return value_length in range.lengths
         return range.min_len <= value_length <= range.max_len
     
     @staticmethod
     def is_on(options: int, flag: int) -> bool:
-        """Checks if a bitmask flag is enabled in the options."""
+        """Checks if a bitmask flag is enabled in the options.
+        
+        Args:
+            options: Bitmask of all enabled flags.
+            flag: The specific flag to check.
+
+        Returns:
+            True if the flag is enabled in options, False otherwise.
+        """
         return (options & flag) > 0
     
     def is_valid(self, card: str) -> bool:
         """Returns True if the card is valid according to any of the configured card
-        types."""
+        types.
+        
+        Args:
+            card: The credit card number as a string.
+
+         Returns:
+            True if the card is valid, False otherwise.
+        """
         if GenericValidator.is_blank_or_null(card):
             return False
         return any(validator.is_valid(card) for validator in self.card_types)
 
     def validate(self, card: str) -> Optional[str]:
         """Validates the card and returns the cleaned card number if valid, otherwise
-        None."""
+        None.
+
+        Args:
+            card: The credit card number to validate.
+
+        Returns:
+            The card number if valid, or None if invalid.
+        """
         if GenericValidator.is_blank_or_null(card):
             return None
         for validator in self.card_types:
@@ -251,34 +281,105 @@ class CreditCardValidator:
     @classmethod
     def generic_credit_card_validator(cls) -> "CreditCardValidator":
         """Creates a validator that only checks for numeric card numbers with Luhn
-        validation, using the default min and max length."""
+        validation, using the default min and max length.
+        
+        Returns:
+            A CreditCardValidator instance using numeric+Luhn check.
+        """
         return cls.generic_credit_card_validator_with_range(cls.MIN_CC_LENGTH, cls.MAX_CC_LENGTH)
 
     @classmethod
     def generic_credit_card_validator_with_exact_length(cls, length: int) -> "CreditCardValidator":
-        """Creates a validator for a specific length, e.g., 16-digit cards."""
+        """Creates a validator for a specific length, e.g., 16-digit cards.
+        
+        Args:
+            length: The exact card length to validate.
+
+        Returns:
+            A CreditCardValidator configured to check that length.
+        """
         return cls.generic_credit_card_validator_with_range(length, length)
 
     @classmethod
     def generic_credit_card_validator_with_range(cls, min_len: int, max_len: int) -> "CreditCardValidator":
         """Creates a validator that only ensures the card is numeric, within a given
-        length range, and passes the Luhn check."""
+        length range, and passes the Luhn check.
+        
+        Args:
+            min_len: Minimum allowed length.
+            max_len: Maximum allowed length.
+
+        Returns:
+            A CreditCardValidator instance with Luhn check and length bounds.
+        """
         generic_validator = CodeValidator(regex=r"^(\d+)$", min_length=min_len, max_length=max_len, length=None, checkdigit=cls.LUHN_VALIDATOR)
         return CreditCardValidator(credit_card_validators=[generic_validator])
     
     def create_range_validator(self, ranges: list[CreditCardRange], check_digit) -> CodeValidator:
         """Creates a custom validator that uses a numeric pattern and checks if the
-        prefix and length match any of the provided ranges."""
+        prefix and length match any of the provided ranges.
+        
+        Args:
+            ranges: A list of CreditCardRange objects specifying IIN and length rules.
+            check_digit: A CheckDigit instance used for final validation.
+
+        Returns:
+            A CodeValidator that checks card numbers against all provided ranges.
+        """
 
         class RangeRegexValidator(RegexValidator):
+            """Custom regex validator that also validates IIN prefix and card length.
+
+            This validator subclasses `RegexValidator` and extends it to support
+            additional credit card range checks, including prefix (IIN) range matching
+            and length validation using `CreditCardRange`.
+
+            It is used within `CreditCardValidator.create_range_validator()` to build
+            flexible, range-aware validators.
+
+            Methods:
+                is_valid: Returns True if the value passes both regex and range checks.
+                match: Returns a list containing the value if valid, else None.
+                validate: Performs full validation against regex and defined ranges.
+            """
             def is_valid(self, value: str) -> bool:
+                """Checks if the input passes regex and range-based validation.
+
+                Args:
+                    value: The credit card number to validate.
+
+                Returns:
+                    True if the input matches regex and satisfies at least one
+                    prefix/length range.
+                """
                 return self.validate(value) is not None
 
             def match(self, value: str):
+                """Attempts to match the input value and wrap it in a list if valid.
+
+                Args:
+                    value: The credit card number to check.
+
+                Returns:
+                    A list containing the value if matched and valid, otherwise None.
+                """
                 result = self.validate(value)
                 return [result] if result else None
 
             def validate(self, value: str):
+                """Validates the input using regex and configured credit card ranges.
+
+                The method checks:
+                - If the value matches the regex pattern.
+                - If the value length is within the allowed range.
+                - If the value starts with a prefix within the low-high IIN range.
+
+                Args:
+                    value: The credit card number to validate.
+
+                Returns:
+                    The validated value if successful, otherwise None.
+                """
                 if super().match(value) is None:
                     # super().match(value) returns [] because no groups are captured
                     # if regex pattern no () → no groups → .groups() is empty

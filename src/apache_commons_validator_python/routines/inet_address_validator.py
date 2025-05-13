@@ -26,18 +26,14 @@ License (Taken from apache.commons.validator.routines.InetAddressValidator.java)
 from typing import Final
 import re
 from ..routines.regex_validator import RegexValidator
-# from ..generic_validator import GenericValidator
+from ..generic_validator_new import GenericValidator
 
 class InetAddressValidator:
     """Inet Address validation and conversion routines.
 
     This class provides methods to validate a candidate IP address.
 
-    This class is a Singleton; you can retrieve the instance via the getInstance() method.
-
-    Attributes:
-        <li>serializable (bool): Indicates if the object is serializable.</li>
-        <li>cloneable (bool): Indicates if the object can be cloned.</li>
+    This class is a Singleton; you can retrieve the instance via the get_instance() method.
     """
     serializable = True
     cloneable    = False
@@ -66,7 +62,8 @@ class InetAddressValidator:
     def get_instance(cls):
         """Returns the singleton instance of this validator.
 
-        :return: The singleton instance of this validator.
+        Returns:
+            The singleton instance of this validator.
         """
         if not cls.__VALIDATOR:
             cls.__VALIDATOR = InetAddressValidator()
@@ -79,16 +76,22 @@ class InetAddressValidator:
     def is_valid(self, inet_address: str):
         """Checks if the specified string is a valid IPv4 or IPv6 address.
 
-        :param inet_address: the string to validate.
-        :return: True if the string validates as an IP address.
+        Args:
+            inet_address (str): The string to validate.
+
+        Returns:
+            `True` if the string validates as an IP address.
         """
         return self.is_valid_inet4_address(inet_address) or self.is_valid_inet6_address(inet_address)
     
     def is_valid_inet4_address(self, inet4_address: str):
-        """Validates an IPv4 address. Returns True if valid.
+        """Validates an IPv4 address. Returns `True` if valid.
 
-        :param inet4_address: The IPv4 address to validate.
-        :return: True if the argument contains a valid IPv4 address.
+        Args:
+            inet4_address (str): The IPv4 address to validate.
+
+        Returns:
+            `True` if the argument contains a valid IPv4 address.
         """
         # verify that address conforms to generic IPv4 format
         groups = self.__IPV4_VALIDATOR.match(inet4_address)
@@ -97,8 +100,7 @@ class InetAddressValidator:
         
         # verify that address subgroups are legal
         for ip_segment in groups:
-            # if GenericValidator.is_blank_or_null(ip_segment):
-            if ip_segment is None or ip_segment == '':
+            if GenericValidator.is_blank_or_null(ip_segment):
                 return False
             
             i_ip_segment = 0
@@ -114,8 +116,11 @@ class InetAddressValidator:
     def is_valid_inet6_address(self, inet6_address: str):
         """Validates an IPv6 address. Returns true if valid.
 
-        :param inet6_address: The IPv6 address to validate.
-        :return: True if the argument contains a valid IPv6 address.
+        Args:
+            inet6_address (str): The IPv6 address to validate.
+
+        Returns:
+            `True` if the argument contains a valid IPv6 address.
         """
         # remove prefix size; this will appear after the zone id (if any)
         parts = inet6_address.split('/', -1)
@@ -162,8 +167,7 @@ class InetAddressValidator:
         valid_octets = 0
         empty_octets  = 0 # consecutive empty chunks
         for index, octet in enumerate(octets):
-            # if GenericValidator.is_blank_or_null(octet):
-            if octet is None or octet == '':
+            if GenericValidator.is_blank_or_null(octet):
                 empty_octets += 1
                 if empty_octets > 1:
                     return False

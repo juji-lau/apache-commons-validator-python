@@ -27,6 +27,17 @@ from src.apache_commons_validator_python.routines.checkdigit.modulus_checkdigit 
 from src.apache_commons_validator_python.routines.checkdigit.checkdigit_exception import CheckDigitException
 
 class LuhnCheckDigit(ModulusCheckDigit):
+    """
+    This class is used to validate check digits using the Luhn (modulus 10) algorithm,
+    which is commonly applied to credit card numbers and other identification numbers.
+
+    The Luhn algorithm weights digits from right to left, doubling every
+    second digit and subtracting 9 if the result exceeds 9. This helps detect
+    common data entry errors such as transpositions and single-digit mistakes.
+
+    Attributes:
+        LUHN_CHECK_DIGIT (LuhnCheckDigit): Singleton instance of this class.
+    """
     # Singleton Luhn Check Digit instance
     LUHN_CHECK_DIGIT = None
 

@@ -24,6 +24,11 @@ class Field:
     Instances of this class are configured with a <field> xml element.
 
     Taken from apache.commons.validator.Field;
+
+    Attributes:
+        serializable (bool): Indicates if the object is serializable.
+        cloneable (bool): Indicates if the object can be cloned.
+        
     """
 
     __DEFAULT_ARG: Final[str] = "src.apache_commons_validator_python.field_new.Field.DEFAULT"
@@ -48,8 +53,11 @@ class Field:
     #: The class in the original translation was cloneable
 
     def __init__(self):
+        """
+        Field constructor.
+        """
         self._property: Optional[str] = None
-        #: THe Field's property name.
+        #: The Field's property name.
 
         self._indexed_property: Optional[str] = None
         #: The Field's indexed property name.
@@ -63,7 +71,7 @@ class Field:
         self._depends: Optional[str] = None
         #: a comma separated list of validator's this field depends on.
 
-        self._page: Optional[int] = 0
+        self._page: int = 0
         #: The page number
 
         self._client_validation: bool = True
@@ -86,11 +94,11 @@ class Field:
 
         self._args: List[Dict[str, "Arg"]] = []
         #: Holds Dicts of arguments. args[0] returns the Dict for the first replacement argument. Starts with a 0 length array so that it will only grow to the size of the highest argument position.
-
+    
     def add_arg(self, arg: "Arg") -> None:
         """Add an Arg to the replacement argument list.
 
-        Method Arguments:
+        Args:
             arg (Arg): Validation message's argument.
         """
         # TODO this first if check can go away after arg0, etc. are removed from dtd
@@ -114,25 +122,28 @@ class Field:
     def add_msg(self, msg: "Msg") -> None:
         """Add a Msg to the Field.
 
-        Method Arguments:
+        Args:
             msg (Msg): A validation message.
         """
         self.get_msg_map()[msg.name] = msg
 
     def add_var(self, arg0, arg1=None, arg2=None) -> None:
         """Add a Var to the Field.
-
-        Method Arguments:
-            arg0 (str | Var): Either the Validator Argument or the name of the validation.
-            arg1 (str | None): The Argument's value
-            arg2 (str | None): The JavaScript type
-
+        
         Example Method Call 1:
             v = Var(name, value, js_type)
             add_var(arg0=v)
 
         Example Method Call 2:
             add_var(arg0=name, arg1=value, arg2=jsType)
+
+        Args:
+            arg0 (str | Var): Either the Validator Argument or the name of the validation.
+            arg1 (str | None): The Argument's value
+            arg2 (str | None): The JavaScript type
+
+        Returns: 
+            None
         """
         from src.apache_commons_validator_python.var_new import Var
         if isinstance(arg0, str) and arg1 is not None and arg2 is not None:
@@ -145,7 +156,7 @@ class Field:
     def clone(self) -> "Field":
         """Creates and returns a copy of this field.
 
-        Return:
+        Returns:
             A copy of the Field.
         """
         field = copy.deepcopy(self)
@@ -170,10 +181,14 @@ class Field:
         return field
 
     def __determine_arg_position(self, arg: "Arg") -> None:
-        """Calculate the position of the Arg.
+        """Calculate the position of the Arg and store the position as an 
+        attribute of arg.
 
-        Method Arguments:
-            arg (Arg): TODO
+        Args:
+            arg (Arg): the arg to determine the position of
+
+        Returns: 
+            None
         """
         position: Final[int] = arg.position
 
@@ -207,15 +222,22 @@ class Field:
         """Ensures that the args array can hold the given arg. Resizes the array as
         necessary.
 
-        Method Arguments:
+        Args:
             arg (Arg): Determine if the args array is long enough to store this
                         arg's position.
+
+        Returns: 
+            None
         """
         if arg.position >= len(self._args):
             self._args.extend([None] * (arg.position + 1 - len(self._args)))
 
     def generate_key(self) -> None:
-        """Generates correct key value."""
+        """Generates correct key value.
+        
+        Returns: 
+            None
+        """
         if self.is_indexed():
             self._key = (
                 self._indexed_list_property + self.TOKEN_INDEXED + "." + self._property
@@ -227,12 +249,12 @@ class Field:
         """Gets the Arg object at the given position. If the key finds a None value,
         then the default value then the default value will be retrieved.
 
-        Method Arguments:
+        Args:
             position (int): The Arg number to find.
             key (str | None): The name the Arg is stored under. If not found, the default Arg for the given position (if any) will be retrieved.
 
         Returns:
-            The Arg with the given name and positin or None if not found.
+            The Arg with the given name and position or None if not found.
         """
         if position >= len(self._args) or self._args[position] is None:
             return None
@@ -245,7 +267,7 @@ class Field:
     def get_args(self, key: str) -> List[Optional["Arg"]]:
         """Retrieves the Args for the given validator name.
 
-        Method Parameters:
+        Args:
             key (str): The validator's args to retrieve.
 
         Returns:
@@ -307,7 +329,7 @@ class Field:
     def indexed_property_bean(self, bean) -> List[Any]:
         """Returns an indexed property from the object we're validating.
 
-        Method Arguments:
+        Args:
             bean (object): The bean to extract the indexed values from.
 
         Raises: ValidatorException If there's an error looking up the property
@@ -343,7 +365,8 @@ class Field:
     def get_message(self, key: str) -> Optional["Msg"]:
         """Retrieve a message object.
 
-        Method Arguments;
+        Args:
+     
             key (str): Validation key
 
         Returns:
@@ -365,7 +388,7 @@ class Field:
     def get_msg(self, key: str) -> Optional[str]:
         """Retrieve a message value.
 
-        Method Arguments:
+        Args:
             key (str): Validation key
 
         Returns:
@@ -394,7 +417,7 @@ class Field:
     def get_var(self, main_key: str) -> Optional["Var"]:
         """Retrieve a variable.
 
-        Method Arguments:
+        Args:
             main_key (str): the Variable's key
 
         Returns:
@@ -420,7 +443,7 @@ class Field:
     def get_var_value(self, main_key: str) -> Optional[str]:
         """Retrieve a variable's value.
 
-        Method Arguments:
+        Args:
             main_key (str): the Variable's key
 
         Returns:
@@ -437,7 +460,7 @@ class Field:
         """Called when a validator name is used in a depends clause but there is no know
         ValidatorAction configured for that name.
 
-        Method Arguments:
+        Args:
             name (str): the name of the validator in the depends list
 
         Throws: ValidatorException
@@ -459,7 +482,7 @@ class Field:
     def is_dependency(self, validator_name: str) -> bool:
         """Checks if the validator is listed as a dependency.
 
-        Method Arguments:
+        Args:
             validator_name (str): the name of the validator to check
 
         Returns: whether the field is dependent on a validator
@@ -480,7 +503,7 @@ class Field:
         """Replace the constants with values in fields and process the depends field to
         create the dependency dict.
 
-        Method Arguments:
+        Args:
             global_constants (Dict[str, str])
             constants (Dict[str, str])
         """
@@ -521,9 +544,9 @@ class Field:
     def __process_arg(self, key: str, replace_value: str) -> None:
         """Replace the arg key value with the key/value pairs passed in.
 
-        Method Arguments:
-            key (str):
-            replace_value (str):
+        Args:
+            key (str): the arg key to replace the value of 
+            replace_value (str): the new value
         """
         from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
         for arg_map in self._args:
@@ -535,11 +558,11 @@ class Field:
                         arg.key = ValidatorUtils.replace(arg.key, key, replace_value)
 
     def __process_message_components(self, key: str, replace_value: str) -> None:
-        """Replace the args key value with the key/value pairs passed in.
+        """Replace the msgs key value with the key/value pairs passed in.
 
-        Method Arguments:
-            key (str);
-            replace_value (str):
+        Args:
+            key (str): the msgs key to replace the value of 
+            replace_value (str): the new value
         """
         from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
 
@@ -554,9 +577,9 @@ class Field:
     def __process_vars(self, key: str, replace_value: str) -> None:
         """Replace the vars value with the key/value pairs passed in.
 
-        Method Arguments:
-            key (str);
-            replace_value (str);
+        Args:
+            key (str): the vars key to replace the value of 
+            replace_value (str): the new value
         """
         from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
 
@@ -575,7 +598,7 @@ class Field:
         """Calls all of the validators that this validator depends on. TODO
         ValidatorAction should know how to run its own dependencies.
 
-        Method Arguments:
+        Args:
             va (ValidatorAction): run dependent validators for this action
             results (ValidatorResults)
             actions (Dict[str, ValidatorAction])
@@ -607,7 +630,7 @@ class Field:
         """Sets the flag that determines whether client-side scripting should be
         generated for this field. (translation of setClientValidation())
 
-        Method Arguments:
+        Args:
             client_va (bool): the scripting flag
         """
         self._client_validation = client_va
@@ -617,7 +640,7 @@ class Field:
         """Sets the validation rules for this field as a comma separated list/
         (translation of setDepends())
 
-        Method Arguments:
+        Args:
             depends (str): a comma separated list of validator names
         """
         self._depends = depends
@@ -630,7 +653,7 @@ class Field:
         """Sets the position of the Field in the validation list. (translation of
         setFieldOrder())
 
-        Method Arguments:
+        Args:
             field_ord (int): the field position
         """
         self._field_order = field_ord
@@ -639,7 +662,7 @@ class Field:
     def indexed_list_property(self, indexed_list_prop: str) -> None:
         """Sets the indexed property name of the field.
 
-        Method Arguments:
+        Args:
             indexed_list_prop (str): the field's indexed list property name.
         """
         self._indexed_list_property = indexed_list_prop
@@ -648,7 +671,7 @@ class Field:
     def indexed_property(self, indexed_property: str) -> None:
         """Sets the indexed property name of the field.
 
-        Method Arguments:
+        Args:
             indexed_property (str): the field's indexed property name
         """
         self._indexed_property = indexed_property
@@ -658,7 +681,7 @@ class Field:
         """Sets a unique key for the field. This can be used to change the key
         temporarily to have a unique key for an indexed field.
 
-        Method Arguments:
+        Args:
             key (str): a unique key for the field
         """
         self._key = key
@@ -667,7 +690,8 @@ class Field:
     def page(self, page: int) -> None:
         """Sets the page value that the Field is associated with for validation.
 
-        Method Arguments     page (int): the page number
+        Args:
+          page (int): the page number
         """
         self._page = page
 
@@ -675,7 +699,8 @@ class Field:
     def field_property(self, prop: str) -> None:
         """Sets the property name of the field.
 
-        Method Arguments     property (str): the field's property name
+        Args:
+          property (str): the field's property name
         """
         self._property = prop
 
@@ -689,7 +714,7 @@ class Field:
         """Run the configured validations on this field.  Run all validations in the
         depends clause over each item in turn, returning when the first one fails.
 
-        Method Arguments:
+        Args:
             params (Dict[str, object]): A dict of parameter class names to parameter values to pass into validation methods.
             actions A dict of validator names to ValidatorAction objects.
 

@@ -29,15 +29,17 @@ import urllib.parse
 from ..routines.regex_validator import RegexValidator
 from ..routines.domain_validator import DomainValidator
 from ..routines.inet_address_validator import InetAddressValidator
-# from ..generic_validator import GenericValidator
+from ..generic_validator_new import GenericValidator
 
 class UrlValidator:
     """URL Validation routines.
 
     Behavior of validation is modified by passing in options:
-        <li>ALLOW_2_SLASHES - [FALSE]  Allows double '/' characters in the path component.</li>
-        <li>NO_FRAGMENT - [FALSE]  By default fragments are allowed, if this option is included then fragments are flagged as illegal.</li>
-        <li>ALLOW_ALL_SCHEMES - [FALSE] By default only http, https, and ftp are considered valid schemes. Enabling this option will let any scheme pass validation.</li>
+        - ALLOW_2_SLASHES: [FALSE]  Allows double '/' characters in the path component.
+        - NO_FRAGMENT: [FALSE]  By default fragments are allowed, if this option is included 
+            then fragments are flagged as illegal.
+        - ALLOW_ALL_SCHEMES: [FALSE] By default only http, https, and ftp are considered valid schemes.
+            Enabling this option will let any scheme pass validation.
 
     Originally based in on php script by Debbie Dyer, validation.php v1.2b, Date: 03/07/02,
     https://javascript.internet.com. However, this validation now bears little resemblance to the php original.
@@ -50,7 +52,7 @@ class UrlValidator:
             print("URL is valid")
         else:
             print("URL is invalid")
-    prints "URL is invalid"
+    Will return `False`.
 
     If instead the default constructor is used.
         url_validator = UrlValidator();
@@ -58,18 +60,17 @@ class UrlValidator:
             print("URL is valid")
         else:
             print("URL is invalid")
-    prints out "URL is valid"
+    Will return `True`.
 
     See "http://www.ietf.org/rfc/rfc2396.txt"
     Uniform Resource Identifiers (URI): Generic Syntax
 
     Attributes:
-        <li>serializable (bool): Indicates if the object is serializable.</li>
-        <li>cloneable (bool): Indicates if the object can be cloned.</li>
-        <li>ALLOW_ALL_SCHEMES (int): Allow all validly formatted schemes to pass validation instead of supplying a set of valid schemes.</li>
-        <li>ALLOW_2_SLASHES (int): Allow two slashes in the path component of the URL.</li>
-        <li>NO_FRAGMENTS (int): Disallow any URL fragments.</li>
-        <li>ALLOW_LOCAL_URLS (int): Allow local URLs, enabling a broad-brush check.</li>
+        - ALLOW_ALL_SCHEMES (int): Allow all validly formatted schemes to pass validation
+            instead of supplying a set of valid schemes.
+        - ALLOW_2_SLASHES (int): Allow two slashes in the path component of the URL.
+        - NO_FRAGMENTS (int): Disallow any URL fragments.
+        - ALLOW_LOCAL_URLS (int): Allow local URLs, enabling a broad-brush check.
     """
     serializable = True
     cloneable    = False
@@ -127,7 +128,8 @@ class UrlValidator:
         """Returns the singleton instance of this class with default schemes and
         options.
 
-        :return: Singleton instance with default schemes and options.
+        Returns:
+            Singleton instance with default schemes and options.
         """
         if not cls.__DEFAULT_URL_VALIDATOR:
             cls.__DEFAULT_URL_VALIDATOR = UrlValidator()
@@ -137,15 +139,16 @@ class UrlValidator:
                  domain_validator: DomainValidator=None):
         """Constructs a new instance with the given validation options.
 
-        :param schemes: The list of valid schemes. Ignored if the ALLOW_ALL_SCHEMES
-            option is set.
-        :param authority_validator: Regular expression validator used to validate the
-            authority part.
-        :param options: Validation options. Set using the public constants of this
-            class. To set multiple options, simply add them together: ALLOW_2_SLASHES +
-            NO_FRAGMENTS enables both of those options.
-        :param domain_validator: The DomainValidator to use; must agree with
-            ALLOW_LOCAL_URLS setting.
+        Args:
+            schemes (list[str]): The list of valid schemes. Ignored if the ALLOW_ALL_SCHEMES
+                option is set.
+            authority_validator (RegexValidator): Regular expression validator used to validate
+                the authority part.
+            options (int): Validation options. Set using the public constants of this
+                class. To set multiple options, simply add them together: `ALLOW_2_SLASHES` +
+                `NO_FRAGMENTS` enables both of those options.
+            domain_validator (DomainValidator): The DomainValidator to use; must agree with
+                `ALLOW_LOCAL_URLS` setting.
         """
         self.__options = options
 
@@ -170,42 +173,54 @@ class UrlValidator:
     def _count_token(self, token: str, target: str):
         """Returns the number of times the token appears in the target.
 
-        :param token: Token value to be counted.
-        :param target: Target value to count tokens in.
-        :return: The number of tokens.
+        Args:
+            token (str): Token value to be counted.
+            target (str): Target value to count tokens in.
+
+        Returns:
+            The number of tokens.
         """
         return target.count(token)
     
     def __is_off(self, flag: int):
-        """Tests whether the given flag is off.  If the flag is not a power of 2 (for
+        """Tests whether the given flag is off. If the flag is not a power of 2 (for
         example, 3) this tests whether the combination of flags is off.
 
-        :param flag: Flag value to check.
-        :return: Whether the specified flag value is off.
+        Args:
+            flag (int): The flag value to check.
+
+        Returns:
+            Whether the specified flag value is off.
         """
         return (self.__options & flag) == 0
     
     def __is_on(self, flag: int, options: int=None):
-        """Tests whether the given flag is on.  If the flag is not a power of 2 (for
+        """Tests whether the given flag is on. If the flag is not a power of 2 (for
         example, 3) this tests whether the combination of flags is on.
 
-        :param flag: Flag value to check.
-        :param options: What to check. If not given, will check this instances options.
-        :return: Whether the specified flag value is on.
+        Args:
+            flag (int): The flag value to check.
+            options (int): What to check. Default is to check this instances options.
+
+        Returns:
+            Whether the specified flag value is on.
         """
         if options:
             return (options & flag) > 0
         return (self.__options & flag) > 0
     
     def is_valid(self, value: str):
-        """Checks if a field has a valid URL address.</p>
+        """Checks if a field has a valid URL address.
 
         Note that the method calls is_valid_authority() which checks that the domain is
         valid.
 
-        :param value: The value validation is being performed on. None is considered an
-            invalid value.
-        :return: True if the URL is valid.
+        Args:
+            value: The value validation is being performed on. `None` is considered an
+                invalid value.
+
+        Returns:
+            `True` if the URL is valid.
         """
         if not value:
             return False
@@ -222,8 +237,7 @@ class UrlValidator:
             return False
         
         authority = uri.netloc
-        # if scheme == "file" and GenericValidator.is_blank_or_null(authority):
-        if scheme == "file" and (not authority or authority == ''):
+        if scheme == "file" and GenericValidator.is_blank_or_null(authority):
             return self._is_valid_path(uri.path)
         
         # validate the authority
@@ -237,15 +251,18 @@ class UrlValidator:
         
     def _is_valid_authority(self, authority: str):
         """
-        Returns true if the authority is properly formatted. An authority is the combination
-        of hostname and port. An authority value of None is considered invalid.
+        Returns `True` if the authority is properly formatted. An authority is the combination
+        of hostname and port. An authority value of `None` is considered invalid.
         Note: this implementation validates the domain unless a RegexValidator was provided.
         If a RegexValidator was supplied, and it matches, then the authority is regarded
         as valid with no further checks, otherwise the method checks against the
-        AUTHORITY_PATTERN and the DomainValidator (ALLOW_LOCAL_URLS)
-        
-        :param authority: Authority value to validate, allows IDN.
-        :return: True if authority (hostname and port) is valid.
+        `AUTHORITY_PATTERN` and the DomainValidator (`ALLOW_LOCAL_URLS`).
+
+        Args:
+            authority (str): Authority value to validate, allows IDN.
+
+        Returns:
+            `True` if authority (hostname and port) is valid.
         """
         if not authority:
             return False
@@ -279,8 +296,7 @@ class UrlValidator:
                     return False
             
             port = authority_matches.group(self.__PARSE_AUTHORITY_PORT)
-            # if not GenericValidator.is_blank_or_null(port):
-            if port:
+            if not GenericValidator.is_blank_or_null(port):
                 try:
                     i_port = int(port)
                     if i_port < 0 or i_port > self.__MAX_UNSIGNED_16_BIT_INT:
@@ -297,20 +313,25 @@ class UrlValidator:
     def _is_valid_fragment(self, fragment: str):
         """Returns true if the given fragment is None or fragments are allowed.
 
-        :param fragment: Fragment value to validate.
-        :return: True if fragment is valid.
+        Args:
+            fragment (str): The fragment value to validate.
+
+        Returns:
+            `True` if fragment is valid.
         """
-        # if GenericValidator.is_blank_or_null(fragment):
-        if fragment is None or fragment.strip() == '':
+        if GenericValidator.is_blank_or_null(fragment):
             return True
 
         return self.__is_off(self.NO_FRAGMENTS)
     
     def _is_valid_path(self, path: str):
-        """Returns true if the path is valid.  A value of None is considered invalid.
+        """Returns `True` if the path is valid. A value of `None` is considered invalid.
 
-        :param path: Path value to validate.
-        :return: True if path is valid.
+        Args:
+            path (str): The path value to validate.
+
+        Returns:
+            `True` if path is valid.
         """
         if path is None or not self.__PATH_PATTERN.fullmatch(path):
             return False
@@ -332,10 +353,13 @@ class UrlValidator:
         return True
     
     def _is_valid_query(self, query: str):
-        """Returns true if the query is None, or it's a properly formatted query string.
+        """Returns `True` if the query is `None`, or it's a properly formatted query string.
 
-        :param query: Query value to validate.
-        :return: True if query is valid.
+        Args:
+            query (str): The query value to validate.
+
+        Returns:
+            `True` if query is valid.
         """
         if not query:
             return True
@@ -343,12 +367,15 @@ class UrlValidator:
         return bool(self.__QUERY_PATTERN.fullmatch(query))
     
     def _is_valid_scheme(self, scheme: str):
-        """Validate scheme. If schemes[] was initialized to a non-None value, then only
+        """Validate scheme. If schemes was initialized to a non-`None` value, then only
         those schemes are allowed. Otherwise, the default schemes are "http", "https",
         "ftp". Matching is case-blind.
 
-        :param scheme: The scheme to validate.  A value of None is considered invalid.
-        :return: True if valid.
+        Args:
+            scheme (str): The scheme to validate. A value of `None` is considered invalid.
+
+        Returns:
+            `True` if valid.
         """
         if not scheme or not self.__SCHEME_PATTERN.fullmatch(scheme):
             return False

@@ -17,11 +17,53 @@ from __future__ import annotations
 import logging
 from urllib.request import urlopen
 import locale
-from typing import IO, Dict, List, Optional, Final, Union
+from typing import IO, Any, Dict, List, Optional, Final, Union
 
 class ValidatorResources:
     """General purpose class for storing FormSet objects based on their associated
-    locale."""
+    locale.
+    
+    The xml files being passed in need to match the structure detailed below:
+    <form-validation>
+    ├── <global>
+    │   ├── <validator>
+    │   │   ├── name (attribute, required)
+    │   │   ├── classname (attribute, required)
+    │   │   ├── method (attribute, optional, defaults to 'validate')
+    │   │   ├── methodParams (attribute, optional)
+    │   │   ├── depends (attribute, optional)
+    │   │   └── msg (attribute, optional; default error message key)
+    │   ├── <constant>
+    │   │   ├── <constant-name> (text, required)
+    │   │   └── <constant-value> (text, required)
+    │   └── ... (multiple <validator> and <constant> allowed)
+    │
+    ├── <formset>
+    │   ├── language (attribute, optional)
+    │   ├── country (attribute, optional)
+    │   └── <form>
+    │       ├── name (attribute, required)
+    │       └── <field>
+    │           ├── property (attribute, required)
+    │           ├── depends (attribute, optional; comma-separated validator names)
+    │           ├── page (attribute, optional; for multi-page forms)
+    │           ├── indexedListProperty (attribute, optional)
+    │           ├── indexedProperty (attribute, optional)
+    │           ├── key (attribute, optional; alternate for message bundle)
+    │           ├── <arg0> to <arg3> (optional; provides values for messages)
+    │           │   ├── key (attribute, required)
+    │           │   ├── name (attribute, optional)
+    │           │   └── resource (attribute, optional, default true)
+    │           ├── <msg> (optional; overrides default validator message)
+    │           │   ├── name (attribute, required; matches a validator)
+    │           │   └── key (attribute, required; message key)
+    │           ├── <var> (optional; parameter to validator)
+    │           │   ├── <var-name> (text, required)
+    │           │   └── <var-value> (text, required)
+    │           └── ... (multiple <arg>, <msg>, <var> allowed)
+    │
+    └── ... (multiple <formset> allowed, one per locale if needed)
+    """
 
     __VALIDATOR_RULES: Final[str] = (
         "src/apache_commons_validator_python/resources/digester-rules.xml"  #: Path to the XML rules file used by the digester.
@@ -41,15 +83,36 @@ class ValidatorResources:
         locale.getlocale()[0] or "en_US"
     )  #: Default locale based on system settings.
 
-    serializable = True
+    serializable = True 
+    #: Is the class serializable
+
     cloneable = False
-    
-    def __init__(self, sources: Optional[Union[List[Union[str, IO, object]], Union[str, IO, object]]] = None):
+    #: is the class cloneable
+
+    def __init__(self, sources: Optional[List[str]] = None):
+        """_summary_
+
+        Args:
+            sources (Optional[List[str]], optional): list of file paths. Defaults to None.
+
+        Raises:
+            ValueError
+        """
+        
         self.__logger = logging.getLogger(__name__)
+        #: logger 
+
         self._h_form_sets: Dict[str, 'FormSet'] = {}
+        #: All `FormSet` objects stored in this object.
+
         self._h_constants: Dict[str, str] = {}
+        #: All constants stored in this object,
+
         self._h_actions: Dict[str, 'ValidatorAction'] = {}
+        #: All `ValidatorAction`s stored in this object. 
+
         self._default_form_set: Optional['FormSet'] = None
+        #: Default `FormSet`
 
         if sources:
             if not isinstance(sources, list):
@@ -72,25 +135,34 @@ class ValidatorResources:
 
             self.process()
 
-    def _get_form_sets(self):
+    def _get_form_sets(self) -> Dict[str, Any]:
         """Returns a Dictionary of FormSet objects indexed by locale keys."""
         return self._h_form_sets
 
-    def _get_actions(self):
+    def _get_actions(self) -> Dict[str, Any]:
         """Dictionary of ValidatorAction objects indexed by name."""
         return self._h_actions
 
-    def _get_constants(self):
+    def _get_constants(self) -> Dict[str, str]:
         """Dictionary of global constants."""
         return self._h_constants
 
-    def add_constant(self, name: str, value: str):
-        """Add a global constant to the resource."""
+    def add_constant(self, name: str, value: str) -> None:
+        """Add a global constant to the resource.
+
+        Args:
+            name (str): name of the global constant
+            value (str): value of the global constant
+        """
         self.__logger.debug(f"Adding Global Constant: {name}, {value}")
         self._h_constants[name] = value
 
-    def add_form_set(self, form_set: 'FormSet'):
-        """Add a FormSet to this ValidatorResources object."""
+    def add_form_set(self, form_set: 'FormSet') -> None:
+        """Add a FormSet to this ValidatorResources object.
+
+        Args:
+            form_set (FormSet): FormSet to add 
+        """
         key = self._build_key(form_set)
         if not key:  # default FormSet
             if self._default_form_set != None:
@@ -105,17 +177,34 @@ class ValidatorResources:
                 )
             self._h_form_sets[key] = form_set
 
-    def get_form(self, *args):
+    def get_form(self, *args) -> "Form":
         """Gets a Form based on either on language, country, variant and formkey or
-        locale and form key."""
+        locale and form key.
+
+        Raises:
+            ValueError: 
+
+        Returns:
+            form (Form)
+        """
         if len(args) == 4:  # language, country, variant, form_key
             return self._get_form_with_locale(*args)
         elif len(args) == 2:  # Locale object, form_key
             return self._get_form_with_locale_obj(*args)
         raise ValueError("Invalid arguments")
 
-    def _get_form_with_locale(self, language, country, variant, form_key):
-        """Gets a Form based on language, country, variant, and form key."""
+    def _get_form_with_locale(self, language: str, country: str, variant: str, form_key: str) -> "Form":
+        """Gets a Form based on language, country, variant, and form key.
+
+        Args:
+            language (str): 
+            country (str)
+            variant (str)
+            form_key (str)
+
+        Returns:
+            form with locale or None.
+        """
         form = None
 
         # Try language/country/variant
@@ -159,21 +248,50 @@ class ValidatorResources:
 
         return form
 
-    def _get_form_with_locale_obj(self, locale_obj, form_key):
-        """Gets a Form based on locale and form key."""
+    def _get_form_with_locale_obj(self, locale_obj: "Locale", form_key: str) -> "Form":
+        """Gets a Form based on locale and form key.
+
+        Args:
+            locale_obj (Locale)
+            form_key (str)
+
+        Returns:
+            Form with locale object and form key.
+        """
         return self._get_form_with_locale(
             locale_obj.language, locale_obj.country, locale_obj.variant, form_key
         )
 
     def _build_key(self, form_set: 'FormSet') -> str:
+        """Build locale key using language, country, and variant from form_set
+
+        Args:
+            form_set (FormSet): FormSet from which to build locale key
+
+        Returns:
+            str: locale key 
+        """
         return self.build_locale(form_set.language, form_set.country, form_set.variant)
 
     def build_locale(self, lang: str, country: str, variant: str) -> str:
-        """Assembles a locale code from given parts."""
+        """Assembles a locale code from given parts.
+
+        Args:
+            lang (str): 
+            country (str): 
+            variant (str): 
+
+        Returns:
+            str
+        """
         return "_".join(filter(None, [lang, country, variant]))
 
-    def add_validator_action(self, validator_action: 'ValidatorAction'):
-        """Add a ValidatorAction to the resource."""
+    def add_validator_action(self, validator_action: 'ValidatorAction') -> None:
+        """Add a ValidatorAction to the resource.
+
+        Args:
+            validator_action (ValidatorAction): ValidatorAction to add to the resource.
+        """
         validator_action.init()
         self._h_actions[validator_action.name] = validator_action
         self.__logger.debug(
@@ -181,9 +299,15 @@ class ValidatorResources:
         )
 
     def get_validator_action(self, key: str) -> Optional['ValidatorAction']:
+        """Gets the ValidatorAction associated with the key.
+
+        Returns:
+            ValidatorAction | None
+        """
         return self._h_actions.get(key)
 
     def get_validator_actions(self) -> Dict[str, 'ValidatorAction']:
+        """Returns a copy of the ValidatorActions in this resources."""
         return dict(self._h_actions)  # Return a copy to prevent modification
 
     def process(self):

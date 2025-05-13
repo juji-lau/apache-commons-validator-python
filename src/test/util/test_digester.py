@@ -15,7 +15,7 @@ def digester():
     digester = Digester(root_object=resources)
 
     # Load digester rules from the real digester-rules.xml file
-    digester.load_rules("src/apache_commons_validator_python/resources/digester-rules.xml")
+    digester.load_rules("src/apache_commons_validator_python/digester-rules.xml")
     return digester, resources
 
 def test_digester_parse_validation_xml(digester):

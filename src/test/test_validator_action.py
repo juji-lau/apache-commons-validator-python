@@ -86,7 +86,7 @@ def test_validator_action_full_integration():
     # Step 1: Setup ValidatorResources and Digester
     resources = ValidatorResources()
     digester = Digester(root_object=resources)
-    digester.load_rules("src/apache_commons_validator_python/resources/digester-rules.xml")  # Adjust if needed
+    digester.load_rules("src/apache_commons_validator_python/digester-rules.xml")  # Adjust if needed
 
     # Step 2: Parse a minimal XML with a <validator>
     validation_xml = io.StringIO(

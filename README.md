@@ -1,5 +1,5 @@
 # apache-commons-validator-python
-This is a Python translation of the Apache Commons Validator, which provides librarie sfor client-side validation and server-side data validation. 
+This is a Python translation of the Apache Commons Validator, which provides libraries for client-side validation and server-side data validation. 
 
 ### Documentation
 Documentation can be found in this repository at docs/_build/latex/apachecommonsvalidatorpython.pdf

@@ -32,10 +32,10 @@ Changes:
 from __future__ import annotations
 from typing import Final, Optional
 
-from src.apache_commons_validator_python.routines.code_validator import CodeValidator
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit_exception import CheckDigitException
-from src.apache_commons_validator_python.routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
-from src.apache_commons_validator_python.routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
+from ..routines.code_validator import CodeValidator
+from ..routines.checkdigit.checkdigit_exception import CheckDigitException
+from ..routines.checkdigit.ean13_checkdigit import EAN13CheckDigit
+from ..routines.checkdigit.isbn10_checkdigit import ISBN10CheckDigit
 
 
 class ISBNValidator:

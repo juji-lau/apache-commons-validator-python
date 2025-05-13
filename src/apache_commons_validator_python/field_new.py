@@ -15,7 +15,8 @@ limitations under the License.
 
 import copy
 from typing import Final, Optional, List, Dict, Any
-from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
+# from ..util.validator_utils import ValidatorUtils
+from .util.validator_utils import ValidatorUtils
 import threading
 
 class Field:
@@ -145,7 +146,9 @@ class Field:
         Returns: 
             None
         """
-        from src.apache_commons_validator_python.var_new import Var
+        # from ..var_new import Var
+        from .var_new import Var
+        
         if isinstance(arg0, str) and arg1 is not None and arg2 is not None:
             v = Var(name=arg0, value=arg1, js_type=arg2)
             self.get_var_map()[v.name] = v
@@ -465,7 +468,7 @@ class Field:
 
         Throws: ValidatorException
         """
-        from src.apache_commons_validator_python.validator_exception_new import ValidatorException
+        from ..validator_exception_new import ValidatorException
         raise ValidatorException(
             f"No ValidatorAction named {name} found for field {self.field_property}"
         )
@@ -507,7 +510,8 @@ class Field:
             global_constants (Dict[str, str])
             constants (Dict[str, str])
         """
-        from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
+        # from ..util.validator_utils import ValidatorUtils
+        from .util.validator_utils import ValidatorUtils
         self.generate_key()
 
         for key1 in constants:
@@ -548,7 +552,9 @@ class Field:
             key (str): the arg key to replace the value of 
             replace_value (str): the new value
         """
-        from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
+        # from ..util.validator_utils import ValidatorUtils
+        from .util.validator_utils import ValidatorUtils
+
         for arg_map in self._args:
             if arg_map is None:
                 pass
@@ -564,7 +570,8 @@ class Field:
             key (str): the msgs key to replace the value of 
             replace_value (str): the new value
         """
-        from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
+        # from ..util.validator_utils import ValidatorUtils
+        from .util.validator_utils import ValidatorUtils
 
         var_key: Final[str] = self._TOKEN_START + self._TOKEN_VAR
         # process messages
@@ -581,7 +588,8 @@ class Field:
             key (str): the vars key to replace the value of 
             replace_value (str): the new value
         """
-        from src.apache_commons_validator_python.util.validator_utils import ValidatorUtils
+        # from ..util.validator_utils import ValidatorUtils
+        from .util.validator_utils import ValidatorUtils
 
         for var_key in self.get_var_map():
             var: Final["Var"] = self.get_var(var_key)
@@ -724,7 +732,8 @@ class Field:
         Throws:
             ValidatorException If an error occurs during validation.
         """
-        from src.apache_commons_validator_python.validator_results_new import ValidatorResults
+        # from ..validator_results_new import ValidatorResults
+        from .validator_results_new import ValidatorResults
         if self.depends is None:
             return ValidatorResults()
 
@@ -774,7 +783,8 @@ class Field:
         if not self.__run_dependent_validators(va, results, actions, params, pos):
             return False
 
-        from src.apache_commons_validator_python.validator_results_new import ValidatorResults
+        # from ..validator_results_new import ValidatorResults
+        from .validator_results_new import ValidatorResults
         result_bool = va.execute_validation_method(self, params)
         results.add(self, va.name, result_bool)
         return result_bool

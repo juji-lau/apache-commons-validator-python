@@ -118,7 +118,8 @@ class ValidatorResources:
             if not isinstance(sources, list):
                 sources = [sources]
 
-            from src.apache_commons_validator_python.util.digester import Digester
+            # from ..util.digester import Digester
+            from .util.digester import Digester
             digester = Digester(root_object=self)
             digester.load_rules(self.__VALIDATOR_RULES)
 

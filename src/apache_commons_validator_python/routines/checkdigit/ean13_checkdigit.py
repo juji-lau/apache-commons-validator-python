@@ -32,8 +32,8 @@ Changes:
 """
 from __future__ import annotations
 from typing  import Final
-from src.apache_commons_validator_python.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
-
+# from ..routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
+from .modulus_checkdigit import ModulusCheckDigit
 
 class EAN13CheckDigit(ModulusCheckDigit):
     """Modulus 10 EAN-13 / UPC / ISBN-13 Check Digit calculation and validation.

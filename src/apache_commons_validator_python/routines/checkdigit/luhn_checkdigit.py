@@ -22,9 +22,12 @@ License (Taken from apache.commons.validator.routines.checkdigit.LuhnCheckDigit.
 
 Changes:
 """
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit import CheckDigit
-from src.apache_commons_validator_python.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit_exception import CheckDigitException
+# from ..routines.checkdigit.checkdigit import CheckDigit
+# from ..routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
+# from ..routines.checkdigit.checkdigit_exception import CheckDigitException
+from .checkdigit import CheckDigit
+from .modulus_checkdigit import ModulusCheckDigit
+from .checkdigit_exception import CheckDigitException
 
 class LuhnCheckDigit(ModulusCheckDigit):
     """

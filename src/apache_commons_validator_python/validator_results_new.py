@@ -33,7 +33,8 @@ class ValidatorResults:
             result (bool): The result of the validation.
             value (Any, optional): The value returned by the validator.
         """
-        from src.apache_commons_validator_python.validator_result_new import ValidatorResult
+        # from ..validator_result_new import ValidatorResult
+        from .validator_result_new import ValidatorResult
         
         key = field.key
         if key not in self._results:

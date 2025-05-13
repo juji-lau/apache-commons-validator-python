@@ -69,8 +69,8 @@ Changes:
 import logging
 from typing import Optional, Final
 # from generic_validator import GenericValidator
-from src.apache_commons_validator_python.routines.regex_validator import RegexValidator
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit import CheckDigit
+from ..routines.regex_validator import RegexValidator
+from ..routines.checkdigit.checkdigit import CheckDigit
 
 
 class CodeValidator:

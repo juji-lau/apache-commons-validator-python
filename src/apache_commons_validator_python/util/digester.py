@@ -1,14 +1,14 @@
 import xml.sax
 import xml.etree.ElementTree as ET
 from typing import Any, Dict, Optional, Type
-from src.apache_commons_validator_python.form_set_new import FormSet
-from src.apache_commons_validator_python.form_new import Form
-from src.apache_commons_validator_python.field_new import Field
-from src.apache_commons_validator_python.var_new import Var
-from src.apache_commons_validator_python.msg_new import Msg
-from src.apache_commons_validator_python.arg_new import Arg
-from src.apache_commons_validator_python.form_set_factory_new import FormSetFactory
-from src.apache_commons_validator_python.validator_action_new import ValidatorAction
+from ..form_set_new import FormSet
+from ..form_new import Form
+from ..field_new import Field
+from ..var_new import Var
+from ..msg_new import Msg
+from ..arg_new import Arg
+from ..form_set_factory_new import FormSetFactory
+from ..validator_action_new import ValidatorAction
 
 class Digester(xml.sax.ContentHandler):
     """Custom SAX-based XML parser that interprets digester rule files and applies them 

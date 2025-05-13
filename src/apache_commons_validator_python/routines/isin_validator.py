@@ -26,8 +26,8 @@ Changes:
 import pycountry
 from typing import Final, Optional, List
 from locale import getdefaultlocale
-from src.apache_commons_validator_python.routines.code_validator import CodeValidator
-from src.apache_commons_validator_python.routines.checkdigit.isin_checkdigit import ISINCheckDigit
+from ..routines.code_validator import CodeValidator
+from ..routines.checkdigit.isin_checkdigit import ISINCheckDigit
 
 
 class ISINValidator:

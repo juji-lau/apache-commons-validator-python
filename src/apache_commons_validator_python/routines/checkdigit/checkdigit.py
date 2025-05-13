@@ -47,7 +47,8 @@ Changes:
 from abc import ABC, abstractmethod
 from typing import Union
 # from code_validator import CodeValidator  #circular import
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit_exception import CheckDigitException
+# from ..routines.checkdigit.checkdigit_exception import CheckDigitException
+from .checkdigit_exception import CheckDigitException
 
 class CheckDigit(ABC):
     """

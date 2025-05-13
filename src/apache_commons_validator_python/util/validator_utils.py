@@ -2,9 +2,9 @@
 import copy
 from typing import Callable, Optional, Union, Dict
 
-from src.apache_commons_validator_python.var_new import Var
-from src.apache_commons_validator_python.arg_new import Arg
-from src.apache_commons_validator_python.msg_new import Msg
+from ..var_new import Var
+from ..arg_new import Arg
+from ..msg_new import Msg
 
 # Generic utility functions
 def integer_compare(a:int, b:int) -> int:

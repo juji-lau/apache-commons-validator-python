@@ -24,8 +24,9 @@ Changes:
 - StringBuilder -> list of strings
 """
 from typing import Final
-from src.apache_commons_validator_python.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit, CheckDigitException
-
+# from ..routines.checkdigit.modulus_checkdigit import ModulusCheckDigit, CheckDigitException
+from .modulus_checkdigit import ModulusCheckDigit
+from .checkdigit_exception import CheckDigitException
 class ISINCheckDigit(ModulusCheckDigit):
     """Modulus 10 ISIN (International Securities Identifying Number) Check Digit
     calculation and validation.

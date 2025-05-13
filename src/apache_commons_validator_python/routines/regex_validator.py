@@ -82,7 +82,7 @@ from re import Pattern
 from copy import copy
 from typing import Optional, Union, Final
 
-from src.apache_commons_validator_python.util.regex import Regex, compile
+from ..util.regex import Regex, compile
 
 class RegexValidator:
     """A regular expression validator using Python's `re` module.

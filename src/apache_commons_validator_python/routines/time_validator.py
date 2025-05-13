@@ -31,7 +31,7 @@ from __future__ import annotations
 from datetime import datetime, date, time, tzinfo
 from typing import Optional, Callable
 
-from src.apache_commons_validator_python.routines.abstract_calendar_validator import AbstractCalendarValidator
+from ..routines.abstract_calendar_validator import AbstractCalendarValidator
 
 
 class TimeValidator(AbstractCalendarValidator):

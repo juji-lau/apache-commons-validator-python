@@ -26,8 +26,8 @@ from __future__ import annotations
 from datetime import datetime, date, time, tzinfo
 from typing import Optional, Final, Callable
 
-from src.apache_commons_validator_python.routines.abstract_calendar_validator import AbstractCalendarValidator
-from src.apache_commons_validator_python.util.validator_utils import integer_compare
+from ..routines.abstract_calendar_validator import AbstractCalendarValidator
+from ..util.validator_utils import integer_compare
 
 class DateValidator(AbstractCalendarValidator):
     """

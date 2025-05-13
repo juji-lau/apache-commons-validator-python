@@ -28,11 +28,11 @@ Changes:
 
 """
 from typing import Final, Optional
-from src.apache_commons_validator_python.routines.code_validator import CodeValidator
-from src.apache_commons_validator_python.routines.regex_validator import RegexValidator
-from src.apache_commons_validator_python.generic_validator_new import GenericValidator
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit import CheckDigit
-from src.apache_commons_validator_python.routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
+from ..routines.code_validator import CodeValidator
+from ..routines.regex_validator import RegexValidator
+from ..generic_validator_new import GenericValidator
+from ..routines.checkdigit.checkdigit import CheckDigit
+from ..routines.checkdigit.luhn_checkdigit import LuhnCheckDigit
 
 class CreditCardValidator:
     """Validates credit card numbers based on known issuer patterns, numeric format, and

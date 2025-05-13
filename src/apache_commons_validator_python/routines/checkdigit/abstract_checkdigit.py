@@ -27,7 +27,8 @@ License:
     limitations under the License.
 """
 
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit import CheckDigit
+# from ..routines.checkdigit.checkdigit import CheckDigit
+from .checkdigit import CheckDigit
 
 class AbstractCheckDigit(CheckDigit):
     """

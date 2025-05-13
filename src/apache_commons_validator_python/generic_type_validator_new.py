@@ -15,7 +15,7 @@ limitations under the License.
 
 import logging
 from typing import Final, Optional
-from src.apache_commons_validator_python.generic_validator_new import GenericValidator
+from ..generic_validator_new import GenericValidator
 from datetime import datetime
 import locale
 import numpy as np

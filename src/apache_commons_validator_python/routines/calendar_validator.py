@@ -29,9 +29,9 @@ from __future__ import annotations
 from datetime import datetime, date, time, tzinfo
 from typing import Optional, Callable
 
-from src.apache_commons_validator_python.routines.abstract_calendar_validator import AbstractCalendarValidator
-from src.apache_commons_validator_python.util.datetime_helpers import timezone_has_same_rules
-from src.apache_commons_validator_python.util.validator_utils import integer_compare
+from ..routines.abstract_calendar_validator import AbstractCalendarValidator
+from ..util.datetime_helpers import timezone_has_same_rules
+from ..util.validator_utils import integer_compare
 
 
 class CalendarValidator(AbstractCalendarValidator):

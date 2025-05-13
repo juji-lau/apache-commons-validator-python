@@ -16,7 +16,7 @@ limitations under the License.
 import logging
 from typing import Optional
 
-from src.apache_commons_validator_python.form_set_new import FormSet
+from .form_set_new import FormSet
 
 class FormSetFactory:
     """Factory class used to create FormSet instances."""
@@ -54,7 +54,8 @@ class FormSetFactory:
                 self.__get_log().debug(f"FormSet[{form_set.display_key()}] found - merging.")
             return form_set
 
-        from src.apache_commons_validator_python.form_set_new import FormSet
+        # from ..form_set_new import FormSet
+        from .form_set_new import FormSet
         # Create a new FormSet instance
         if form_set is None:
             form_set = FormSet()

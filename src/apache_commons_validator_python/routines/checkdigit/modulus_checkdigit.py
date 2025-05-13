@@ -34,9 +34,11 @@ Changes:
 # from modulus_checkdigit import ModulusCheckDigit
 from abc import abstractmethod
 from typing import Optional, Union, Final
-from src.apache_commons_validator_python.routines.checkdigit.abstract_checkdigit import AbstractCheckDigit
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit_exception import CheckDigitException
-# from src.apache_commons_validator_python.generic_validator import GenericValidator
+# from ..routines.checkdigit.abstract_checkdigit import AbstractCheckDigit
+# from ..routines.checkdigit.checkdigit_exception import CheckDigitException
+from .abstract_checkdigit import AbstractCheckDigit
+from .checkdigit_exception import CheckDigitException
+# from ..generic_validator import GenericValidator
 
 class ModulusCheckDigit(AbstractCheckDigit):
     """Abstract base class for Modulus Check Digit calculation and validation.

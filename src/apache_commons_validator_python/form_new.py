@@ -226,9 +226,12 @@ class Form:
             ValidatorException: If the specified `field_name` does not correspond to a valid field
                                 in the form.
         """
-        from src.apache_commons_validator_python.validator_results_new import ValidatorResults
-        from src.apache_commons_validator_python.validator_new import Validator
-        from src.apache_commons_validator_python.validator_exception_new import ValidatorException
+        # from ..validator_results_new import ValidatorResults
+        # from ..validator_new import Validator
+        # from ..validator_exception_new import ValidatorException
+        from .validator_results_new import ValidatorResults
+        from .validator_new import Validator
+        from .validator_exception_new import ValidatorException
         
         results = ValidatorResults()
         params[Validator.VALIDATOR_RESULTS_PARAM] = results

@@ -39,8 +39,10 @@ Changes:
 """
 from __future__ import annotations
 from typing import Union
-from src.apache_commons_validator_python.routines.checkdigit.checkdigit_exception import CheckDigitException
-from src.apache_commons_validator_python.routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
+# from ..routines.checkdigit.checkdigit_exception import CheckDigitException
+# from ..routines.checkdigit.modulus_checkdigit import ModulusCheckDigit
+from .checkdigit_exception import CheckDigitException
+from .modulus_checkdigit import ModulusCheckDigit
 
 class ISBN10CheckDigit(ModulusCheckDigit):
     """This class perfroms Modulus 11 ISBN-10 Check Digit calculation/validation.

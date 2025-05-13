@@ -37,6 +37,11 @@ mutants/
 /src/test/routines/compiler.java
 .zshrc
 
+# Packaging build artifacts
+build/
+dist/
+*.egg-info/
+
 # # Other system files (optional)
 # Thumbs.db
 # .idea/a

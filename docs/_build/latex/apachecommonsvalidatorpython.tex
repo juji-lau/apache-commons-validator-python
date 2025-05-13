@@ -124,22 +124,32 @@ documentation for details.
 \label{\detokenize{apache_commons_validator_python.routines.checkdigit:module-apache_commons_validator_python.routines.checkdigit.abstract_checkdigit}}\label{\detokenize{apache_commons_validator_python.routines.checkdigit:apache-commons-validator-python-routines-checkdigit-abstract-checkdigit-module}}\index{module@\spxentry{module}!apache\_commons\_validator\_python.routines.checkdigit.abstract\_checkdigit@\spxentry{apache\_commons\_validator\_python.routines.checkdigit.abstract\_checkdigit}}\index{apache\_commons\_validator\_python.routines.checkdigit.abstract\_checkdigit@\spxentry{apache\_commons\_validator\_python.routines.checkdigit.abstract\_checkdigit}!module@\spxentry{module}}
 \sphinxAtStartPar
 Module Name: checkdigit.py
+\begin{description}
+\sphinxlineitem{Description:}
+\sphinxAtStartPar
+This module provides the \sphinxtitleref{AbstractCheckDigit} class, translating Apache Commons
+Validator’s \sphinxtitleref{AbstractCheckDigit.java} into Python. It serves as a base for check
+digit algorithms, defining the interface for computing and validating check digits.
+Original link at:
+\begin{quote}
 
 \sphinxAtStartPar
-Description: Translates apache.commons.validator.routines.checkdigit.CheckDigit.java
-Link: \sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/checkdigit/AbstractCheckDigit.java}
+\sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/checkdigit/AbstractCheckDigit.java}
+\end{quote}
+
+\end{description}
 
 \sphinxAtStartPar
 Author: Juji Lau
 \begin{description}
-\sphinxlineitem{License (Taken from apache.commons.validator.routines.checkdigit.AbstractCheckDigit.java):}
+\sphinxlineitem{License:}
 \sphinxAtStartPar
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements. See the NOTICE file distributed with
 this work for additional information regarding copyright ownership.
 The ASF licenses this file to You under the Apache License, Version 2.0
 (the “License”); you may not use this file except in compliance with
-the License. You may obtain a copy of the License at
+the License. You may obtain a copy of the License at:
 \begin{quote}
 
 \sphinxAtStartPar
@@ -153,10 +163,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-\sphinxlineitem{Changes:}
-\sphinxAtStartPar
-Added serializeable and clone as abstract attributes
-
 \end{description}
 \index{AbstractCheckDigit (class in apache\_commons\_validator\_python.routines.checkdigit.abstract\_checkdigit)@\spxentry{AbstractCheckDigit}\spxextra{class in apache\_commons\_validator\_python.routines.checkdigit.abstract\_checkdigit}}
 
@@ -169,7 +175,11 @@ Added serializeable and clone as abstract attributes
 Bases: \sphinxcode{\sphinxupquote{CheckDigit}}
 
 \sphinxAtStartPar
-Abstract class for CheckDigit interface.
+Abstract base class for check digit algorithms.
+
+\sphinxAtStartPar
+Subclasses must implement methods for calculating and validating check digits
+according to specific standards (e.g., ISBN, EAN\sphinxhyphen{}13).
 
 \end{fulllineitems}
 
@@ -211,9 +221,8 @@ See the package summary for a full list of implementations provided within Commo
 
 \sphinxAtStartPar
 Author: Juji Lau
-License (Taken from apache.commons.validator.routines.checkdigit.CheckDigit.java):
-\begin{quote}
-
+\begin{description}
+\sphinxlineitem{License (Taken from apache.commons.validator.routines.checkdigit.CheckDigit.java):}
 \sphinxAtStartPar
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements. See the NOTICE file distributed with
@@ -233,8 +242,7 @@ distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-\end{quote}
-\begin{description}
+
 \sphinxlineitem{Changes:}
 \sphinxAtStartPar
 Added serializeable and clone as abstract attributes
@@ -251,19 +259,12 @@ Added serializeable and clone as abstract attributes
 Bases: \sphinxcode{\sphinxupquote{ABC}}
 
 \sphinxAtStartPar
-Check Digit calculation and validation.
+Abstract base class for check digit calculation and validation.
 
 \sphinxAtStartPar
-The logic for validating check digits was previously embedded within specific
-code validation, which included format and length verification. The \sphinxtitleref{CheckDigit}
-class separates the check digit calculation logic, making it easier to test and reuse.
-
-\sphinxAtStartPar
-Although Commons Validator primarily focuses on validation, \sphinxtitleref{CheckDigit} also defines
-behavior for calculating and generating check digits. This allows users to reuse the same
-logic for both validation and generation. For example, validator.routines.ISBNValidator
-makes specific use of this feature by providing the facility to validate
-ISBN\sphinxhyphen{}10 codes and then converting them to the new ISBN\sphinxhyphen{}13 standard.
+This class defines the interface for computing and verifying check digits,
+decoupling this logic from code format and length validation. Implementations
+must provide algorithms for specific standards (e.g., ISBN\sphinxhyphen{}10, EAN\sphinxhyphen{}13).
 
 \sphinxAtStartPar
 \sphinxtitleref{CheckDigit} is used by the generic \sphinxtitleref{CodeValidator} implementation.
@@ -311,19 +312,23 @@ bool
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{abstract\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{calculate}}}{\sphinxparam{\DUrole{n}{code}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }CheckDigitException\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Calculates the Check Digit for a code.
+Calculate the check digit for a given code string (excluding the check digit).
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{code}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The code to calculate the Check Digit for.  It must not include the checkdigit
+\sphinxstyleliteralstrong{\sphinxupquote{code}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The input code without its check digit.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-The calculated Check Digit
+The computed check digit character.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str
 
 \sphinxlineitem{Raises}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{CheckDigitException if an error occurs.}} \textendash{} 
+{\hyperref[\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.checkdigit_exception.CheckDigitException}]{\sphinxcrossref{\sphinxstyleliteralstrong{\sphinxupquote{CheckDigitException}}}}} \textendash{} If calculation fails due to invalid input.
 
 \end{description}\end{quote}
 
@@ -336,6 +341,19 @@ The calculated Check Digit
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{abstract\DUrole{w}{ }property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{clone}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }bool}}}
 \pysigstopsignatures
+\sphinxAtStartPar
+Indicates if this check digit implementation supports cloning.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+True if cloneable; False otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
+
+\end{description}\end{quote}
+
 \end{fulllineitems}
 
 \index{is\_valid() (apache\_commons\_validator\_python.routines.checkdigit.checkdigit.CheckDigit method)@\spxentry{is\_valid()}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.checkdigit.CheckDigit method}}
@@ -346,15 +364,23 @@ The calculated Check Digit
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{abstract\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{is\_valid}}}{\sphinxparam{\DUrole{n}{code}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ bool}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Validates the check digit for the code.
+Validate the check digit of a full code string (including the check digit).
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{code}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The code to validate, the string must include the check digit.
+\sphinxstyleliteralstrong{\sphinxupquote{code}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The complete code including its check digit.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-True if the check digit is valid; False otherwise
+True if the code’s check digit is valid; False otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
+
+\sphinxlineitem{Raises}
+\sphinxAtStartPar
+{\hyperref[\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.checkdigit_exception.CheckDigitException}]{\sphinxcrossref{\sphinxstyleliteralstrong{\sphinxupquote{CheckDigitException}}}}} \textendash{} If validation fails due to invalid input format.
 
 \end{description}\end{quote}
 
@@ -367,6 +393,19 @@ True if the check digit is valid; False otherwise
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{abstract\DUrole{w}{ }property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{serializable}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }bool}}}
 \pysigstopsignatures
+\sphinxAtStartPar
+Indicates if this check digit implementation supports serialization.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+True if serializable; False otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
+
+\end{description}\end{quote}
+
 \end{fulllineitems}
 
 
@@ -378,20 +417,25 @@ True if the check digit is valid; False otherwise
 \label{\detokenize{apache_commons_validator_python.routines.checkdigit:module-apache_commons_validator_python.routines.checkdigit.checkdigit_exception}}\label{\detokenize{apache_commons_validator_python.routines.checkdigit:apache-commons-validator-python-routines-checkdigit-checkdigit-exception-module}}\index{module@\spxentry{module}!apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception@\spxentry{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception}}\index{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception@\spxentry{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception}!module@\spxentry{module}}
 \sphinxAtStartPar
 Module Name: checkdigit\_exception.py
-Description: Translates apache.commons.validator.routines.checkdigit.CheckDigitException.java
-Link: \sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/checkdigit/CheckDigitException.java}
-Parapphrased from apache.commons.validator.routines.checkdigit.CheckDigitException.java:
+\begin{description}
+\sphinxlineitem{Description:}
+\sphinxAtStartPar
+This module provides a Python exception class translating the behavior of
+Apache Commons Validator’s \sphinxtitleref{CheckDigitException.java} for errors during check
+digit calculation or validation. It captures an optional underlying cause.
+Original link at:
 \begin{quote}
 
 \sphinxAtStartPar
-Check Digit calculation/validation error.
+\sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/checkdigit/CheckDigitException.java}
 \end{quote}
+
+\end{description}
 
 \sphinxAtStartPar
 Author: Juji Lau
-License (Taken from apache.commons.validator.routines.checkdigit.CheckDigitException.java):
-\begin{quote}
-
+\begin{description}
+\sphinxlineitem{License (Taken from apache.commons.validator.routines.checkdigit.CheckDigitException.java):}
 \sphinxAtStartPar
 Licensed to the Apache Software Foundation (ASF) under one or more
 contributor license agreements. See the NOTICE file distributed with
@@ -411,11 +455,13 @@ distributed under the License is distributed on an “AS IS” BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-\end{quote}
-\begin{description}
-\sphinxlineitem{Changes:}
+
+\sphinxlineitem{Changes:}\begin{itemize}
+\item {} 
 \sphinxAtStartPar
 Added self.\_\_cause\_\_ to allow propogation of Python’s base Exceptions.
+
+\end{itemize}
 
 \end{description}
 \index{CheckDigitException@\spxentry{CheckDigitException}}
@@ -430,37 +476,19 @@ Bases: \sphinxcode{\sphinxupquote{Exception}}
 
 \sphinxAtStartPar
 Exception raised for errors in check digit calculation or validation.
-\index{message (apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception.CheckDigitException attribute)@\spxentry{message}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception.CheckDigitException attribute}}
+\index{value (apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception.CheckDigitException attribute)@\spxentry{value}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception.CheckDigitException attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.checkdigit_exception.CheckDigitException.message}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.checkdigit_exception.CheckDigitException.value}}
 \pysigstartsignatures
-\pysigline{\sphinxbfcode{\sphinxupquote{message}}}
+\pysigline{\sphinxbfcode{\sphinxupquote{value}}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Explanation of the error.
+The error message explaining the error.
 \begin{quote}\begin{description}
 \sphinxlineitem{Type}
 \sphinxAtStartPar
 str
-
-\end{description}\end{quote}
-
-\end{fulllineitems}
-
-\index{cause (apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception.CheckDigitException attribute)@\spxentry{cause}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception.CheckDigitException attribute}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.checkdigit_exception.CheckDigitException.cause}}
-\pysigstartsignatures
-\pysigline{\sphinxbfcode{\sphinxupquote{cause}}}
-\pysigstopsignatures
-\sphinxAtStartPar
-Underlying exception that caused this error.
-\begin{quote}\begin{description}
-\sphinxlineitem{Type}
-\sphinxAtStartPar
-Exception, optional
 
 \end{description}\end{quote}
 
@@ -638,17 +666,28 @@ bool
 
 \end{fulllineitems}
 
-\begin{description}
-\sphinxlineitem{Constants:}
-\sphinxAtStartPar
-EAN13\_CHECK\_DIGIT (EAN13CheckDigit): Singleton instance of this class.
-POSITION\_WEIGHT (list{[}int{]}): Weighting given to digits depending on their right position
-
-\end{description}
-\index{EAN13\_CHECK\_DIGIT (apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit.EAN13CheckDigit property)@\spxentry{EAN13\_CHECK\_DIGIT}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit.EAN13CheckDigit property}}
+\index{EAN13\_CHECK\_DIGIT (apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit.EAN13CheckDigit attribute)@\spxentry{EAN13\_CHECK\_DIGIT}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit.EAN13CheckDigit attribute}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.ean13_checkdigit.EAN13CheckDigit.EAN13_CHECK_DIGIT}}
+\pysigstartsignatures
+\pysigline{\sphinxbfcode{\sphinxupquote{EAN13\_CHECK\_DIGIT}}}
+\pysigstopsignatures
+\sphinxAtStartPar
+Singleton instance of this class.
+\begin{quote}\begin{description}
+\sphinxlineitem{Type}
+\sphinxAtStartPar
+{\hyperref[\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.ean13_checkdigit.EAN13CheckDigit}]{\sphinxcrossref{EAN13CheckDigit}}}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{EAN13\_CHECK\_DIGIT (apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit.EAN13CheckDigit property)@\spxentry{EAN13\_CHECK\_DIGIT}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit.EAN13CheckDigit property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id4}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{EAN13\_CHECK\_DIGIT}}}
 \pysigstopsignatures
@@ -789,16 +828,28 @@ bool
 
 \end{fulllineitems}
 
-\begin{description}
-\sphinxlineitem{Constants:}
-\sphinxAtStartPar
-ISBN10\_CHECK\_DIGIT (ISBN10CheckDigit): Singleton instance of this class.
-
-\end{description}
-\index{ISBN10\_CHECK\_DIGIT (apache\_commons\_validator\_python.routines.checkdigit.isbn10\_checkdigit.ISBN10CheckDigit property)@\spxentry{ISBN10\_CHECK\_DIGIT}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.isbn10\_checkdigit.ISBN10CheckDigit property}}
+\index{ISBN10\_CHECK\_DIGIT (apache\_commons\_validator\_python.routines.checkdigit.isbn10\_checkdigit.ISBN10CheckDigit attribute)@\spxentry{ISBN10\_CHECK\_DIGIT}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.isbn10\_checkdigit.ISBN10CheckDigit attribute}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.isbn10_checkdigit.ISBN10CheckDigit.ISBN10_CHECK_DIGIT}}
+\pysigstartsignatures
+\pysigline{\sphinxbfcode{\sphinxupquote{ISBN10\_CHECK\_DIGIT}}}
+\pysigstopsignatures
+\sphinxAtStartPar
+Singleton instance of this class.
+\begin{quote}\begin{description}
+\sphinxlineitem{Type}
+\sphinxAtStartPar
+{\hyperref[\detokenize{apache_commons_validator_python.routines.checkdigit:apache_commons_validator_python.routines.checkdigit.isbn10_checkdigit.ISBN10CheckDigit}]{\sphinxcrossref{ISBN10CheckDigit}}}
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{ISBN10\_CHECK\_DIGIT (apache\_commons\_validator\_python.routines.checkdigit.isbn10\_checkdigit.ISBN10CheckDigit property)@\spxentry{ISBN10\_CHECK\_DIGIT}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.isbn10\_checkdigit.ISBN10CheckDigit property}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id7}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{class\DUrole{w}{ }property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{ISBN10\_CHECK\_DIGIT}}}
 \pysigstopsignatures
@@ -954,7 +1005,7 @@ Singleton instance of this class.
 \index{LUHN\_CHECK\_DIGIT (apache\_commons\_validator\_python.routines.checkdigit.luhn\_checkdigit.LuhnCheckDigit attribute)@\spxentry{LUHN\_CHECK\_DIGIT}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.luhn\_checkdigit.LuhnCheckDigit attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id6}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id8}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{LUHN\_CHECK\_DIGIT}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }\textless{}apache\_commons\_validator\_python.routines.checkdigit.luhn\_checkdigit.LuhnCheckDigit object\textgreater{}}}}
 \pysigstopsignatures
@@ -1129,7 +1180,7 @@ bool
 \index{MODULUS\_10 (apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute)@\spxentry{MODULUS\_10}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id7}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id9}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{MODULUS\_10}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }Final\DUrole{p}{{[}}int\DUrole{p}{{]}}}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }10}}}
 \pysigstopsignatures
@@ -1138,7 +1189,7 @@ bool
 \index{MODULUS\_11 (apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute)@\spxentry{MODULUS\_11}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id8}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id10}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{MODULUS\_11}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }Final\DUrole{p}{{[}}int\DUrole{p}{{]}}}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }11}}}
 \pysigstopsignatures
@@ -1173,7 +1224,7 @@ The calculated Check Digit
 \index{clone (apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute)@\spxentry{clone}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id9}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id11}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{clone}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }False}}}
 \pysigstopsignatures
@@ -1205,19 +1256,20 @@ False otherwise.
 \index{modulus (apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit property)@\spxentry{modulus}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit property}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id10}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id12}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{modulus}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }int}}}
 \pysigstopsignatures
 \sphinxAtStartPar
 Gets the modulus value this check digit routine is based on.
+:returns: The modulus value (e.g., 10 or 11).
 
 \end{fulllineitems}
 
 \index{serializable (apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute)@\spxentry{serializable}\spxextra{apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit.ModulusCheckDigit attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id11}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.routines.checkdigit:id13}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{serializable}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }True}}}
 \pysigstopsignatures
@@ -1260,10 +1312,18 @@ The sum of the digits.
 \label{\detokenize{apache_commons_validator_python.routines:module-apache_commons_validator_python.routines.abstract_calendar_validator}}\label{\detokenize{apache_commons_validator_python.routines:apache-commons-validator-python-routines-abstract-calendar-validator-module}}\index{module@\spxentry{module}!apache\_commons\_validator\_python.routines.abstract\_calendar\_validator@\spxentry{apache\_commons\_validator\_python.routines.abstract\_calendar\_validator}}\index{apache\_commons\_validator\_python.routines.abstract\_calendar\_validator@\spxentry{apache\_commons\_validator\_python.routines.abstract\_calendar\_validator}!module@\spxentry{module}}
 \sphinxAtStartPar
 Module Name: abstract\_calendar\_validator.py
+\begin{description}
+\sphinxlineitem{Description:}
+\sphinxAtStartPar
+This module provides a Python translation of the Apache Commons Validator
+AbstractCalendarValidator (original Java source at:
+\begin{quote}
 
 \sphinxAtStartPar
-Description: Translates apache.commons.validator.routines.AbstractCalendarValidator.java
-Link: \sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/AbstractCalendarValidator.java}
+\sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/AbstractCalendarValidator.java}).
+\end{quote}
+
+\end{description}
 
 \sphinxAtStartPar
 Author: Juji Lau
@@ -1290,19 +1350,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 \sphinxlineitem{Changes:}\begin{itemize}
+\item {} \begin{description}
+\sphinxlineitem{Removed Java’s Calendar fields that don’t have an equivalent datetime field, and added the closest equivalent Python datetime field}
+\sphinxAtStartPar
+(e.g. \sphinxtitleref{Calendar.MILLISECOND} \sphinxhyphen{}\textgreater{} datetime.millisecond\textasciigrave{})
+
+\end{description}
+
 \item {} 
 \sphinxAtStartPar
-Removed Java’s Calendar fields that don’t have an equivalent datetime field.
+Modified compare() signature to accept string field names instead of integers for consistency with Python’s datetime module.
+
+\item {} 
+\sphinxAtStartPar
+Seperated \sphinxtitleref{parse()} into helper functions to handle \sphinxtitleref{date}, \sphinxtitleref{time}, and \sphinxtitleref{datetime} strings independently.
+
+\item {} 
+\sphinxAtStartPar
+Added helper function, \sphinxtitleref{get\_format\_no\_pattern()} to avoid overloading the \sphinxtitleref{\_get\_format()} when no pattern is passed in (simpler logic).
 
 \end{itemize}
-
-\sphinxAtStartPar
-Modified \sphinxcode{\sphinxupquote{AbstractCalendarValidator.compare(Calendar value, Calendar compare, int field)}} have users pass in a string
-instead of an int. Python’s datetime validator does not map its properties to integers, hence using integers will be confusing
-to Python users.
-
-\sphinxAtStartPar
-Implemented \sphinxcode{\sphinxupquote{parse()}} in the concrete subclasses instead.
 
 \end{description}
 \index{AbstractCalendarValidator (class in apache\_commons\_validator\_python.routines.abstract\_calendar\_validator)@\spxentry{AbstractCalendarValidator}\spxextra{class in apache\_commons\_validator\_python.routines.abstract\_calendar\_validator}}
@@ -1316,10 +1383,11 @@ Implemented \sphinxcode{\sphinxupquote{parse()}} in the concrete subclasses inst
 Bases: \sphinxcode{\sphinxupquote{AbstractFormatValidator}}
 
 \sphinxAtStartPar
-Abstract class for Date/Time/Calendar validation.
+Abstract base class for calendar\sphinxhyphen{}based validators using format parsing.
 
 \sphinxAtStartPar
-This is a base class for building Date/Time Validators using format parsing.
+This class provides shared mechanisms for date, time, and datetime parsing,
+validation, and formatting, using Babel, DateParser, and datetime.
 \index{date\_style (apache\_commons\_validator\_python.routines.abstract\_calendar\_validator.AbstractCalendarValidator attribute)@\spxentry{date\_style}\spxextra{apache\_commons\_validator\_python.routines.abstract\_calendar\_validator.AbstractCalendarValidator attribute}}
 
 \begin{fulllineitems}
@@ -1351,24 +1419,6 @@ The time style to use for Locale validation.
 \sphinxlineitem{Type}
 \sphinxAtStartPar
 int
-
-\end{description}\end{quote}
-
-\end{fulllineitems}
-
-\index{int2str\_style (apache\_commons\_validator\_python.routines.abstract\_calendar\_validator.AbstractCalendarValidator attribute)@\spxentry{int2str\_style}\spxextra{apache\_commons\_validator\_python.routines.abstract\_calendar\_validator.AbstractCalendarValidator attribute}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.abstract_calendar_validator.AbstractCalendarValidator.int2str_style}}
-\pysigstartsignatures
-\pysigline{\sphinxbfcode{\sphinxupquote{int2str\_style}}}
-\pysigstopsignatures
-\sphinxAtStartPar
-Maps the integer date and time style to a string argument for \sphinxcode{\sphinxupquote{babel.format()}}.
-\begin{quote}\begin{description}
-\sphinxlineitem{Type}
-\sphinxAtStartPar
-dict{[}int, str{]}
 
 \end{description}\end{quote}
 
@@ -1427,32 +1477,36 @@ bool
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{format}}}{\sphinxparam{\DUrole{o}{*}}\sphinxparamcomma \sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{object}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }Locale}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{time\_zone}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{timezone}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ str}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Format an object into a string using the specified pattern and/or locale.
+Format a date/time object to string with optional pattern and locale.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{object}}) \textendash{} The value validation is being performed on.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{object}}) \textendash{} The date or datetime to format.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The pattern used to format the value.
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} LDML pattern string. Uses locale defaults if None.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} A locale string (e.g., “en\_US”) used for formatting.
-If locale is \sphinxcode{\sphinxupquote{None}} or empty, the system default is used.
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Locale code (e.g., “en\_US”). Uses system default if None.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{timezone}}) \textendash{} The timezone used to format the date,
-If \sphinxcode{\sphinxupquote{None}}, the system default will be used unless value is a \sphinxtitleref{datetime}.
+\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{timezone}}) \textendash{} Time zone for output.
+Uses value.tzinfo if timezone is None.
+Uses system default if both are None.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-The value formatted as a String.
+Formatted date/time string, or None if \sphinxtitleref{value} is None.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str
 
 \end{description}\end{quote}
 
@@ -1466,26 +1520,30 @@ The value formatted as a String.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_valid}}}{\sphinxparam{\DUrole{o}{*}}\sphinxparamcomma \sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ bool}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Validate using the specified locale.
+Validate a date, time, or datetime string using the specified pattern and locale.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The value validation is being performed on.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The input string to validate.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The pattern used to format the value.
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} LDML pattern string. Uses locale defaults if None.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The locale to use for the Format, defaults to the system if None.
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Locale code (e.g., “en\_US”). Uses system default if None.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-\sphinxcode{\sphinxupquote{True}} if the value is valid; \sphinxcode{\sphinxupquote{False}} otherwise.
+True if parsable, False otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
 
 \end{description}\end{quote}
 
@@ -2573,124 +2631,15 @@ limitations under the License.
 Bases: \sphinxcode{\sphinxupquote{AbstractCalendarValidator}}
 
 \sphinxAtStartPar
-Calendar Validation and Conversion Routines (using Python datetime objects)
+Calendar Validation and Conversion Routines.
 
 \sphinxAtStartPar
-This module provides a collection of methods for validating and converting a
-string representing a date and/or time into a Python datetime (or date/time)
-object. Parsing can be performed using various mechanisms:
-\begin{itemize}
-\item {} 
-\sphinxAtStartPar
-Using the default format for the default locale.
-
-\item {} 
-\sphinxAtStartPar
-Using a specified pattern with the default locale.
-
-\item {} 
-\sphinxAtStartPar
-Using the default format for a specified locale.
-
-\item {} 
-\sphinxAtStartPar
-Using a specified pattern with a specified locale.
-
-\end{itemize}
+This class offers methods to validate and convert string representations of datetime
+objects into \sphinxtitleref{datetime} objects, and methods to format \sphinxtitleref{datetime} objects as strings.
 
 \sphinxAtStartPar
-For each of the above mechanisms, validation function implementations are provided
-which either use the system’s default timezone or allow a timezone to be explicitly specified.
-\begin{description}
-\sphinxlineitem{Usage:}\begin{itemize}
-\item {} 
-\sphinxAtStartPar
-Use one of the is\_valid() methods to simply check if a given string is valid.
-
-\item {} 
-\sphinxAtStartPar
-Use one of the validate() methods to both validate the input and return a
-
-\end{itemize}
-
-\sphinxAtStartPar
-converted datetime (or date/time) object.
-
-\end{description}
-
-\sphinxAtStartPar
-Additionally, methods are provided to create datetime objects adjusted for
-different time zones if the system default is not appropriate. Alternatively,
-the \sphinxcode{\sphinxupquote{adjust\_to\_timezone()}} method can be used to modify the timezone of an
-existing \sphinxcode{\sphinxupquote{datetime}} object.
-
-\sphinxAtStartPar
-Once a value has been successfully converted, several comparison methods are
-available to perform date arithmetic and comparison checks:
-\begin{quote}
-\begin{itemize}
-\item {} 
-\sphinxAtStartPar
-compare\_dates(): Compares the day, month, and year of two datetime objects.
-
-\item {} 
-\sphinxAtStartPar
-compare\_weeks(): Compares the week and year of two datetime objects.
-
-\item {} 
-\sphinxAtStartPar
-compare\_months(): Compares the month and year of two datetime objects.
-
-\item {} \begin{description}
-\sphinxlineitem{compare\_quarters(): Compares the quarter (computed from the month) and year}
-\sphinxAtStartPar
-of two datetime objects.
-
-\end{description}
-
-\end{itemize}
-
-\sphinxAtStartPar
-These compare methods return 0 if the arguments are equal, \sphinxhyphen{}1 if the first
-argument is earlier, or +1 if it is later.
-\end{quote}
-
-\sphinxAtStartPar
-To allow the same parsing mechanism used for input validation to be
-used for output formatting, corresponding format() methods are provided. These
-methods enable formatting of datetime objects by:
-\begin{itemize}
-\item {} 
-\sphinxAtStartPar
-Using a specified pattern.
-
-\item {} 
-\sphinxAtStartPar
-Using the format for a specified locale.
-
-\item {} 
-\sphinxAtStartPar
-Using the format for the default locale.
-
-\end{itemize}
-\index{VALDIATOR (apache\_commons\_validator\_python.routines.calendar\_validator.CalendarValidator attribute)@\spxentry{VALDIATOR}\spxextra{apache\_commons\_validator\_python.routines.calendar\_validator.CalendarValidator attribute}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.calendar_validator.CalendarValidator.VALDIATOR}}
-\pysigstartsignatures
-\pysigline{\sphinxbfcode{\sphinxupquote{VALDIATOR}}}
-\pysigstopsignatures
-\sphinxAtStartPar
-An instance of this validator.
-\begin{quote}\begin{description}
-\sphinxlineitem{Type}
-\sphinxAtStartPar
-{\hyperref[\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.calendar_validator.CalendarValidator}]{\sphinxcrossref{CalendarValidator}}}
-
-\end{description}\end{quote}
-
-\end{fulllineitems}
-
+Formatting, parsing, and validation methods support custom patterns, locales, and timezones,
+using the system default if not provided.
 \index{serializable (apache\_commons\_validator\_python.routines.calendar\_validator.CalendarValidator attribute)@\spxentry{serializable}\spxextra{apache\_commons\_validator\_python.routines.calendar\_validator.CalendarValidator attribute}}
 
 \begin{fulllineitems}
@@ -2735,22 +2684,26 @@ bool
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{classmethod\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{adjust\_to\_time\_zone}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{time\_zone}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{tzinfo}}}{{ $\rightarrow$ datetime}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Adjusts a datetime’s value to a different time\_zone.
+Adjusts a datetime’s value to a different timezone.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The value to adjust.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime value to adjust.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}) \textendash{} The new time zone to use to adjust the Calendar to.
+\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}) \textendash{} The new timezone to apply.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A new datetime with the values adjusted.
+A new datetime with the adjusted timezone.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+datetime
 
 \end{description}\end{quote}
 
@@ -2773,24 +2726,26 @@ A new datetime with the values adjusted.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_dates}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare Dates (day, month and year \sphinxhyphen{} not time)
+Compares two datetimes based on day, month, and year (not time).
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime value to check.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime to compare the value to.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the dates are equal,
-\sphinxhyphen{}1 if the first date is less than the second.
-+1 if the first date is greater than the second.
+0 if equal, \sphinxhyphen{}1 if value \textless{} compare, 1 if value \textgreater{} compare.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -2804,24 +2759,26 @@ Compare Dates (day, month and year \sphinxhyphen{} not time)
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_months}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare Months (month and year).
+Compare two datetimes based on months (month and year).
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime value to check.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime to compare the value to.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the months are equal,
-\sphinxhyphen{}1 if the first month is less than the second.
-+1 if the first month is greater than the second.
+0 if equal, \sphinxhyphen{}1 if value \textless{} compare, 1 if value \textgreater{} compare.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -2835,28 +2792,30 @@ Compare Months (month and year).
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_quarters}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{month\_of\_first\_quarter}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{int}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{1}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare Quarters (quarter and year).
+Compare two datetimes based on Quarters (quarter and year).
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime value to check.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime to compare the value to.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{month\_of\_first\_quarter}} (\sphinxstyleliteralemphasis{\sphinxupquote{int}}) \textendash{} The month the first quarter starts (default is 1 or Jaunuary)
+\sphinxstyleliteralstrong{\sphinxupquote{month\_of\_first\_quarter}} (\sphinxstyleliteralemphasis{\sphinxupquote{int}}) \textendash{} The starting month of the first quarter. Defaults to 1 (January).
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the quarters are equal,
-\sphinxhyphen{}1 if the first quarters is less than the second.
-+1 if the first quarters is greater than the second.
+0 if equal, \sphinxhyphen{}1 if value \textless{} compare, 1 if value \textgreater{} compare.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -2870,24 +2829,26 @@ Compare Quarters (quarter and year).
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_weeks}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare Weeks (week and year).
+Compare two datetimes based on year, then ISO week.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime value to check.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime to compare the value to.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the weeks are equal,
-\sphinxhyphen{}1 if the first week is less than the second.
-+1 if the first week is greater than the second.
+0 if equal, \sphinxhyphen{}1 if value \textless{} compare, 1 if value \textgreater{} compare.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -2901,24 +2862,26 @@ Compare Weeks (week and year).
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_years}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare Years.
+Compares two datetimes based on year.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime value to check.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The datetime to compare the value to.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the years are equal,
-\sphinxhyphen{}1 if the first year is less than the second.
-+1 if the first year is greater than the second.
+0 if equal, \sphinxhyphen{}1 if value \textless{} compare, 1 if value \textgreater{} compare.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -2933,6 +2896,16 @@ Compare Years.
 \pysigstopsignatures
 \sphinxAtStartPar
 Returns the singleton instance of the CalendarValidator.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+The singleton instance.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+{\hyperref[\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.calendar_validator.CalendarValidator}]{\sphinxcrossref{CalendarValidator}}}
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -2953,32 +2926,34 @@ Returns the singleton instance of the CalendarValidator.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{validate}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{time\_zone}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{tzinfo\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ datetime}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Validate/convert a \sphinxtitleref{datetime} using the specified \sphinxtitleref{locale} and \sphinxtitleref{timezone}. If
-these arguments are not provided, the system default will be used.
+Validates and converts a string to a datetime object.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The value validation is being performed on.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} The string to validate.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}})
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} The pattern to use for parsing.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{dt\_locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} A locale string (e.g., “en\_US”) used for the date formatting.
-If \sphinxcode{\sphinxupquote{None}}, the default will be used.
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} The locale to use for parsing.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo/timezone}})
+\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} The timezone to apply.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-The parsed \sphinxtitleref{datetime} if valid or \sphinxcode{\sphinxupquote{None}} if invalid.
+The parsed datetime if valid, otherwise None.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+datetime or None
 
 \end{description}\end{quote}
 
@@ -4177,7 +4152,7 @@ Description: Translates apache.commons.validator.routines.DateValidator.java
 Link: \sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/DateValidator.java}
 
 \sphinxAtStartPar
-Author: Alicia Chu
+Authors: Alicia Chu, Juji Lau
 \begin{description}
 \sphinxlineitem{License (Taken from apache.commons.validator.routines.DateValidator.java):}
 \sphinxAtStartPar
@@ -4201,9 +4176,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 \end{description}
-
-\sphinxAtStartPar
-Changes:
 \index{DateValidator (class in apache\_commons\_validator\_python.routines.date\_validator)@\spxentry{DateValidator}\spxextra{class in apache\_commons\_validator\_python.routines.date\_validator}}
 
 \begin{fulllineitems}
@@ -4218,38 +4190,9 @@ Bases: \sphinxcode{\sphinxupquote{AbstractCalendarValidator}}
 Date validation and conversion utilities.
 
 \sphinxAtStartPar
-This module provides methods to validate and convert string representations
-of dates into timezone naive \sphinxtitleref{datetime.datetime} objects using various parsing formats and locales.
-
-\sphinxAtStartPar
-Supported conversions:
-\sphinxhyphen{} Default format for the default locale
-\sphinxhyphen{} Specified pattern with the default locale
-\sphinxhyphen{} Default format for a specified locale
-\sphinxhyphen{} Specified pattern with a specified locale
-
-\sphinxAtStartPar
-All conversion methods allow optional specification of time zones.
-If this is not provided, the system default will be used.
-
-\sphinxAtStartPar
-Validation methods:
-\sphinxhyphen{} \sphinxtitleref{is\_valid()}: Checks if a string is a valid date.
-\sphinxhyphen{} \sphinxtitleref{validate()}: Returns a converted \sphinxtitleref{date} object if valid.
-
-\sphinxAtStartPar
-Date comparison methods:
-\sphinxhyphen{} \sphinxtitleref{compare\_dates(d1, d2)}: Compares day, month, year of two dates.
-\sphinxhyphen{} \sphinxtitleref{compare\_weeks(d1, d2)}: Compares week and year of two dates.
-\sphinxhyphen{} \sphinxtitleref{compare\_months(d1, d2)}: Compares month and year of two dates.
-\sphinxhyphen{} \sphinxtitleref{compare\_quarters(d1, d2)}: Compares quarter and year of two dates.
-\sphinxhyphen{} \sphinxtitleref{compare\_years(d1, d2)}: Compares years of two dates.
-
-\sphinxAtStartPar
-Formatting methods mirror parsing options and support:
-\sphinxhyphen{} Specified pattern
-\sphinxhyphen{} Format for a specified locale
-\sphinxhyphen{} Format for the default locale
+This class offers methods to validate and convert string representations
+of dates into \sphinxtitleref{datetime} objects optionally using various parsing formats,
+timezones, and locales.
 \index{serializable (apache\_commons\_validator\_python.routines.date\_validator.DateValidator attribute)@\spxentry{serializable}\spxextra{apache\_commons\_validator\_python.routines.date\_validator.DateValidator attribute}}
 
 \begin{fulllineitems}
@@ -4340,9 +4283,7 @@ Compare two datetime values by day, month, and year (ignores time component).
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the dates are equal,
-\sphinxhyphen{}1 if the first date is earlier,
-+1 if the first date is later.
+0 if the dates are equal, \sphinxhyphen{}1 if \sphinxtitleref{value} is earlier, +1 if later.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
@@ -4379,9 +4320,7 @@ Compare two datetime values by month and year (ignores day and time).
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the month/year are equal,
-\sphinxhyphen{}1 if the first is earlier,
-+1 if the first is later.
+0 if the month/year are equal, \sphinxhyphen{}1 if \sphinxtitleref{value} is earlier, +1 if later.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
@@ -4420,32 +4359,27 @@ Compare two datetime values by quarter and year.
 
 \end{itemize}
 
+\end{description}\end{quote}
+\subsubsection*{Notes}
+
+\sphinxAtStartPar
+This Python implementation uses \sphinxtitleref{month\_of\_first\_quarter=1} by default,
+replicating the overloaded Java method:
+\begin{quote}
+
+\sphinxAtStartPar
+compareQuarters(value, compare, timeZone)
+\end{quote}
+\begin{quote}\begin{description}
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if quarters are equal,
-\sphinxhyphen{}1 if the first is earlier,
-+1 if the first is later.
+0 if quarters are equal, \sphinxhyphen{}1 if \sphinxtitleref{value} is earlier, +1 if later.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
 int
 
 \end{description}\end{quote}
-\begin{description}
-\sphinxlineitem{Changes from Java:}
-\sphinxAtStartPar
-month\_of\_first\_quarter defaults to 1 to replace
-“public int compareQuarters(final Date value, final Date compare, final TimeZone timeZone) \{
-\begin{quote}
-
-\sphinxAtStartPar
-return compareQuarters(value, compare, timeZone, 1);
-\end{quote}
-
-\sphinxAtStartPar
-\}”
-
-\end{description}
 
 \end{fulllineitems}
 
@@ -4476,9 +4410,7 @@ Compare two datetime values by ISO week number and year.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the ISO week/year are equal,
-\sphinxhyphen{}1 if the first is earlier,
-+1 if the first is later.
+0 if ISO week/year are equal, \sphinxhyphen{}1 if \sphinxtitleref{value} is earlier, +1 if later.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
@@ -4515,9 +4447,7 @@ Compare two datetime values by year only.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if years are equal,
-\sphinxhyphen{}1 if the first year is earlier,
-+1 if the first year is later.
+0 if years are equal, \sphinxhyphen{}1 if \sphinxtitleref{value} is earlier, +1 if later.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
@@ -4536,11 +4466,10 @@ int
 \pysigstopsignatures
 \sphinxAtStartPar
 Returns the singleton instance of DateValidator.
-Ensures only one instance is created and reused globally.
 \begin{quote}\begin{description}
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A singleton instance of the class.
+The single global instance of the class.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
@@ -4567,31 +4496,30 @@ A singleton instance of the class.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{validate}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{time\_zone}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{tzinfo\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ datetime\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Validates and converts a date string into a datetime object using the
-provided pattern, locale, and time zone.
+Validate and convert a date string to a datetime object.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The input string to validate.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Input date string.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The date pattern (e.g., ‘yyyy\sphinxhyphen{}MM\sphinxhyphen{}dd’). If None, a default pattern is used.
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} Date pattern (e.g., ‘\%Y\sphinxhyphen{}\%m\sphinxhyphen{}\%d’). Uses default if None.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The locale to apply (e.g., ‘en\_US’). If None, the system default is used.
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} Locale to use for parsing.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The timezone to apply to the resulting datetime. If None, no change is made.
+\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} Time zone to apply to resulting datetime.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A valid datetime object if parsing succeeds, or None if invalid.
+Parsed datetime if valid; otherwise, None.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
@@ -6318,7 +6246,17 @@ ISBN13\_REGEX (str): Regular expression pattern for ISBN\sphinxhyphen{}13 valida
 \pysigline{\sphinxbfcode{\sphinxupquote{property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{convert}}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Returns the convert attribute.
+Whether ISBN\sphinxhyphen{}10 codes are converted to ISBN\sphinxhyphen{}13 on validation.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+Current conversion setting.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -6330,19 +6268,23 @@ Returns the convert attribute.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{convert\_to\_isbn13}}}{\sphinxparam{\DUrole{n}{isbn10}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ str}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Convert an ISBN\sphinxhyphen{}10 code to an ISBN\sphinxhyphen{}13 code.
+Convert a valid ISBN\sphinxhyphen{}10 string to ISBN\sphinxhyphen{}13.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{isbn10}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The ISBN\sphinxhyphen{}10 code to convert. Must be a valid ISBN\sphinxhyphen{}10 with NO formatting characters.
+\sphinxstyleliteralstrong{\sphinxupquote{isbn10}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Unformatted ISBN\sphinxhyphen{}10 string (10 characters, last can be ‘X’).
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A converted ISBN\sphinxhyphen{}13 code, or None if the ISBN\sphinxhyphen{}10 code is not valid.
+Corresponding ISBN\sphinxhyphen{}13 string.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str
 
 \sphinxlineitem{Raises}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{ValueError if isbn10 is invalid}}\sphinxstyleliteralstrong{\sphinxupquote{ or }}\sphinxstyleliteralstrong{\sphinxupquote{has formatting errors.}} \textendash{} 
+\sphinxstyleliteralstrong{\sphinxupquote{ValueError}} \textendash{} If length is incorrect or check digit calculation fails.
 
 \end{description}\end{quote}
 
@@ -6366,7 +6308,11 @@ codes should be converted to ISBN\sphinxhyphen{}13.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A singleton instance of the ISBN validator.
+Shared instance with requested conversion setting.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+{\hyperref[\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.isbn_validator.ISBNValidator}]{\sphinxcrossref{ISBNValidator}}}
 
 \end{description}\end{quote}
 
@@ -6380,15 +6326,19 @@ A singleton instance of the ISBN validator.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{is\_valid}}}{\sphinxparam{\DUrole{n}{code}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ bool}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Checks if code is either a valid ISBN\sphinxhyphen{}10 or ISBN\sphinxhyphen{}13 code.
+Check if a code is a valid ISBN\sphinxhyphen{}10 or ISBN\sphinxhyphen{}13.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{code}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The code to check.
+\sphinxstyleliteralstrong{\sphinxupquote{code}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} ISBN string, may include separators.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-True if the code is a valid ISBN\sphinxhyphen{}10 or ISBN\sphinxhyphen{}13 code, otherwise false.
+True if valid ISBN\sphinxhyphen{}10 or ISBN\sphinxhyphen{}13, False otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
 
 \end{description}\end{quote}
 
@@ -6412,6 +6362,10 @@ Checks if code is a valid ISBN\sphinxhyphen{}10 code.
 \sphinxAtStartPar
 True if the code is a valid ISBN\sphinxhyphen{}10 code, False otherwise.
 
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
+
 \end{description}\end{quote}
 
 \end{fulllineitems}
@@ -6434,6 +6388,10 @@ Checks if code is a valid ISBN\sphinxhyphen{}13 code.
 \sphinxAtStartPar
 True if the code is a valid ISBN\sphinxhyphen{}13 code, otherwise false.
 
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
+
 \end{description}\end{quote}
 
 \end{fulllineitems}
@@ -6446,7 +6404,17 @@ True if the code is a valid ISBN\sphinxhyphen{}13 code, otherwise false.
 \pysigline{\sphinxbfcode{\sphinxupquote{property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{isbn10\_validator}}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Returns the isbn10\_validator attribute.
+Access the ISBN\sphinxhyphen{}10 CodeValidator instance.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+Validator for ISBN\sphinxhyphen{}10.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+{\hyperref[\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.code_validator.CodeValidator}]{\sphinxcrossref{CodeValidator}}}
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -6458,7 +6426,17 @@ Returns the isbn10\_validator attribute.
 \pysigline{\sphinxbfcode{\sphinxupquote{property\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{isbn13\_validator}}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Returns the isbn13\_validator attribute.
+Access the ISBN\sphinxhyphen{}13 CodeValidator instance.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+Validator for ISBN\sphinxhyphen{}13.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+{\hyperref[\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.code_validator.CodeValidator}]{\sphinxcrossref{CodeValidator}}}
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -6491,6 +6469,10 @@ hyphen). Converts an ISBN\sphinxhyphen{}10 codes to ISBN\sphinxhyphen{}13 if con
 \sphinxAtStartPar
 A valid ISBN code if valid, otherwise None.
 
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str or None
+
 \end{description}\end{quote}
 
 \end{fulllineitems}
@@ -6514,6 +6496,10 @@ ISBN\sphinxhyphen{}10 code with formatting characters removed (i.e. space or hyp
 \sphinxAtStartPar
 A valid ISBN\sphinxhyphen{}10 code if valid, otherwise None.
 
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str or None
+
 \end{description}\end{quote}
 
 \end{fulllineitems}
@@ -6536,6 +6522,10 @@ ISBN\sphinxhyphen{}13 code with formatting characters removed (i.e. space or hyp
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
 A valid ISBN\sphinxhyphen{}13 code if valid, otherwise None.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str or None
 
 \end{description}\end{quote}
 
@@ -7547,10 +7537,20 @@ The parsed short (as an int) if valid or \sphinxtitleref{None} if invalid.
 \label{\detokenize{apache_commons_validator_python.routines:module-apache_commons_validator_python.routines.time_validator}}\label{\detokenize{apache_commons_validator_python.routines:apache-commons-validator-python-routines-time-validator-module}}\index{module@\spxentry{module}!apache\_commons\_validator\_python.routines.time\_validator@\spxentry{apache\_commons\_validator\_python.routines.time\_validator}}\index{apache\_commons\_validator\_python.routines.time\_validator@\spxentry{apache\_commons\_validator\_python.routines.time\_validator}!module@\spxentry{module}}
 \sphinxAtStartPar
 Module Name: time\_validator.py
+\begin{description}
+\sphinxlineitem{Description:}
+\sphinxAtStartPar
+This module provides a Python translation of Apache Commons Validator’s
+\sphinxcode{\sphinxupquote{TimeValidator.java}}, focusing on validating and converting time strings
+into Python’s \sphinxcode{\sphinxupquote{datetime}} objects (with the date fields set to the unix epoch: Jan 1, 1970),
+using locale\sphinxhyphen{}aware formats and custom patterns.  Original Java source at:
+\begin{quote}
 
 \sphinxAtStartPar
-Description: Translates apache.commons.validator.routines.TimeValidator.java
-Link: \sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/TimeValidator.java}
+\sphinxurl{https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/TimeValidator.java}
+\end{quote}
+
+\end{description}
 
 \sphinxAtStartPar
 Author: Juji Lau
@@ -7577,9 +7577,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 \end{description}
-
-\sphinxAtStartPar
-Changes:
 \index{TimeValidator (class in apache\_commons\_validator\_python.routines.time\_validator)@\spxentry{TimeValidator}\spxextra{class in apache\_commons\_validator\_python.routines.time\_validator}}
 
 \begin{fulllineitems}
@@ -7594,40 +7591,13 @@ Bases: \sphinxcode{\sphinxupquote{AbstractCalendarValidator}}
 Time validation and conversion utilities.
 
 \sphinxAtStartPar
-This module provides methods to validate and convert string representations
-of times into \sphinxtitleref{datetime.time} objects using various parsing formats and locales.
+This class offers methods to parse and validate \sphinxcode{\sphinxupquote{time}} string representations
+into \sphinxcode{\sphinxupquote{datetime}} objects, with the \sphinxcode{\sphinxupquote{date}} fields set to the unix epoch (Jan 1, 1970),
+and methods to format \sphinxcode{\sphinxupquote{datetime.time}} objects as strings.
 
 \sphinxAtStartPar
-Supported conversions:
-\sphinxhyphen{} Default format for the default locale
-\sphinxhyphen{} Specified pattern with the default locale
-\sphinxhyphen{} Default format for a specified locale
-\sphinxhyphen{} Specified pattern with a specified locale
-
-\sphinxAtStartPar
-All conversion methods (\sphinxtitleref{validate()}) allow optional specification of time zones.
-If this is not provided, the system default will be used.
-
-\sphinxAtStartPar
-Alternatively, the \sphinxtitleref{CalendarValidator.adjust\_to\_timezone()} method can be used to adjuat the \sphinxtitleref{tzinfo}
-of the \sphinxtitleref{datetime} object afterwards.
-
-\sphinxAtStartPar
-Once a value has been successfully converted the following methods can be
-used to perform various time comparison checks:
-
-\sphinxAtStartPar
-Date comparison methods:
-\sphinxhyphen{} \sphinxtitleref{compare\_time(d1, d2)}: Compares the hours, minutes, seconds, and milliseconds of two datettimes.
-\sphinxhyphen{} \sphinxtitleref{compare\_seconds(d1, d2)}: Compares the hours, minutes, and seconds of two times.
-\sphinxhyphen{} \sphinxtitleref{compare\_minutes(d1, d2)}: Compares hours and minutes of two times.
-\sphinxhyphen{} \sphinxtitleref{compare\_hours(d1, d2)}: Compares the hours of two times
-
-\sphinxAtStartPar
-Formatting methods mirror parsing options and support:
-\sphinxhyphen{} Specified pattern
-\sphinxhyphen{} Format for a specified locale
-\sphinxhyphen{} Format for the default locale
+Formatting, parsing, and validation methods support custom patterns, locales, and timezones,
+using the system default if not provided.
 \index{serializable (apache\_commons\_validator\_python.routines.time\_validator.TimeValidator attribute)@\spxentry{serializable}\spxextra{apache\_commons\_validator\_python.routines.time\_validator.TimeValidator attribute}}
 
 \begin{fulllineitems}
@@ -7664,24 +7634,6 @@ bool
 
 \end{fulllineitems}
 
-\index{VALIDATOR (apache\_commons\_validator\_python.routines.time\_validator.TimeValidator attribute)@\spxentry{VALIDATOR}\spxextra{apache\_commons\_validator\_python.routines.time\_validator.TimeValidator attribute}}
-
-\begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.time_validator.TimeValidator.VALIDATOR}}
-\pysigstartsignatures
-\pysigline{\sphinxbfcode{\sphinxupquote{VALIDATOR}}}
-\pysigstopsignatures
-\sphinxAtStartPar
-The singleton instance of this class
-\begin{quote}\begin{description}
-\sphinxlineitem{Type}
-\sphinxAtStartPar
-{\hyperref[\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.time_validator.TimeValidator}]{\sphinxcrossref{TimeValidator}}}
-
-\end{description}\end{quote}
-
-\end{fulllineitems}
-
 \index{cloneable (apache\_commons\_validator\_python.routines.time\_validator.TimeValidator attribute)@\spxentry{cloneable}\spxextra{apache\_commons\_validator\_python.routines.time\_validator.TimeValidator attribute}}
 
 \begin{fulllineitems}
@@ -7699,24 +7651,26 @@ The singleton instance of this class
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_hours}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare two datetime values by hours (ignores date component).
+Compare two datetimes by hour component only.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} First datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare against.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} Second datetime to compare against.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the hours are equal,
-\sphinxhyphen{}1 if the hour of value is less than the hour of compare,
-+1 if the hour of value is greater than the hour of compare.
+0 if hours equal, \sphinxhyphen{}1 if \sphinxcode{\sphinxupquote{value.hour}} \textless{} \sphinxcode{\sphinxupquote{compare.hour}}, +1 otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -7730,25 +7684,26 @@ Compare two datetime values by hours (ignores date component).
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_minutes}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare two datetime values by hours and minutes (ignores the date
-component).
+Compare two datetimes by hour, then minute components.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} First datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare against.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} Second datetime to compare against.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the hour/minutes are equal,
-\sphinxhyphen{}1 if the minute of value is less than the minute of compare,
-+1 if the minute of value is greater than the minute of compare.
+0 if minute/hour equal, \sphinxhyphen{}1 if \sphinxcode{\sphinxupquote{value.minute}} \textless{} \sphinxcode{\sphinxupquote{compare.minute}}, +1 otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -7762,24 +7717,26 @@ component).
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_seconds}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare two datetime values by hours, minutes, and seconds.
+Compare two datetimes by hour, minute, then second components.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} First datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare against.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} Second datetime to compare against.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the hour/minutes/seconds are equal,
-\sphinxhyphen{}1 if the seconds of value is less than the seconds of compare,
-+1 if the seconds of value is greater than the seconds of compare.
+0 if second/minute/hour equal, \sphinxhyphen{}1 if \sphinxcode{\sphinxupquote{value.second}} \textless{} \sphinxcode{\sphinxupquote{compare.second}}, +1 otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
 
@@ -7793,36 +7750,37 @@ Compare two datetime values by hours, minutes, and seconds.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{compare\_time}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}\sphinxparamcomma \sphinxparam{\DUrole{n}{compare}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ int}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Compare two datetime values by absolute time (hour, minute, second, and
-microscecond).
+Compare two datetimes by full time (hour, minute, second, then microsecond).
+\begin{quote}
+\begin{description}
+\sphinxlineitem{Note:}
+\sphinxAtStartPar
+Python’s \sphinxcode{\sphinxupquote{datetime}} uses microseconds rather than milliseconds (Java’s Calendar).
+This implementation accomodates that.
+
+\end{description}
+\end{quote}
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The first datetime to compare.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} First datetime to compare.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The second datetime to compare against.
+\sphinxstyleliteralstrong{\sphinxupquote{compare}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} Second datetime to compare against.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-0 if the times are equal
-\sphinxhyphen{}1 if the time represented by value is less than (earlier) the time of compare.
-+1 if the time represented by value is greater than (later) the time of compare.
+0 if times equal, \sphinxhyphen{}1 if \sphinxcode{\sphinxupquote{value}} \textless{} \sphinxcode{\sphinxupquote{compare}}, +1 otherwise.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+int
 
 \end{description}\end{quote}
-\begin{description}
-\sphinxlineitem{Changes from Java:}
-\sphinxAtStartPar
-Java compares the \sphinxstyleemphasis{millisecond} of two \sphinxcode{\sphinxupquote{Calendar}} object.
-Python’s \sphinxcode{\sphinxupquote{datetime}} does not have milliseconds.
-The finest unit of time in a \sphinxcode{\sphinxupquote{datetime.time}} is the \sphinxstyleemphasis{microsecond}.
-This implementation compares milliseconds to determine the earlier time.
-
-\end{description}
 
 \end{fulllineitems}
 
@@ -7834,12 +7792,11 @@ This implementation compares milliseconds to determine the earlier time.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{classmethod\DUrole{w}{ }}}\sphinxbfcode{\sphinxupquote{get\_instance}}}{}{{ $\rightarrow$ {\hyperref[\detokenize{apache_commons_validator_python.routines:apache_commons_validator_python.routines.time_validator.TimeValidator}]{\sphinxcrossref{TimeValidator}}}}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Returns the singleton instance of TimeValidator. Ensures only one instance is
-created and reused globally.
+Retrieve the singleton TimeValidator instance.
 \begin{quote}\begin{description}
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A singleton instance of the class.
+The single, shared instance of this class.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
@@ -7866,38 +7823,38 @@ A singleton instance of the class.
 \pysiglinewithargsret{\sphinxbfcode{\sphinxupquote{validate}}}{\sphinxparam{\DUrole{o}{*}}\sphinxparamcomma \sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}\sphinxparamcomma \sphinxparam{\DUrole{n}{time\_zone}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{tzinfo\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ datetime\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }None}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Validates and converts a time string into a datetime object using the
-provided pattern, locale, and time zone. The datetime will represent the time
-string elapsed since the epoch (year, month, day will be set to 1970, 1, 1
-respectively.)
+Validate and parse a time string into a datetime.
+
+\sphinxAtStartPar
+The resulting datetime represents the parsed time on the epoch date
+(1970\sphinxhyphen{}01\sphinxhyphen{}01).
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The input string to validate.
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Time string to validate.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The date pattern (e.g., ‘yyyy\sphinxhyphen{}MM\sphinxhyphen{}dd’). If None, a default pattern is used.
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} LDML pattern for parsing.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The locale to apply (e.g., ‘en\_US’). If None, the system default is used.
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} Locale code (e.g., ‘en\_US’).
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{Optional}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The timezone to apply to the resulting datetime. If None, no change is made.
+\sphinxstyleliteralstrong{\sphinxupquote{time\_zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} Time zone to apply.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A datetime object representing the time\sphinxhyphen{}string elapsed since the the Epoch, if parsing succeeds.
-\sphinxcode{\sphinxupquote{None}} if invalid.
+Parsed datetime if valid, otherwise None.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
-Optional{[}datetime{]}
+datetime or None
 
 \end{description}\end{quote}
 
@@ -8249,7 +8206,50 @@ invalid value.
 \paragraph{apache\_commons\_validator\_python.util.datetime\_helpers module}
 \label{\detokenize{apache_commons_validator_python.util:module-apache_commons_validator_python.util.datetime_helpers}}\label{\detokenize{apache_commons_validator_python.util:apache-commons-validator-python-util-datetime-helpers-module}}\index{module@\spxentry{module}!apache\_commons\_validator\_python.util.datetime\_helpers@\spxentry{apache\_commons\_validator\_python.util.datetime\_helpers}}\index{apache\_commons\_validator\_python.util.datetime\_helpers@\spxentry{apache\_commons\_validator\_python.util.datetime\_helpers}!module@\spxentry{module}}
 \sphinxAtStartPar
-TODO: insert module description
+Module Name: datetime\_helpers.py
+\begin{description}
+\sphinxlineitem{Description:}
+\sphinxAtStartPar
+Helper functions and constants for date/time parsing and validation.
+
+\end{description}
+
+\sphinxAtStartPar
+This module provides:
+\sphinxhyphen{} Mappings from Java date/time locales and patterns to Python equivalents.
+\sphinxhyphen{} Utilities for obtaining system default locale and timezone information.
+\sphinxhyphen{} Conversion between Java SimpleDateFormat patterns (LDML) and Python strptime formats.
+\sphinxhyphen{} Wrappers around \sphinxtitleref{dateparser} for flexible and strict parsing.
+\sphinxhyphen{} Comparison of timezone behaviors analogous to Java’s \sphinxtitleref{TimeZone.hasSameRules()}.
+\begin{description}
+\sphinxlineitem{Classes:}\begin{description}
+\sphinxlineitem{JavaToPyLocale}
+\sphinxAtStartPar
+Constants for common Java locale identifiers.
+
+\end{description}
+
+\sphinxlineitem{Functions:}
+\sphinxAtStartPar
+obj\_to\_str
+get\_default\_locale
+get\_default\_tzinfo
+get\_tzname
+date\_get\_time
+timezone\_gmt
+timezone\_has\_same\_rules
+ldml\_to\_strptime\_format
+fuzzy\_parse
+ldml2strptime
+ldml2strpdate
+parse\_pattern\_strict
+parse\_pattern\_flexible
+
+\sphinxlineitem{Author:}
+\sphinxAtStartPar
+Juji Lau
+
+\end{description}
 \index{JavaToPyLocale (class in apache\_commons\_validator\_python.util.datetime\_helpers)@\spxentry{JavaToPyLocale}\spxextra{class in apache\_commons\_validator\_python.util.datetime\_helpers}}
 
 \begin{fulllineitems}
@@ -8261,11 +8261,83 @@ TODO: insert module description
 Bases: \sphinxcode{\sphinxupquote{object}}
 
 \sphinxAtStartPar
-Wrapper class to convert Java’s locales to a Python locale string.
+Wrapper constants to convert Java locale identifiers to Python locale strings.
+\index{US (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{US}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:apache_commons_validator_python.util.datetime_helpers.JavaToPyLocale.US}}
+\pysigstartsignatures
+\pysigline{\sphinxbfcode{\sphinxupquote{US}}}
+\pysigstopsignatures
+\sphinxAtStartPar
+English (United States).
+\begin{quote}\begin{description}
+\sphinxlineitem{Type}
+\sphinxAtStartPar
+str
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
 \index{GERMAN (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{GERMAN}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
 
 \begin{fulllineitems}
 \phantomsection\label{\detokenize{apache_commons_validator_python.util:apache_commons_validator_python.util.datetime_helpers.JavaToPyLocale.GERMAN}}
+\pysigstartsignatures
+\pysigline{\sphinxbfcode{\sphinxupquote{GERMAN}}}
+\pysigstopsignatures
+\sphinxAtStartPar
+German (general).
+\begin{quote}\begin{description}
+\sphinxlineitem{Type}
+\sphinxAtStartPar
+str
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{GERMANY (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{GERMANY}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:apache_commons_validator_python.util.datetime_helpers.JavaToPyLocale.GERMANY}}
+\pysigstartsignatures
+\pysigline{\sphinxbfcode{\sphinxupquote{GERMANY}}}
+\pysigstopsignatures
+\sphinxAtStartPar
+German (Germany).
+\begin{quote}\begin{description}
+\sphinxlineitem{Type}
+\sphinxAtStartPar
+str
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{UK (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{UK}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:apache_commons_validator_python.util.datetime_helpers.JavaToPyLocale.UK}}
+\pysigstartsignatures
+\pysigline{\sphinxbfcode{\sphinxupquote{UK}}}
+\pysigstopsignatures
+\sphinxAtStartPar
+English (United Kingdom).
+\begin{quote}\begin{description}
+\sphinxlineitem{Type}
+\sphinxAtStartPar
+str
+
+\end{description}\end{quote}
+
+\end{fulllineitems}
+
+\index{GERMAN (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{GERMAN}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
+
+\begin{fulllineitems}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:id0}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{GERMAN}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }str}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }\textquotesingle{}de\textquotesingle{}}}}
 \pysigstopsignatures
@@ -8274,7 +8346,7 @@ Wrapper class to convert Java’s locales to a Python locale string.
 \index{GERMANY (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{GERMANY}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.util:apache_commons_validator_python.util.datetime_helpers.JavaToPyLocale.GERMANY}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:id1}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{GERMANY}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }str}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }\textquotesingle{}de\_DE\textquotesingle{}}}}
 \pysigstopsignatures
@@ -8283,7 +8355,7 @@ Wrapper class to convert Java’s locales to a Python locale string.
 \index{UK (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{UK}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.util:apache_commons_validator_python.util.datetime_helpers.JavaToPyLocale.UK}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:id2}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{UK}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }str}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }\textquotesingle{}en\_GB\textquotesingle{}}}}
 \pysigstopsignatures
@@ -8292,7 +8364,7 @@ Wrapper class to convert Java’s locales to a Python locale string.
 \index{US (apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute)@\spxentry{US}\spxextra{apache\_commons\_validator\_python.util.datetime\_helpers.JavaToPyLocale attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.util:apache_commons_validator_python.util.datetime_helpers.JavaToPyLocale.US}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:id3}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{US}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }str}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }\textquotesingle{}en\_US\textquotesingle{}}}}
 \pysigstopsignatures
@@ -8309,28 +8381,22 @@ Wrapper class to convert Java’s locales to a Python locale string.
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{date\_get\_time}}}{\sphinxparam{\DUrole{n}{dt}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime}}}{{ $\rightarrow$ float}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Python wrapper for Java’s \sphinxcode{\sphinxupquote{Date.getTime()}} function. Returns the number of
-milliseconds since January 1, 1970, 00:00:00 GMT represented by this \sphinxcode{\sphinxupquote{datetime}}
-object.
+Return milliseconds since Unix epoch (January 1, 1970, 00:00:00 GMT) for a datetime.
 
 \sphinxAtStartPar
-\sphinxstylestrong{Note}
-Java’s validator calculates the time since the epoch using a \sphinxcode{\sphinxupquote{Date}} object.
-However, Java’s \sphinxcode{\sphinxupquote{Date}} is in the processes of deprecating all references to time fields (e.g. hour, minute, second, etc.).
-In this project, even though we substitute python’s \sphinxcode{\sphinxupquote{date}} for Java’s \sphinxcode{\sphinxupquote{Date}},
-we will use Python’s \sphinxcode{\sphinxupquote{date}} does not store time fields, hence we will be using a \sphinxcode{\sphinxupquote{datetime}} for this.
+Python wrapper for Java’s \sphinxcode{\sphinxupquote{Date.getTime()}} function.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{dt}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} The Python date to get thet time from.
+\sphinxstyleliteralstrong{\sphinxupquote{dt}} (\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}) \textendash{} Input datetime.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-00:00 GMT represented by dt.
+Milliseconds since 1970\sphinxhyphen{}01\sphinxhyphen{}01T00:00:00Z.
 
 \sphinxlineitem{Return type}
 \sphinxAtStartPar
-The number of milliseconds since January 1, 1970, 00
+float
 
 \end{description}\end{quote}
 
@@ -8344,17 +8410,42 @@ The number of milliseconds since January 1, 1970, 00
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{fuzzy\_parse}}}{\sphinxparam{\DUrole{o}{*}}\sphinxparamcomma \sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{settings}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{dict}}}{{ $\rightarrow$ datetime}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Uses \sphinxcode{\sphinxupquote{dateparser.parse()}} to parse a datetime given a value string, locale, and pattern.
-This is a last resort, if all else fails, because dateparser.parse() is too loose;
-it allows differing value strings to be parsed. We still use it because it respects locales the best.
-\begin{quote}\begin{description}
-\sphinxlineitem{Parameters}
+Attempt to parse a datetime string using \sphinxtitleref{dateparser.parse()}, respecting locale and pattern
+with fallback strategies for language\sphinxhyphen{}only or region\sphinxhyphen{}only parsing.
+
+\begin{sphinxadmonition}{note}{Note:}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{TODO}}
+This function is a last resort, only called if all else fails, because
+\sphinxcode{\sphinxupquote{dateparser.parse()}} is too loose; it allows differing value strings to be parsed.
+It exists \sphinxcode{\sphinxupquote{dateparser.parse()}} is best for parsing locale sensitive strings.
+\end{sphinxadmonition}
+\begin{quote}\begin{description}
+\sphinxlineitem{Parameters}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Date/time string to parse.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} LDML pattern for parsing.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Locale code (e.g., ‘en\_US’).
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{settings}} (\sphinxstyleliteralemphasis{\sphinxupquote{dict}}) \textendash{} Additional settings for dateparser.
+
+\end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-TODO
+Parsed datetime or None if all attempts fail.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+datetime or None
 
 \end{description}\end{quote}
 
@@ -8368,7 +8459,17 @@ TODO
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{get\_default\_locale}}}{}{{ $\rightarrow$ str}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Gets the system’s default locale (\sphinxtitleref{en\_US}).
+Retrieve the system’s default locale code.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+Locale code (e.g., ‘en\_US’).
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -8380,7 +8481,17 @@ Gets the system’s default locale (\sphinxtitleref{en\_US}).
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{get\_default\_tzinfo}}}{}{{ $\rightarrow$ tzinfo}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Gets the system’s default timezone.
+Retrieve the system’s default timezone as a tzinfo object.
+\begin{quote}\begin{description}
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+System local timezone.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+tzinfo
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -8392,16 +8503,24 @@ Gets the system’s default timezone.
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{get\_tzname}}}{\sphinxparam{\DUrole{n}{timezone}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{tzinfo}}}{{ $\rightarrow$ str}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Returns the name of the timezone (same as \sphinxcode{\sphinxupquote{datetime.tzname}}).
-\sphinxtitleref{tzinfo} does not have a name field, so this function is nessescary to get the name of a lone tzinfo objct.
+Get the name of a tzinfo object.
+
+\begin{sphinxadmonition}{note}{Note:}
+\sphinxAtStartPar
+Functionally the same as \sphinxcode{\sphinxupquote{datetime.tzname}}, except \sphinxtitleref{tzinfo} does not have a \sphinxcode{\sphinxupquote{name}} field.
+\end{sphinxadmonition}
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{timezone}} (\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}) \textendash{} The tzinfo object that we want the name of
+\sphinxstyleliteralstrong{\sphinxupquote{timezone}} (\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}) \textendash{} tzinfo instance to get the name of.
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-The name of timezone as a string.
+tzinfo object’s name (e.g., ‘PST’).
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str
 
 \end{description}\end{quote}
 
@@ -8415,29 +8534,30 @@ The name of timezone as a string.
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{ldml2strpdate}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{style\_format}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{\textquotesingle{}short\textquotesingle{}}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ datetime}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Parses the value to a \sphinxcode{\sphinxupquote{datetime}} based on the style\_format and locale. Uses
-system default if the locale is \sphinxcode{\sphinxupquote{None}}.
+Parse a date string into datetime using Babel’s LDML style formats.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The string to parse into a datetie
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} \sphinxtitleref{date} string to parse.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{style\_format}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The style of the \sphinxcode{\sphinxupquote{value}} string passed in (‘short’ by default.)
-One of: ‘short’, ‘medium’, ‘long’, or ‘full’
+\sphinxstyleliteralstrong{\sphinxupquote{style\_format}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} LDML style (‘short’, ‘medium’, ‘long’, ‘full’).
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The locale of the value string.
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} Locale code to use; system default if None.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-The parsed \sphinxcode{\sphinxupquote{datetime}} from the value string.
-\sphinxcode{\sphinxupquote{None}} if the value string is unparseable with the given locale.
+Parsed datetime or None on parsing failure.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+datetime or None
 
 \end{description}\end{quote}
 
@@ -8451,29 +8571,30 @@ The parsed \sphinxcode{\sphinxupquote{datetime}} from the value string.
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{ldml2strptime}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{style\_format}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{\textquotesingle{}short\textquotesingle{}}}\sphinxparamcomma \sphinxparam{\DUrole{n}{locale}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ datetime}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Parses the value to a \sphinxcode{\sphinxupquote{datetime}} based on the style\_format and locale.
-Uses system default if the locale is \sphinxcode{\sphinxupquote{None}}.
+Parse a time string into datetime using Babel’s LDML style formats.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The string to parse into a \sphinxcode{\sphinxupquote{datetime}}
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} \sphinxtitleref{time} string to parse.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{style\_format}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The style of the \sphinxcode{\sphinxupquote{value}} string passed in (‘short’ by default.)
-One of: ‘short’, ‘medium’, ‘long’, or ‘full’
+\sphinxstyleliteralstrong{\sphinxupquote{style\_format}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} LDML style (‘short’, ‘medium’, ‘long’, ‘full’).
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The locale of the value string.
+\sphinxstyleliteralstrong{\sphinxupquote{locale}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} Locale code to use; system default if None.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-The parsed \sphinxcode{\sphinxupquote{datetime}} from the value string.
-\sphinxcode{\sphinxupquote{None}} if the value string is unparseable with the given locale.
+Parsed datetime or None on parsing failure.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+datetime or None
 
 \end{description}\end{quote}
 
@@ -8487,43 +8608,19 @@ The parsed \sphinxcode{\sphinxupquote{datetime}} from the value string.
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{ldml\_to\_strptime\_format}}}{\sphinxparam{\DUrole{n}{java\_input}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ str}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Convert a Java SimpleDateFormat pattern into an equivalent Python strftime
-pattern.
-\begin{description}
-\sphinxlineitem{Steps:}\begin{enumerate}
-\sphinxsetlistlabels{\arabic}{enumi}{enumii}{}{.}%
-\item {} 
-\sphinxAtStartPar
-Scan the input string for substrings like ‘yyyy’, ‘MM’, ‘dd’, etc.
-
-\item {} 
-\sphinxAtStartPar
-For each match, look up its replacement in JAVA\_TO\_PY.
-
-\item {} 
-\sphinxAtStartPar
-Produce a new format string with all tokens swapped out.
-
-\end{enumerate}
-
-\end{description}
-\subsubsection*{Example}
-
-\sphinxAtStartPar
-java\_fmt = “yyyy\sphinxhyphen{}MM\sphinxhyphen{}dd’T’HH:mm:ss.SSSZ”
-returns “\%Y\sphinxhyphen{}\%m\sphinxhyphen{}\%dT\%H:\%M:\%S.\%f\%z”
-
-\sphinxAtStartPar
-(Used for testing date, time, and calendar validators.)
+Convert Java SimpleDateFormat patterns to patterns accepted by Python’s \sphinxcode{\sphinxupquote{strptime()}}.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{java\_fmt}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The Java SimpleDateFormat pattern to convert
+\sphinxstyleliteralstrong{\sphinxupquote{java\_fmt}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Java date/time format string (ldml format).
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-The Python string pattern, that when fed into \sphinxcode{\sphinxupquote{datetime.strftime()}} produces
-an equivalent date/time string representation.
+Equivalent Python strftime format.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str
 
 \end{description}\end{quote}
 
@@ -8537,22 +8634,26 @@ an equivalent date/time string representation.
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{obj\_to\_str}}}{\sphinxparam{\DUrole{n}{expected\_obj}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{object}}\sphinxparamcomma \sphinxparam{\DUrole{n}{tested\_obj}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{object}\DUrole{w}{ }\DUrole{o}{=}\DUrole{w}{ }\DUrole{default_value}{None}}}{{ $\rightarrow$ str}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Prints the object as a string for debugging purposes on the test cases.
+Generate a comparison string for expected and tested objects (for debugging).
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{expected\_obj}} (\sphinxstyleliteralemphasis{\sphinxupquote{Union}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{object}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The expected object in the test case.
+\sphinxstyleliteralstrong{\sphinxupquote{expected\_obj}} (\sphinxstyleliteralemphasis{\sphinxupquote{object}}) \textendash{} The expected test result (datetime or other).
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{tested\_obj}} (\sphinxstyleliteralemphasis{\sphinxupquote{Union}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{object}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} The object being tested in the test case.
+\sphinxstyleliteralstrong{\sphinxupquote{tested\_obj}} (\sphinxstyleliteralemphasis{\sphinxupquote{object}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{optional}}) \textendash{} The actual test result to compare. Defaults to None.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A string comparing the expected\_obj and tested\_obj and their fields if applicable.
+Detailed comparison of expected vs. actual, including time since the unix epoch and tzinfo for datetimes.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+str
 
 \end{description}\end{quote}
 
@@ -8566,10 +8667,32 @@ A string comparing the expected\_obj and tested\_obj and their fields if applica
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{parse\_pattern\_flexible}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{ldml\_pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ datetime}}
 \pysigstopsignatures
 \sphinxAtStartPar
-TODO: Parses value string into the representing datetime in the locale’s “short” style.
-Except there are multiple acceptable “short” strings in Java, but only one acceptable
-“short” string in Python. This function aims to mimic Java’s flexibility. Uses the
-system’s default locale if a locale is not provided.
+Flexibly parse a date string mimicking Java’s flexible locale\sphinxhyphen{}dependent ‘short’ style.
+
+\sphinxAtStartPar
+There are multiple acceptable “short” strings per locale in Java’s SimpleDateFormat,
+but only one acceptable “short” string per locale in Python.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parameters}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Date string to parse.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{ldml\_pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} LDML ‘short’ pattern to guide parsing.
+
+\end{itemize}
+
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+Parsed datetime or None if unparseable.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+datetime or None
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -8581,7 +8704,28 @@ system’s default locale if a locale is not provided.
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{parse\_pattern\_strict}}}{\sphinxparam{\DUrole{n}{value}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}\sphinxparamcomma \sphinxparam{\DUrole{n}{ldml\_pattern}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ datetime}}
 \pysigstopsignatures
 \sphinxAtStartPar
-TODO:
+Strictly parse a string into datetime using a converted LDML pattern.
+\begin{quote}\begin{description}
+\sphinxlineitem{Parameters}\begin{itemize}
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{value}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} String to parse.
+
+\item {} 
+\sphinxAtStartPar
+\sphinxstyleliteralstrong{\sphinxupquote{ldml\_pattern}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} LDML pattern to convert and use.
+
+\end{itemize}
+
+\sphinxlineitem{Returns}
+\sphinxAtStartPar
+Parsed datetime.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+datetime
+
+\end{description}\end{quote}
 
 \end{fulllineitems}
 
@@ -8593,17 +8737,22 @@ TODO:
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{timezone\_gmt}}}{\sphinxparam{\DUrole{n}{zone}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{str}}}{{ $\rightarrow$ ZoneInfo}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Creates and returns a \sphinxcode{\sphinxupquote{tzinfo}} object with the specified timezone. A
-replacement for Java’s \sphinxcode{\sphinxupquote{org.apache.commons.lang3.time.TimeZones}}.
+Create a tzinfo object for a given timezone name.
+
+\sphinxAtStartPar
+Wrapper for Java’s \sphinxcode{\sphinxupquote{org.apache.commons.lang3.time.TimeZones}}.
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} The timezone to return. e.g. “est”, or “gmt”.
+\sphinxstyleliteralstrong{\sphinxupquote{zone}} (\sphinxstyleliteralemphasis{\sphinxupquote{str}}) \textendash{} Timezone identifier (e.g., ‘UTC’, ‘America/New\_York’).
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-A \sphinxcode{\sphinxupquote{ZoneInfo}} object with the specified zone.
-Note that \sphinxcode{\sphinxupquote{tzinfo}} is an abstract class, and \sphinxcode{\sphinxupquote{ZoneInfo}} is an implementation.
+ZoneInfo instance or None if invalid.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+tzinfo or None
 
 \end{description}\end{quote}
 
@@ -8617,31 +8766,33 @@ Note that \sphinxcode{\sphinxupquote{tzinfo}} is an abstract class, and \sphinxc
 \pysiglinewithargsret{\sphinxcode{\sphinxupquote{apache\_commons\_validator\_python.util.datetime\_helpers.}}\sphinxbfcode{\sphinxupquote{timezone\_has\_same\_rules}}}{\sphinxparam{\DUrole{n}{val1}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }tzinfo}}\sphinxparamcomma \sphinxparam{\DUrole{n}{val2}\DUrole{p}{:}\DUrole{w}{ }\DUrole{n}{datetime\DUrole{w}{ }\DUrole{p}{|}\DUrole{w}{ }tzinfo}}}{{ $\rightarrow$ bool}}
 \pysigstopsignatures
 \sphinxAtStartPar
-Wrapper function for java.util.TimeZone.hasSameRules().
+Determine if two timezones share the same UTC offset and DST time adjustment rules,
+including the raw UTC offset and daylight saving time rules. Disregards the
+time zone identifier (i.e. the name) and focuses solely on the effective behavior
+(time zone offset).
 
 \sphinxAtStartPar
-Determines if two datetime or tzinfo objects share the same rules for time adjustments,
-including the raw UTC offset and daylight saving time rules. This function disregards the
-time zone identifier (i.e. the name) and focuses solely on the effective behavior (offset)
-of the time zones.
+Wrapper function for java.util.TimeZone.hasSameRules().
 \begin{quote}\begin{description}
 \sphinxlineitem{Parameters}\begin{itemize}
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{val1}} (\sphinxstyleliteralemphasis{\sphinxupquote{Union}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} A datetime object (from which the tzinfo is extracted)
-or a tzinfo instance representing the first time zone.
+\sphinxstyleliteralstrong{\sphinxupquote{val1}} (\sphinxstyleliteralemphasis{\sphinxupquote{Union}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} First datetime or tzinfo.
 
 \item {} 
 \sphinxAtStartPar
-\sphinxstyleliteralstrong{\sphinxupquote{val2}} (\sphinxstyleliteralemphasis{\sphinxupquote{Union}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{None}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} A datetime object or tzinfo instance representing the
-second time zone. If None, the function returns False.
+\sphinxstyleliteralstrong{\sphinxupquote{val2}} (\sphinxstyleliteralemphasis{\sphinxupquote{Union}}\sphinxstyleliteralemphasis{\sphinxupquote{{[}}}\sphinxstyleliteralemphasis{\sphinxupquote{datetime}}\sphinxstyleliteralemphasis{\sphinxupquote{, }}\sphinxstyleliteralemphasis{\sphinxupquote{tzinfo}}\sphinxstyleliteralemphasis{\sphinxupquote{{]}}}) \textendash{} Second datetime or tzinfo.
 
 \end{itemize}
 
 \sphinxlineitem{Returns}
 \sphinxAtStartPar
-\sphinxcode{\sphinxupquote{True}} if the time zones have identical rules (i.e. the same UTC offset at the reference time);
-\sphinxcode{\sphinxupquote{False}} otherwise, or if either value does not have tzinfo information.
+True if both have identical offset rules; False if otherwise or if
+\sphinxtitleref{val1} or \sphinxtitleref{val2} is None.
+
+\sphinxlineitem{Return type}
+\sphinxAtStartPar
+bool
 
 \end{description}\end{quote}
 
@@ -9416,7 +9567,7 @@ int
 \index{CASE\_INSENSITIVE (apache\_commons\_validator\_python.util.regex.Regex attribute)@\spxentry{CASE\_INSENSITIVE}\spxextra{apache\_commons\_validator\_python.util.regex.Regex attribute}}
 
 \begin{fulllineitems}
-\phantomsection\label{\detokenize{apache_commons_validator_python.util:id0}}
+\phantomsection\label{\detokenize{apache_commons_validator_python.util:id4}}
 \pysigstartsignatures
 \pysigline{\sphinxbfcode{\sphinxupquote{CASE\_INSENSITIVE}}\sphinxbfcode{\sphinxupquote{\DUrole{p}{:}\DUrole{w}{ }int}}\sphinxbfcode{\sphinxupquote{\DUrole{w}{ }\DUrole{p}{=}\DUrole{w}{ }2}}}
 \pysigstopsignatures

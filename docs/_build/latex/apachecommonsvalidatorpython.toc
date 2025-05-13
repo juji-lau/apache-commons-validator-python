@@ -8,67 +8,67 @@
 \contentsline {subparagraph}{Submodules}{3}{subparagraph*.6}%
 \contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.abstract\_checkdigit module}{3}{subparagraph*.7}%
 \contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.checkdigit module}{4}{subparagraph*.9}%
-\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception module}{5}{subparagraph*.17}%
-\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit module}{6}{subparagraph*.25}%
+\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.checkdigit\_exception module}{6}{subparagraph*.17}%
+\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.ean13\_checkdigit module}{7}{subparagraph*.24}%
 \contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.isbn10\_checkdigit module}{8}{subparagraph*.30}%
-\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.isin\_checkdigit module}{9}{subparagraph*.35}%
-\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.luhn\_checkdigit module}{9}{subparagraph*.37}%
-\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit module}{10}{subparagraph*.41}%
-\contentsline {subparagraph}{Module contents}{12}{subparagraph*.56}%
-\contentsline {paragraph}{Submodules}{12}{paragraph*.57}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.abstract\_calendar\_validator module}{12}{paragraph*.58}%
+\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.isin\_checkdigit module}{9}{subparagraph*.36}%
+\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.luhn\_checkdigit module}{10}{subparagraph*.38}%
+\contentsline {subparagraph}{apache\_commons\_validator\_python.routines.checkdigit.modulus\_checkdigit module}{10}{subparagraph*.42}%
+\contentsline {subparagraph}{Module contents}{12}{subparagraph*.57}%
+\contentsline {paragraph}{Submodules}{12}{paragraph*.58}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.abstract\_calendar\_validator module}{12}{paragraph*.59}%
 \contentsline {paragraph}{apache\_commons\_validator\_python.routines.abstract\_format\_validator module}{14}{paragraph*.69}%
 \contentsline {paragraph}{apache\_commons\_validator\_python.routines.abstract\_number\_validator module}{15}{paragraph*.76}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.big\_decimal\_validator module}{17}{paragraph*.91}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.big\_decimal\_validator module}{18}{paragraph*.91}%
 \contentsline {paragraph}{apache\_commons\_validator\_python.routines.big\_integer\_validator module}{19}{paragraph*.95}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.byte\_validator module}{20}{paragraph*.99}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.calendar\_validator module}{21}{paragraph*.107}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.code\_validator module}{25}{paragraph*.122}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.credit\_card\_validator module}{28}{paragraph*.138}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.currency\_validator module}{32}{paragraph*.178}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.date\_validator module}{33}{paragraph*.181}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.domain\_validator module}{36}{paragraph*.195}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.double\_validator module}{40}{paragraph*.223}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.email\_validator module}{41}{paragraph*.227}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.float\_validator module}{42}{paragraph*.233}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.inet\_address\_validator module}{44}{paragraph*.241}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.integer\_validator module}{45}{paragraph*.249}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.isbn\_validator module}{46}{paragraph*.257}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.isin\_validator module}{49}{paragraph*.279}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.long\_validator module}{51}{paragraph*.289}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.percent\_validator module}{52}{paragraph*.297}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.regex\_validator module}{53}{paragraph*.300}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.short\_validator module}{56}{paragraph*.311}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.time\_validator module}{57}{paragraph*.317}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.routines.url\_validator module}{60}{paragraph*.330}%
-\contentsline {paragraph}{Module contents}{62}{paragraph*.340}%
-\contentsline {subsubsection}{apache\_commons\_validator\_python.util package}{62}{subsubsection*.341}%
-\contentsline {paragraph}{Submodules}{62}{paragraph*.342}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.datetime\_helpers module}{62}{paragraph*.343}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.decimal\_places module}{65}{paragraph*.362}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.digester module}{65}{paragraph*.364}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.domains module}{66}{paragraph*.372}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.flags module}{69}{paragraph*.378}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.locale module}{70}{paragraph*.388}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.regex module}{71}{paragraph*.403}%
-\contentsline {paragraph}{apache\_commons\_validator\_python.util.validator\_utils module}{72}{paragraph*.409}%
-\contentsline {paragraph}{Module contents}{73}{paragraph*.416}%
-\contentsline {subsection}{\numberline {1.1.2}Submodules}{73}{subsection.1.1.2}%
-\contentsline {subsection}{\numberline {1.1.3}apache\_commons\_validator\_python.arg\_new module}{73}{subsection.1.1.3}%
-\contentsline {subsection}{\numberline {1.1.4}apache\_commons\_validator\_python.field\_new module}{75}{subsection.1.1.4}%
-\contentsline {subsection}{\numberline {1.1.5}apache\_commons\_validator\_python.form\_new module}{80}{subsection.1.1.5}%
-\contentsline {subsection}{\numberline {1.1.6}apache\_commons\_validator\_python.form\_set\_factory\_new module}{82}{subsection.1.1.6}%
-\contentsline {subsection}{\numberline {1.1.7}apache\_commons\_validator\_python.form\_set\_new module}{83}{subsection.1.1.7}%
-\contentsline {subsection}{\numberline {1.1.8}apache\_commons\_validator\_python.generic\_type\_validator\_new module}{85}{subsection.1.1.8}%
-\contentsline {subsection}{\numberline {1.1.9}apache\_commons\_validator\_python.generic\_validator\_new module}{87}{subsection.1.1.9}%
-\contentsline {subsection}{\numberline {1.1.10}apache\_commons\_validator\_python.msg\_new module}{88}{subsection.1.1.10}%
-\contentsline {subsection}{\numberline {1.1.11}apache\_commons\_validator\_python.validator\_action\_new module}{89}{subsection.1.1.11}%
-\contentsline {subsection}{\numberline {1.1.12}apache\_commons\_validator\_python.validator\_exception\_new module}{90}{subsection.1.1.12}%
-\contentsline {subsection}{\numberline {1.1.13}apache\_commons\_validator\_python.validator\_new module}{90}{subsection.1.1.13}%
-\contentsline {subsection}{\numberline {1.1.14}apache\_commons\_validator\_python.validator\_resources\_new module}{91}{subsection.1.1.14}%
-\contentsline {subsection}{\numberline {1.1.15}apache\_commons\_validator\_python.validator\_result\_new module}{93}{subsection.1.1.15}%
-\contentsline {subsection}{\numberline {1.1.16}apache\_commons\_validator\_python.validator\_results\_new module}{95}{subsection.1.1.16}%
-\contentsline {subsection}{\numberline {1.1.17}apache\_commons\_validator\_python.var\_new module}{96}{subsection.1.1.17}%
-\contentsline {subsection}{\numberline {1.1.18}Module contents}{97}{subsection.1.1.18}%
-\contentsline {chapter}{Python Module Index}{99}{section*.607}%
-\contentsline {chapter}{Index}{101}{section*.608}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.byte\_validator module}{21}{paragraph*.99}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.calendar\_validator module}{22}{paragraph*.107}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.code\_validator module}{25}{paragraph*.121}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.credit\_card\_validator module}{28}{paragraph*.137}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.currency\_validator module}{32}{paragraph*.177}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.date\_validator module}{33}{paragraph*.180}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.domain\_validator module}{36}{paragraph*.194}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.double\_validator module}{40}{paragraph*.222}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.email\_validator module}{41}{paragraph*.226}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.float\_validator module}{42}{paragraph*.232}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.inet\_address\_validator module}{44}{paragraph*.240}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.integer\_validator module}{45}{paragraph*.248}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.isbn\_validator module}{46}{paragraph*.256}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.isin\_validator module}{50}{paragraph*.278}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.long\_validator module}{51}{paragraph*.288}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.percent\_validator module}{53}{paragraph*.296}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.regex\_validator module}{54}{paragraph*.299}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.short\_validator module}{56}{paragraph*.310}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.time\_validator module}{58}{paragraph*.316}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.routines.url\_validator module}{60}{paragraph*.328}%
+\contentsline {paragraph}{Module contents}{62}{paragraph*.338}%
+\contentsline {subsubsection}{apache\_commons\_validator\_python.util package}{62}{subsubsection*.339}%
+\contentsline {paragraph}{Submodules}{62}{paragraph*.340}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.datetime\_helpers module}{62}{paragraph*.341}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.decimal\_places module}{67}{paragraph*.364}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.digester module}{67}{paragraph*.366}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.domains module}{68}{paragraph*.374}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.flags module}{71}{paragraph*.380}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.locale module}{72}{paragraph*.390}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.regex module}{73}{paragraph*.405}%
+\contentsline {paragraph}{apache\_commons\_validator\_python.util.validator\_utils module}{74}{paragraph*.411}%
+\contentsline {paragraph}{Module contents}{75}{paragraph*.418}%
+\contentsline {subsection}{\numberline {1.1.2}Submodules}{75}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}apache\_commons\_validator\_python.arg\_new module}{75}{subsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.1.4}apache\_commons\_validator\_python.field\_new module}{77}{subsection.1.1.4}%
+\contentsline {subsection}{\numberline {1.1.5}apache\_commons\_validator\_python.form\_new module}{82}{subsection.1.1.5}%
+\contentsline {subsection}{\numberline {1.1.6}apache\_commons\_validator\_python.form\_set\_factory\_new module}{84}{subsection.1.1.6}%
+\contentsline {subsection}{\numberline {1.1.7}apache\_commons\_validator\_python.form\_set\_new module}{85}{subsection.1.1.7}%
+\contentsline {subsection}{\numberline {1.1.8}apache\_commons\_validator\_python.generic\_type\_validator\_new module}{87}{subsection.1.1.8}%
+\contentsline {subsection}{\numberline {1.1.9}apache\_commons\_validator\_python.generic\_validator\_new module}{89}{subsection.1.1.9}%
+\contentsline {subsection}{\numberline {1.1.10}apache\_commons\_validator\_python.msg\_new module}{90}{subsection.1.1.10}%
+\contentsline {subsection}{\numberline {1.1.11}apache\_commons\_validator\_python.validator\_action\_new module}{91}{subsection.1.1.11}%
+\contentsline {subsection}{\numberline {1.1.12}apache\_commons\_validator\_python.validator\_exception\_new module}{92}{subsection.1.1.12}%
+\contentsline {subsection}{\numberline {1.1.13}apache\_commons\_validator\_python.validator\_new module}{92}{subsection.1.1.13}%
+\contentsline {subsection}{\numberline {1.1.14}apache\_commons\_validator\_python.validator\_resources\_new module}{93}{subsection.1.1.14}%
+\contentsline {subsection}{\numberline {1.1.15}apache\_commons\_validator\_python.validator\_result\_new module}{95}{subsection.1.1.15}%
+\contentsline {subsection}{\numberline {1.1.16}apache\_commons\_validator\_python.validator\_results\_new module}{97}{subsection.1.1.16}%
+\contentsline {subsection}{\numberline {1.1.17}apache\_commons\_validator\_python.var\_new module}{98}{subsection.1.1.17}%
+\contentsline {subsection}{\numberline {1.1.18}Module contents}{99}{subsection.1.1.18}%
+\contentsline {chapter}{Python Module Index}{101}{section*.609}%
+\contentsline {chapter}{Index}{103}{section*.610}%

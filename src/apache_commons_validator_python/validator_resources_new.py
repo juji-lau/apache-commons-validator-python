@@ -20,7 +20,7 @@ import locale
 from typing import IO, Any, Dict, List, Optional, Final, Union
 import os
 import importlib
-
+from io import StringIO
 class ValidatorResources:
     """General purpose class for storing FormSet objects based on their associated
     locale.
@@ -127,11 +127,14 @@ class ValidatorResources:
             digester = Digester(root_object=self)
 
             print(f"Current Working Directory: {os.getcwd()}")
-            try:
-                digester.load_rules(self.__VALIDATOR_RULES[0]) # local
-            except:
-                digester.load_rules(self.__VALIDATOR_RULES[1]) # package
-
+            # try:
+            #     digester.load_rules(self.__VALIDATOR_RULES[0]) # local
+            # except:
+            #     digester.load_rules(self.__VALIDATOR_RULES[1]) # package
+            with importlib.resources.files(__package__).joinpath("digester-rules.xml").open("r", encoding="utf-8") as f:
+                xml_content = f.read()
+                stream = StringIO(xml_content)
+                digester.load_rules(stream)
 
             for source in sources:
                 if isinstance(source, str):

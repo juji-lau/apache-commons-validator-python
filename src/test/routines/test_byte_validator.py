@@ -57,7 +57,7 @@ class TestByteValidator(TestAbstractNumberValidator):
     def test_format(self):
         validator = ByteValidator()
         expected = "123"
-        pattern = "%d"
+        pattern = '#,##0'
         
         assert validator.format(123) == expected
         assert validator.format(123, pattern=pattern) == expected

@@ -24,7 +24,8 @@ License (Taken from apache.commons.validator.routines.AbstractNumberValidator.ja
 """
 
 from typing import Final, override
-import locale as Locale
+from babel.numbers import format_decimal, format_currency, get_territory_currencies
+from babel.core import Locale
 import re
 from decimal import Decimal
 from ..routines.abstract_format_validator import AbstractFormatValidator
@@ -78,23 +79,23 @@ class AbstractNumberValidator(AbstractFormatValidator):
             The value formatted as a str.
         """
         try:
-            locale = "" if locale is None else locale
-            Locale.setlocale(Locale.LC_ALL, locale)
-        except Locale.Error:
+            locale = "en_US" if locale is None else locale
+            Locale.parse(locale)
+        except Exception:
             return None
         
         if GenericValidator.is_blank_or_null(pattern):
             if self.format_type == self.PERCENT_FORMAT:
-                pattern = "%.2f%" if self.allow_fractions else "%d%"
+                pattern = '#,##0.00%' if self.allow_fractions else '#,##0'
             elif self.format_type == self.STANDARD_FORMAT:
-                pattern = "%.1f" if self.allow_fractions else "%d" # TODO: considering changing pattern to allow more decimal places?
+                pattern = '#,##0.0' if self.allow_fractions else '#,##0' # TODO: considering changing pattern to allow more decimal places?
         
         if self.format_type == self.CURRENCY_FORMAT:
-            return Locale.currency(value, grouping=True)
+            return format_currency(value, get_territory_currencies(locale), locale=locale)
         elif self.format_type == self.PERCENT_FORMAT:
-            return Locale.format_string(pattern, value*100, grouping=True)
+            return format_decimal(value*100, format=pattern, locale=locale)
         else:   # should be STANDARD_FORMAT
-            return Locale.format_string(pattern, value, grouping=True)
+            return format_decimal(value, format=pattern, locale=locale)
         
 
     def _determine_scale(self, pattern: str, locale: str):
@@ -112,17 +113,9 @@ class AbstractNumberValidator(AbstractFormatValidator):
         if not self.allow_fractions:
             return 0
         
-        try:
-            locale = "" if locale is None else locale
-            Locale.setlocale(Locale.LC_ALL, locale)
-        except Locale.Error:
-            return None
-        
-        locale_info = Locale.localeconv()
-        
         if GenericValidator.is_blank_or_null(pattern):
             if self.format_type == self.CURRENCY_FORMAT:
-                return locale_info['frac_digits']
+                return 2
             elif self.format_type == self.STANDARD_FORMAT:
                 return -1
             else:
@@ -143,11 +136,6 @@ class AbstractNumberValidator(AbstractFormatValidator):
         Returns:
             The function to use for formatting.
         """
-        try:
-            locale = "" if locale is None else locale
-            Locale.setlocale(Locale.LC_NUMERIC, locale)
-        except Locale.Error:
-            return
         return Decimal
     
     @property
@@ -240,18 +228,18 @@ class AbstractNumberValidator(AbstractFormatValidator):
         if not bool(match):
             return None
         try:
-            locale = "" if locale is None else locale
-            Locale.setlocale(Locale.LC_NUMERIC, locale)
-        except Locale.Error:
+            locale = "en_US" if locale is None else locale
+            locale = Locale.parse(locale)
+        except Exception:
             return None
         
         value = re.sub(r"[A-Za-z]", '', value)
         
         # check that partial match is valid
-        locale_info = Locale.localeconv()
-        decimal_point = locale_info["decimal_point"]
+        decimal_point = locale.number_symbols.get('decimal')
+        thousands_sep = locale.number_symbols.get('group')
         if len(match.group(0).split(decimal_point)[0]) == len(value.split(decimal_point)[0]):
-            return value.replace(locale_info['thousands_sep'], '')
+            return value.replace(thousands_sep, '')
         return None
      
     def _parse(self, value: str, pattern: str, locale: str):
@@ -281,17 +269,18 @@ class AbstractNumberValidator(AbstractFormatValidator):
                 return None
 
         try:
-            locale = "" if locale is None else locale
-            Locale.setlocale(Locale.LC_NUMERIC, locale)
-        except Locale.Error:
+            locale = "en_US" if locale is None else locale
+            locale = Locale.parse(locale)
+        except Exception:
             return None
 
-        locale_info = Locale.localeconv()
-        decimal_point = locale_info["decimal_point"]
+        decimal_point = locale.number_symbols.get('decimal')
+        thousands_sep = locale.number_symbols.get('group')
+
         if self.strict and (not self.allow_fractions) and value.count(decimal_point) > 0:
             return None
-
-        value = value.replace(locale_info["thousands_sep"], '').replace(locale_info["decimal_point"], '.')
+        
+        value = value.replace(thousands_sep, '').replace(decimal_point, '.')
         formatter = self._get_format(pattern=pattern, locale=locale)
         return super()._parse(value, formatter)
     

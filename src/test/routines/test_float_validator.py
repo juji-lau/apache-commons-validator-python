@@ -160,9 +160,9 @@ class TestFloatValidator(TestAbstractNumberValidator):
         assert FloatValidator.get_instance().is_valid(us_val) is True
         assert FloatValidator.get_instance().validate(us_val) == expected
 
-        us_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='en_US.UTF-8')
-        de_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='de_DE.UTF-8')
-        fr_val = FloatValidator.get_instance().format(1234.567, pattern="%.3f", locale='fr_FR.UTF-8')
+        us_val = FloatValidator.get_instance().format(1234.567, pattern='#,##0.000', locale='en_US.UTF-8')
+        de_val = FloatValidator.get_instance().format(1234.567, pattern='#,##0.000', locale='de_DE.UTF-8')
+        fr_val = FloatValidator.get_instance().format(1234.567, pattern='#,##0.000', locale='fr_FR.UTF-8')
         validator = FloatValidator(strict=False)
 
         # Test with thousands separator

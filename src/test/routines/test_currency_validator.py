@@ -17,12 +17,13 @@
 
 import pytest
 import locale as Locale
+from babel.numbers import format_currency
 from src.apache_commons_validator_python.routines.currency_validator import CurrencyValidator
 from src.apache_commons_validator_python.routines.abstract_number_validator import AbstractNumberValidator
 
 original = Locale.setlocale(Locale.LC_ALL, None)
 
-class TestBigCurrencyValidator:
+class TestCurrencyValidator:
 
     Locale.setlocale(Locale.LC_MONETARY, "en_GB.UTF-8")
     locale_info = Locale.localeconv()
@@ -135,13 +136,12 @@ class TestBigCurrencyValidator:
         uk_plus_3decimal = Locale.currency(1234.567, symbol=True, grouping=True)
         uk_minus = Locale.currency(-1234.56, symbol=True, grouping=True)
 
-        Locale.setlocale(Locale.LC_MONETARY, "en_US.UTF-8")
-        us_plus = Locale.currency(1234.56, symbol=True, grouping=True)
-        us_plus_0decimal = Locale.currency(1234, symbol=True, grouping=True)
-        us_plus_1decimal = Locale.currency(1234.5, symbol=True, grouping=True)
-        us_plus_3decimal = Locale.currency(1234.567, symbol=True, grouping=True)
-        us_minus = Locale.currency(-1234.56, symbol=True, grouping=True)
-        
+        us_plus = format_currency(1234.56, "USD", locale="en_US")
+        us_plus_0decimal = format_currency(1234, "USD", locale="en_US")
+        us_plus_1decimal = format_currency(1234.5, "USD", locale="en_US")
+        us_plus_3decimal = format_currency(1234.567, "USD", locale="en_US")
+        us_minus = format_currency(-1234.56, "USD", locale="en_US")
+
         assert validator.validate(us_plus) == expected
         assert validator.validate(us_plus, locale="en_US.UTF-8") == expected
         assert validator.validate(us_minus, locale="en_US.UTF-8") == negative

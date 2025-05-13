@@ -31,13 +31,9 @@ from ..routines.inet_address_validator import InetAddressValidator
 class EmailValidator:
     """Perform email validations.
 
-    Based on a script by Sandeep V. Tamhankar (https://javascript.internet.com)
+    Based on a script by Sandeep V. Tamhankar (https://javascript.internet.com).
 
     This implementation is not guaranteed to catch all possible errors in an email address.
-
-    Attributes:
-        <li>serializable (bool): Indicates if the object is serializable.</li>
-        <li>cloneable (bool): Indicates if the object can be cloned.</li>
     """
 
     serializable = True
@@ -76,10 +72,13 @@ class EmailValidator:
         """Returns the Singleton instance of this validator, with local and/or TLD
         validation as required.
 
-        :param allow_local: Should local addresses be considered valid? Default is
-            False.
-        :param allow_tld: Should TLDs be allowed? Default is False.
-        :return: Singleton instance of this validator.
+        Args:
+            allow_local (bool): Should local addresses be considered valid?
+                Default is `False`.
+            allow_tld (bool): Should TLDs be allowed? Default is `False`.
+
+        Returns:
+            Singleton instance of this validator.
         """
         if not cls.__EMAIL_VALIDATOR:
             domain_validator_no_local = DomainValidator.get_instance(allow_local=False)
@@ -100,11 +99,12 @@ class EmailValidator:
     def __init__(self, allow_local: bool=False, allow_tld: bool=False, domain_validator: DomainValidator=None):
         """Constructor for creating instances with the specified DomainValidator.
 
-        :param allow_local: Should local addresses be considered valid? Default is
-            False.
-        :param allow_tld: Should TLDs be allowed? Default is False.
-        :param domain_validator: Allow override of the DomainValidator. The instance
-            must have the same allow_local setting.
+        Args:
+            allow_local (bool): Should local addresses be considered valid?
+                Default is `False`.
+            allow_tld (bool): Should TLDs be allowed? Default is `False`.
+            domain_validator (DomainValidator): Allow override of the DomainValidator.
+                The instance must have the same allow_local setting.
         """
         self.__allow_tld = allow_tld
 
@@ -119,9 +119,12 @@ class EmailValidator:
     def is_valid(self, email: str):
         """Checks if a field has a valid e-mail address.
 
-        :param email: The value validation is being performed on. A value of None is
-            considered invalid.
-        :return: True if the email address is valid.
+        Args:
+            email (str): The value validation is being performed on. A value of `None`
+                is considered invalid.
+
+        Returns:
+            `True` if the email address is valid.
         """
         if not email or email.endswith('.'): # check this first - it's cheap!
             return False
@@ -142,8 +145,11 @@ class EmailValidator:
     def _is_valid_domain(self, domain: str):
         """Returns true if the domain component of an email address is valid.
 
-        :param domain: The domain being validated, may be in IDN format.
-        :return: True if the email address's domain is valid.
+        Args:
+            domain (str): The domain being validated, may be in IDN format.
+
+        Returns:
+            `True` if the email address's domain is valid.
         """
         # see if domain is an IP address in brackets
         ip_domain_match = self.__IP_DOMAIN_PATTERN.fullmatch(domain)
@@ -160,8 +166,11 @@ class EmailValidator:
     def _is_valid_user(self, user: str):
         """Returns true if the user component of an email address is valid.
 
-        :param user: The user being validated.
-        :return: True if the username is valid.
+        Args:
+            user (str): The user being validated.
+
+        Returns:
+            `True` if the username is valid.
         """
         if not user or len(user) > self.__MAX_USERNAME_LEN:
             return False

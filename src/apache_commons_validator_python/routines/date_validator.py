@@ -4,7 +4,7 @@ Module Name: date_validator.py
 Description: Translates apache.commons.validator.routines.DateValidator.java
 Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/DateValidator.java
 
-Author: Alicia Chu
+Authors: Alicia Chu, Juji Lau
 
 License (Taken from apache.commons.validator.routines.DateValidator.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
@@ -20,10 +20,7 @@ License (Taken from apache.commons.validator.routines.DateValidator.java):
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
-    limitations under the License.
-
-Changes:
-  
+    limitations under the License.  
 """
 from __future__ import annotations
 from datetime import datetime, date, time, tzinfo
@@ -36,46 +33,23 @@ class DateValidator(AbstractCalendarValidator):
     """
     Date validation and conversion utilities.
 
-    This module provides methods to validate and convert string representations
-    of dates into timezone naive `datetime.datetime` objects using various parsing formats and locales.
-
-    Supported conversions:
-    - Default format for the default locale
-    - Specified pattern with the default locale
-    - Default format for a specified locale
-    - Specified pattern with a specified locale
-
-    All conversion methods allow optional specification of time zones.
-    If this is not provided, the system default will be used.
-
-    Validation methods:
-    - `is_valid()`: Checks if a string is a valid date.
-    - `validate()`: Returns a converted `date` object if valid.
-
-    Date comparison methods:
-    - `compare_dates(d1, d2)`: Compares day, month, year of two dates.
-    - `compare_weeks(d1, d2)`: Compares week and year of two dates.
-    - `compare_months(d1, d2)`: Compares month and year of two dates.
-    - `compare_quarters(d1, d2)`: Compares quarter and year of two dates.
-    - `compare_years(d1, d2)`: Compares years of two dates.
-
-    Formatting methods mirror parsing options and support:
-    - Specified pattern
-    - Format for a specified locale
-    - Format for the default locale
-
+    This class offers methods to validate and convert string representations
+    of dates into `datetime` objects optionally using various parsing formats, 
+    timezones, and locales.
+   
     Attributes:
         serializable (bool): Indicates if the object is serializable.
         cloneable (bool): Indicates if the object can be cloned.
         VALIDATOR (DateValidator): The singleton instance of this class
     """
-    serializable = True   # class extends AbstracCalendarvalidator which is serializable
+    serializable = True    # class extends AbstracCalendarvalidator which is serializable
     cloneable = False      # class extends AbstracCalendarvalidator which is not cloneable
+    __VALIDATOR: Optional[DateValidator] = None  # Singleton instance of this DateValidator
 
-    __VALIDATOR: Optional[DateValidator] = None  # Singleton instance
 
     def __init__(self, *, strict: bool = True, date_style:int=3) -> None:
-        """Constructs a DateValidator instance with configurable parsing strictness and
+        """
+        Constructs a DateValidator instance with configurable parsing strictness and
         date style.
 
         Args:
@@ -88,10 +62,9 @@ class DateValidator(AbstractCalendarValidator):
     def get_instance(cls) -> DateValidator:
         """
         Returns the singleton instance of DateValidator.
-        Ensures only one instance is created and reused globally.
 
         Returns:
-            DateValidator: A singleton instance of the class.
+            DateValidator: The single global instance of the class.
         """
         if cls.__VALIDATOR is None:
             cls.__VALIDATOR = cls()
@@ -106,10 +79,7 @@ class DateValidator(AbstractCalendarValidator):
             time_zone (Optional[tzinfo]): Optional time zone to align both values before comparison.
 
         Returns:
-            int:
-                0 if the dates are equal,
-               -1 if the first date is earlier,
-               +1 if the first date is later.
+            int: 0 if the dates are equal, -1 if `value` is earlier, +1 if later.
         """
         calendar_value: Final[datetime] = self.__get_calendar(value, time_zone)
         calendar_compare: Final[datetime] = self.__get_calendar(compare, time_zone)
@@ -124,10 +94,7 @@ class DateValidator(AbstractCalendarValidator):
             time_zone (Optional[tzinfo]): Optional time zone to align both values before comparison.
 
         Returns:
-            int:
-                0 if the month/year are equal,
-               -1 if the first is earlier,
-               +1 if the first is later.
+            int: 0 if the month/year are equal, -1 if `value` is earlier, +1 if later.
         """
         calendar_value: Final[datetime] = self.__get_calendar(value, time_zone)
         calendar_compare: Final[datetime] = self.__get_calendar(compare, time_zone)
@@ -148,17 +115,12 @@ class DateValidator(AbstractCalendarValidator):
             time_zone (Optional[tzinfo]): Optional time zone to align both values before comparison.
             month_of_first_quarter (datetime): Month the first quarter starts (1 = January, 3 = March, etc.).
 
+        Notes:
+            This Python implementation uses `month_of_first_quarter=1` by default,
+            replicating the overloaded Java method:
+                compareQuarters(value, compare, timeZone)
         Returns:
-            int:
-                0 if quarters are equal,
-               -1 if the first is earlier,
-               +1 if the first is later.
-
-        Changes from Java:
-            month_of_first_quarter defaults to 1 to replace
-            "public int compareQuarters(final Date value, final Date compare, final TimeZone timeZone) {
-                return compareQuarters(value, compare, timeZone, 1);
-            }"
+            int: 0 if quarters are equal, -1 if `value` is earlier, +1 if later.
         """
         calendar_value: datetime = self.__get_calendar(value, time_zone)
         calendar_compare: datetime = self.__get_calendar(compare, time_zone)
@@ -178,10 +140,7 @@ class DateValidator(AbstractCalendarValidator):
             time_zone (Optional[tzinfo]): Optional time zone to align both values before comparison.
 
         Returns:
-            int:
-                0 if the ISO week/year are equal,
-               -1 if the first is earlier,
-               +1 if the first is later.
+            int: 0 if ISO week/year are equal, -1 if `value` is earlier, +1 if later.
         """
         calendar_value: Final[datetime] = self.__get_calendar(value, time_zone)
         calendar_compare: Final[datetime] = self.__get_calendar(compare, time_zone)
@@ -208,10 +167,7 @@ class DateValidator(AbstractCalendarValidator):
             time_zone (Optional[tzinfo]): Optional time zone to align both values before comparison.
 
         Returns:
-            int:
-                0 if years are equal,
-               -1 if the first year is earlier,
-               +1 if the first year is later.
+            int: 0 if years are equal, -1 if `value` is earlier, +1 if later.
         """
         calendar_value: Final[datetime] = self.__get_calendar(value, time_zone)
         calendar_compare: Final[datetime] = self.__get_calendar(compare, time_zone)
@@ -224,15 +180,14 @@ class DateValidator(AbstractCalendarValidator):
         time_zone: Optional[tzinfo]
     ) -> datetime:
         """
-        Returns a datetime object adjusted to the specified time zone, 
-        or the original if no time zone is provided.
+        Returns a datetime object adjusted to the specified time zone, if provided.
 
         Args:
             value (datetime): The input datetime.
             time_zone (Optional[tzinfo]): The time zone to convert to. If None, the original is returned.
 
         Returns:
-            datetime: A timezone-adjusted datetime (or original).
+            datetime: Timezone-adjusted datetime, or original if `time_zone` is None.
         """
         if time_zone is not None:
             # If the datetime is naive (no tzinfo), attach the timezone directly
@@ -251,11 +206,15 @@ class DateValidator(AbstractCalendarValidator):
         time set to 00:00:00.
 
         Args:
-            value (object): The parsed value from the formatter (typically a `date`).
-            formatter (Callable): The formatter used during parsing (not used here, but included for consistency).
+            value (object): The parsed value from the formatter (typically a `date` or `datetime`).
+            formatter (Callable): Formatter used during parsing (unused but kept for compatibility with Java).
 
         Returns:
             datetime: The normalized datetime object.
+
+        Raises:
+            TypeError: If `value` is not a `date` or `datetime`.
+
         """
         if isinstance(value, datetime):
             return value
@@ -272,16 +231,16 @@ class DateValidator(AbstractCalendarValidator):
         locale: Optional[str] = None,
         time_zone: Optional[tzinfo] = None
     ) -> Optional[datetime]:
-        """Validates and converts a date string into a datetime object using the
-        provided pattern, locale, and time zone.
+        """
+        Validate and convert a date string to a datetime object.
 
         Args:
-            value (str): The input string to validate.
-            pattern (Optional[str]): The date pattern (e.g., 'yyyy-MM-dd'). If None, a default pattern is used.
-            locale (Optional[str]): The locale to apply (e.g., 'en_US'). If None, the system default is used.
-            time_zone (Optional[tzinfo]): The timezone to apply to the resulting datetime. If None, no change is made.
+            value (str): Input date string.
+            pattern (Optional[str]): Date pattern (e.g., '%Y-%m-%d'). Uses default if None.
+            locale (Optional[str]): Locale to use for parsing.
+            time_zone (Optional[tzinfo]): Time zone to apply to resulting datetime.
 
         Returns:
-            Optional[datetime]: A valid datetime object if parsing succeeds, or None if invalid.
+            Optional[datetime]: Parsed datetime if valid; otherwise, None.
         """
         return self._parse(value, pattern, locale, time_zone)

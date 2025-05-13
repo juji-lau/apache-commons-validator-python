@@ -1,11 +1,15 @@
 """ 
 Module Name: checkdigit_exception.py
-Description: Translates apache.commons.validator.routines.checkdigit.CheckDigitException.java
-Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/checkdigit/CheckDigitException.java    
-Parapphrased from apache.commons.validator.routines.checkdigit.CheckDigitException.java:
-    Check Digit calculation/validation error.
+
+Description: 
+    This module provides a Python exception class translating the behavior of
+    Apache Commons Validator’s `CheckDigitException.java` for errors during check
+    digit calculation or validation. It captures an optional underlying cause.
+    Original link at: 
+        https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/checkdigit/CheckDigitException.java    
          
 Author: Juji Lau
+
 License (Taken from apache.commons.validator.routines.checkdigit.CheckDigitException.java):
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements. See the NOTICE file distributed with
@@ -23,16 +27,14 @@ License (Taken from apache.commons.validator.routines.checkdigit.CheckDigitExcep
     limitations under the License.
 
 Changes:
-    Added self.__cause__ to allow propogation of Python's base Exceptions.
-
+    - Added self.__cause__ to allow propogation of Python's base Exceptions.
 """
 
 class CheckDigitException(Exception):
     """Exception raised for errors in check digit calculation or validation.
 
     Attributes:
-        message (str): Explanation of the error.
-        cause (Exception, optional): Underlying exception that caused this error.
+        value (str): The error message explaining the error.
         serializable (bool): Indicates if the object is serializable.
         clone (bool): Indicates if the object can be cloned.
     """
@@ -42,10 +44,11 @@ class CheckDigitException(Exception):
     clone = False
 
     def __init__(self, msg:str = None, cause:Exception = None):
-        """Initializes CheckDigitException.
+        """
+        Initializes CheckDigitException.
 
         Args:
-            message (str, optional): The error message.
+            msg (str, optional): The error message.
             cause (Exception, optional): The underlying cause of the error.
         """
         super().__init__(msg)

@@ -15,6 +15,7 @@
 node_modules/
 
 # Python bytecode files
+/main
 __pycache__/
 *.pyc
 *.pyo

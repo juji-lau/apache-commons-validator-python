@@ -65,9 +65,10 @@ class ValidatorResources:
     └── ... (multiple <formset> allowed, one per locale if needed)
     """
 
-    __VALIDATOR_RULES: Final[str] = (
-        "src/apache_commons_validator_python/resources/digester-rules.xml"  #: Path to the XML rules file used by the digester.
-    )
+    __VALIDATOR_RULES: Final[List[str]] = [
+        "src/apache_commons_validator_python/resources/digester-rules.xml",  #: Path to the XML rules file used by the digester. (local)
+        "resources/digester-rules.xml" #: path to the XML file by the digester. (package)
+    ]
 
     __REGISTRATIONS: Final[Dict[str, str]] = {
         "-//Apache Software Foundation//DTD Commons Validator Rules Configuration 1.0//EN": "/org/apache/commons/validator/resources/validator_1_0.dtd",
@@ -121,7 +122,11 @@ class ValidatorResources:
             # from ..util.digester import Digester
             from .util.digester import Digester
             digester = Digester(root_object=self)
-            digester.load_rules(self.__VALIDATOR_RULES)
+
+            try:
+                digester.load_rules(self.__VALIDATOR_RULES[0]) # local
+            except:
+                digester.load_rules(self.__VALIDATOR_RULES[1]) # package
 
             for source in sources:
                 if isinstance(source, str):

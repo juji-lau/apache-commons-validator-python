@@ -1,9 +1,11 @@
 """ 
 Module Name: abstract_calendar_validator.py
 
-Description: Translates apache.commons.validator.routines.AbstractCalendarValidator.java
-Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/AbstractCalendarValidator.java
- 
+Description:
+    This module provides a Python translation of the Apache Commons Validator
+    AbstractCalendarValidator (original Java source at:
+        https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/AbstractCalendarValidator.java).
+
 Author: Juji Lau
 
 License (Taken from apache.commons.validator.routines.AbstractCalendarValidator.java):
@@ -22,21 +24,14 @@ License (Taken from apache.commons.validator.routines.AbstractCalendarValidator.
     See the License for the specific language governing permissions and
     limitations under the License.
 Changes:
-    - Removed Java's Calendar fields that don't have an equivalent datetime field.
-    
-    Modified ``AbstractCalendarValidator.compare(Calendar value, Calendar compare, int field)`` have users pass in a string 
-    instead of an int. Python's datetime validator does not map its properties to integers, hence using integers will be confusing
-    to Python users.
-
-    Implemented ``parse()`` in the concrete subclasses instead.
-
+    - Removed Java's Calendar fields that don't have an equivalent datetime field, and added the closest equivalent Python datetime field 
+        (e.g. `Calendar.MILLISECOND` -> datetime.millisecond`)
+    - Modified compare() signature to accept string field names instead of integers for consistency with Python's datetime module.
+    - Seperated `parse()` into helper functions to handle `date`, `time`, and `datetime` strings independently.
+    - Added helper function, `get_format_no_pattern()` to avoid overloading the `_get_format()` when no pattern is passed in (simpler logic).
 """
 from babel import Locale
-from babel.dates import (
-    format_datetime, 
-    format_time, 
-    format_date
-)
+from babel.dates import format_datetime, format_time, format_date
 from datetime import datetime, timezone, tzinfo, date
 from dateparser import parse
 from typing import Union, Optional, Callable
@@ -62,36 +57,37 @@ from src.apache_commons_validator_python.routines.abstract_format_validator impo
 
 
 class AbstractCalendarValidator(AbstractFormatValidator):
-    """Abstract class for Date/Time/Calendar validation.
+    """
+    Abstract base class for calendar-based validators using format parsing.
 
-    This is a base class for building Date/Time Validators using format parsing.
+    This class provides shared mechanisms for date, time, and datetime parsing,
+    validation, and formatting, using Babel, DateParser, and datetime.
 
     Attributes:
         date_style (int): The date style to use for Locale validation.
         time_style (int): The time style to use for Locale validation.
-        int2str_style (dict[int, str]): Maps the integer date and time style to a string argument for ``babel.format()``.
         serializable (bool): Indicates if the object is serializable.
         cloneable (bool): Indicates if the object can be cloned.
     """
+    # Maps the integer date and time style to a string argument for `babel.format()`.
     __int2str_style = {
         0:'full',
         1:'long',
         2:'medium',
         3:'short'
     }
-
     # Attributes to manage serialization and cloning capabilities
     serializable = True    # class is serializable
     cloneable = False      # class is not cloneable
 
     def __init__(self, strict:bool, date_style:int, time_style:int):
-        """Constructs an instance with the specified *strict*, *time*, and *date* style
-        parameters.
+        """
+        Initialize the calendar validator.
 
         Args:
-            strict (bool): ``True`` if strict ``Format`` parsing should be used.
-            date_style (int): The date style to use for Locale validation.
-            time_style (int): The time style to use for Locale validation.
+            strict (bool): Whether to enforce strict parsing rules.
+            date_style (int): Date style code (0-3) for locale formatting.
+            time_style (int): Time style code (0-3) for locale formatting.
         """
         super().__init__(strict)
         self.__date_style = date_style
@@ -99,32 +95,32 @@ class AbstractCalendarValidator(AbstractFormatValidator):
     
 
     def __calculate_compare_result(self, value:datetime, compare:datetime, field:str) -> int:
-        """Compares the field from two datetimes indicating whether the field for the
-        first datetime is equal to, less than or greater than the field from the second
-        datetime.
+        """
+        Compare a specific datetime attribute between two datetimes.
 
         Args:
-            value (datetime): The datetime value.
-            compare (datetime): The datetime to check the value against.
-            field (int): The attribute to compare for the datetimes.
+            value (datetime): First datetime.
+            compare (datetime): Second datetime.
+            field (str): Name of the attribute to compare (e.g., "year", "month").
+                Space padding and case-insensitve.
 
         Returns:
-            0 if the field for both datetimes are equal.
-            -1 if the field for the first datetime (value) it is less than the field for the second (compare).
-            1 if the field for the first datetime (value) is greater than the seconds.
+            int: 0 if equal, -1 if `value.<field>` < `compare.<field>`, 1 otherwise.
+
         """
         return integer_compare(getattr(value, field), getattr(compare, field))
 
 
     def __calculate_quarter(self, calendar:datetime, month_of_first_quarter:int) ->int:
-        """Calculate the quarter for the specified datetime.
+        """
+        Determine the quarter of the year for a datetime.
 
         Args:
-            datetime (datetime): The datetime value
-            month_of_first_quarter: (int): The month that the first quarter starts.
+            calendar (datetime): Input datetime.
+            month_of_first_quarter (int): Month where Q1 begins (1=Jan).
 
         Returns:
-            The calculated quarter.
+            int: Calculated quarter; an integer code combining year and quarter (year*10 + quarter).
         """
         year = calendar.year
         month = calendar.month
@@ -143,26 +139,21 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
 
     def _compare(self, value:datetime, compare:datetime, field:str) -> int:
-        """Compares a datetime value to another, indicating whether it is equal, less
-        than or more than at a specified level.
+        """
+        Compare two datetimes at the specified field level, cascading to smaller units if equal.
+
+        Note:
+            For field="week", performs ISO week/year comparison. Falls back to successive
+            comparisons of year, month, day, and time attributes if needed.
 
         Args:
-            value (datetime): The datetime value.
-            compare (datetime): The datetime to check the value against.
-            field (int): The name of the datetime attribute to compare.
-                For example: ``field = "year"`` will compare ``value.year`` and ``compare.year``.
-                Case and space insensitive: "YEAR", "Year", " Year ", etc. will all work.
+            value (datetime): First datetime.
+            compare (datetime): Second datetime.
+            field (str): Attribute name to compare (field = "week" for ISO week comparisons).
+                Space padding and case-insensitve.
 
         Returns:
-            0 if the first value is equal to the second.
-            -1 if the first value is less than the second.
-            1 if the first value is greater than the second.
-
-        **Changes from Java**:
-            In Java's ``AbstractCalendarValidator.compare()``, the ``field`` parameter is an integer representing
-            the enum mapping to Java's Calendar's fields.  Python's datetime class properties are not mapped to an enum, so the translation
-            in this file has users pass in the name of the datetime property they want to compare.  This is more consistent
-            with Python's datetime module, and will prevent confusion.
+            int: Comparison result: 0 if equal, -1 if `value` < `compare`, 1 if `value` > `compare`.
         """ 
         # process field
         field = to_lower(field)
@@ -191,18 +182,16 @@ class AbstractCalendarValidator(AbstractFormatValidator):
     
 
     def _compare_quarters(self, value:datetime, compare:datetime, month_of_first_quarter:int) ->int:
-        """Compares a datetime's quarter value to another, indicating whether it is
-        equal, less than or more than the specified quarter.
+        """
+        Compare two datetimes by quarter of the year.
 
         Args:
-            value (datetime): The datetime value.
-            compare (datetime): The `datetime` to check the value against.
-            month_of_first_quarter (int): The  month that the first quarter starts.
+            value (datetime): First datetime.
+            compare (datetime): Second datetime.
+            month_of_first_quarter (int): Month where Q1 begins.
 
         Returns:
-            0 if the first quarter is equal to the second.
-            -1 if the first quarter is less than the second.
-            1 if the first quarter is greater than the second.
+            int: 0 if equal quarter, -1 if less, 1 if greater.
         """
         value_quarter = self.__calculate_quarter(value, month_of_first_quarter)
         compare_quarter = self.__calculate_quarter(compare, month_of_first_quarter)
@@ -211,32 +200,20 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
 
     def _compare_time(self, value:datetime, compare:datetime, field:int) -> int:
-        """Compares a datetime time value to another, indicating whether it is equal,
-        less than or more than at a specified level.
-
-        **Note**:
-        In Java's ``AbstractdatetimeValidator.compare(), the ``field`` parameter is an integer representing
-        the enum mapping to Java's Calendar's fields.  Python's datetime class properties are not mapped to an enum, so the translation
-        in this file has users pass in the name of the datetime property they want to compare.  This is more consistent
-        with Python's datetime module, and will prevent confusion.
-
-        Removed comparing ``Calendar.MICROSECOND``
-        Added comparing ``datetime.millisecond``
-
+        """
+        Compare two datetimes at the time component level.
+            
         Args:
-            value (datetime): The datetime value.
-            compare (datetime): The `datetime` to check the value against.
-            field (int): The name of the datetime attribute to compare.
-                For example, ``field = "minute"`` will compare ``value.minute`` and ``compare.minute``.
-                Case and space insensitive; "MINUTE", "minute", " Minute ", etc. will all work.
+            value (datetime): First datetime.
+            compare (datetime): Second datetime.
+            field (str): Time attribute name (e.g. "hour", "minute", "second", "microsecond").  
+                Space padding and case insensitve.
 
         Returns:
-            0 if the first value is equal to the second.
-            -1 if the first value is less than the second.
-            1 if the first value is greater than the second.
+            int: 0 if equal, -1 if `value.<field>` < `compare.<field>`, 1 otherwise.
 
         Raises:
-            ``ValueError`` if the field is invalid
+            ValueError: If `field` is not a valid time attribute.
         """
         # process field
         field = to_lower(field)
@@ -264,14 +241,15 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
 
     def _format(self, *, value:object, formatter:Callable) -> str:
-        """Format a ``date`` value as a string with the sepcified ``formatter``.
+        """
+        Format a date or datetime object using the given formatter.
 
         Args:
-            value (Any): The value to be formatted.
-            formatter (Callable): The format string to use.
+            value (object): The input datetime or date.
+            formatter (Callable): Function that formats a datetime into string.
 
         Returns:
-            The formatted date as a string, or ``None`` if the value is ``None``.
+            str: Formatted string, or None if `value` is None.
         """
         if value is None:
             return None
@@ -282,18 +260,19 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
 
     def format(self, *, value:object=None, pattern:str=None, locale:Union[str, Locale]=None, time_zone:timezone=None) -> str:
-        """Format an object into a string using the specified pattern and/or locale.
+        """
+        Format a date/time object to string with optional pattern and locale.
 
         Args:
-            value (object): The value validation is being performed on.
-            pattern (str): The pattern used to format the value.
-            locale (str): A locale string (e.g., "en_US") used for formatting.
-                If locale is ``None`` or empty, the system default is used.
-            time_zone (timezone): The timezone used to format the date,
-                If ``None``, the system default will be used unless value is a `datetime`.
+            value (object): The date or datetime to format.
+            pattern (str): LDML pattern string. Uses locale defaults if None.
+            locale (str): Locale code (e.g., "en_US"). Uses system default if None.
+            time_zone (timezone): Time zone for output. 
+                Uses value.tzinfo if timezone is None. 
+                Uses system default if both are None.
 
         Returns:
-            The value formatted as a String.
+            str: Formatted date/time string, or None if `value` is None.
         """
         if value is None:
             return None
@@ -321,35 +300,25 @@ class AbstractCalendarValidator(AbstractFormatValidator):
    
 
     def _get_format(self, pattern:str=None, locale:str=None) -> Callable:
-        """Returns a function to format the ``datetime`` or ``time`` for the specified
-        *pattern* and/or `locale`.
+        """
+        Retrieve a formatting function for datetime based on pattern and/or locale.
 
         Args:
-            pattern (str): The pattern used to validate the value against.
-                If ``None``, we use the default for the `Locale`.
-            locale (str): The locale to use for the currency format. System default if None.
+            pattern (str): LDML format pattern. If None, use the default style for `locale`.
+            locale (str): The locale string to use for formatting. Defaults to system locale.
 
         Returns:
-            The function to format the object based on the pattern, locale, or the system default.
+            Callable: Function that formats a datetime.
         """
         if locale is None:
             locale = get_default_locale()
 
        
         def get_format_no_pattern(locale:Union[str, Locale]) -> Callable:
-            """Returns a function to format the ``datetime`` or ``time`` for the
-            specified locale. Called when pattern is blank or None.
-
-            Args:
-                locale (Union[str, Locale]): The locale to use.
-
-            Returns:
-                The function to format the object.
-
-            Changes from Java:
-                In the Java implementation, this was an overloaded function of ``protected Format getFormat()`` which only took a Locale.
-                Instead of overloading the Python ``_get_format()``, I used a helper function to keep the logic closer to the
-                Java implementation, hence easier to debug.
+            """
+            Called only when pattern is blank or None.
+            Returns: 
+                Callable: Function to format the datetime based on specified locale. 
             """
             # Get formatting styles for date and time
             date_format_style = self.__int2str_style.get(self.__date_style, 'short')
@@ -376,36 +345,38 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
 
     def is_valid(self, *, value:str, pattern:Optional[str]=None, locale:Optional[str]=None) -> bool:
-        """Validate using the specified locale.
+        """
+        Validate a date, time, or datetime string using the specified pattern and locale.
 
         Args:
-            value (str): The value validation is being performed on.
-            pattern (str): The pattern used to format the value.
-            locale (str): The locale to use for the Format, defaults to the system if None.
-
+            value (str): The input string to validate.
+            pattern (str): LDML pattern string. Uses locale defaults if None.
+            locale (str): Locale code (e.g., "en_US"). Uses system default if None.
+            
         Returns:
-            ``True`` if the value is valid; ``False`` otherwise.
+            bool: True if parsable, False otherwise.
         """
         return (self._parse(value, pattern, locale, time_zone=None) is not None)
  
 
     def _parse(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None) -> Optional[object]:
-        """Checks if the value is valid against a specified pattern.
+        """
+        Checks if the value is valid against a specified pattern. 
+        If valid, parses a string into a datetime object.
 
+        Note:
+            Java uses the ``protected getFormat()`` to create an object, because
+            `SimpleDateFormat.parse()` accepts a ``DateFormat``.
+            Here, `DateParser.parse()` is used, which does NOT accept a callable or a formatter.
+        
         Args:
             value (str): The value string validation is being performed on
-            pattern (Optional[str]): The pattern (e.g., 'yyyy-MM-dd') used to validate the value against.
-                If ``None``, the default pattern for the ``locale`` is used.
-            locale (Optional[str]): The locale to use for the datetime format (e.g., 'en_US'). System default if ``None``.
-            time_zone (Optional[tzinfo]): The timezone used to parse the datetime. System default if ``None``.
+            pattern (str): LDML pattern string. Uses locale defaults if None.
+            locale (str): Locale code (e.g., "en_US"). Uses system default if None.
+            time_zone (tzinfo): Time zone for parsing. Defaults to system zone if None.
 
         Returns:
-            Optional[datetime]: The parsed value if valid, or ``None`` if parsing fails.
-
-        Changes from Java:
-            Java uses the ``protected getFormat()`` defined in the file to create an object, because
-            there is a ``parse()`` function that accepts a ``DateFormat``.
-            For Python, we will use DateParser.parse(), which does NOT accept a callable or a formatter.
+            object: Parsed value or None if parsing fails.
         """
         if GenericValidator.is_blank_or_null(value):
             return None
@@ -435,10 +406,11 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
     def __parse_datetime(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
         """
-        A use case was not implemented in Java's Validator, so this function is untested.
-
-        Args:
-            TODO:
+        Checks if the value is valid against a specified pattern. 
+        If valid, parses a datetime string into a datetime object.
+        
+        Note:
+            A use case was not implemented in Java's Validator, so this function is untested.
         """
         if GenericValidator.is_blank_or_null(pattern):
             pattern = ""
@@ -449,25 +421,9 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
       
     def __parse_date(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
-        # TODO: Write a more descriptive documentation
         """
-        Returns the ``datetime`` object parsed from the value string based on the passed in locale and timezone.
-        Uses system default for the locale and timezone if any of them are ``None``.
-
-        Args:
-            value (str): TODO
-            pattern (str): TODO
-            locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
-            time_zone (tzinfo): The timezone to parse the object to.
-            settings (dict): TODO
-
-        Returns:
-            The parsed ``datetime`` object.
-
-        Changes from Java:
-            This function does not exist in Java. It was created to mimic the logic in our
-            ``_get_format()``, since we need the logic but cannot use the function.
-            (See documentation for ``_parse()`` for a more detailed explanation.)
+        Checks if the value is valid against a specified pattern. 
+        If valid, parses a date or datetime string into a datetime object.
         """
         if GenericValidator.is_blank_or_null(pattern) or locale is None:
             try:
@@ -498,25 +454,8 @@ class AbstractCalendarValidator(AbstractFormatValidator):
     def __parse_time(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
         # TODO: Improve documentation
         """
-        Returns the ``datetime`` object parsed from the value stirng based on the passed in locale and timezone.
-        Sets the year, month, day to the epoch (Jan 1, 1970), so the ``datetime`` represents time.
-        Uses system default for the locale and timezone if any of them are ``None``.
-
-        Args:
-            value (str): TODO
-            pattern (str): TODO
-            locale (Union[str, Locale]): The locale to use when parsing; System default if ``None``.
-            time_zone (tzinfo): The timezone to parse the object to.
-            settings (dict): TODO
-
-        Returns: 
-            The parsed ``datetime`` object that represents the timestring value by seting the 
-            datetime fields: (year, month, day) to the epoch: (1970, Jan, 1).
-        
-        Changes from Java:
-            This function does not exist in Java. It was created to mimic the logic in our
-            ``_get_format()``, since we need the logic but cannot use the function.
-            (See documentation for ``_parse()`` for a more detailed explanation.)
+        Checks if the value is valid against a specified pattern. 
+        If valid, parses a time string into a datetime object, with the date fields set to the epoch: (1970, Jan, 1).
         """
         try:
             # No pattern providee; Use locale only (which may or may not be the default).

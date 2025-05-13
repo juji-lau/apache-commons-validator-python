@@ -1,5 +1,37 @@
 """
-TODO: insert module description
+Module Name: datetime_helpers.py
+
+Description:
+    Helper functions and constants for date/time parsing and validation.
+
+This module provides:
+- Mappings from Java date/time locales and patterns to Python equivalents.
+- Utilities for obtaining system default locale and timezone information.
+- Conversion between Java SimpleDateFormat patterns (LDML) and Python strptime formats.
+- Wrappers around `dateparser` for flexible and strict parsing.
+- Comparison of timezone behaviors analogous to Java's `TimeZone.hasSameRules()`.
+
+Classes:
+    JavaToPyLocale
+        Constants for common Java locale identifiers.
+
+Functions:
+    obj_to_str
+    get_default_locale
+    get_default_tzinfo
+    get_tzname
+    date_get_time
+    timezone_gmt
+    timezone_has_same_rules
+    ldml_to_strptime_format
+    fuzzy_parse
+    ldml2strptime
+    ldml2strpdate
+    parse_pattern_strict
+    parse_pattern_flexible
+
+Author:
+    Juji Lau
 """
 from babel.dates import (
     parse_pattern, 
@@ -17,13 +49,21 @@ from zoneinfo import ZoneInfo
 
 # ----------------------------- Constants -------------------------------:
 class JavaToPyLocale:
-    """Wrapper class to convert Java's locales to a Python locale string."""
+    """
+    Wrapper constants to convert Java locale identifiers to Python locale strings.
+
+    Attributes:
+        US (str): English (United States).
+        GERMAN (str): German (general).
+        GERMANY (str): German (Germany).
+        UK (str): English (United Kingdom).
+    """
     US:str = "en_US"
     GERMAN:str = "de"
     GERMANY:str = "de_DE"
     UK:str = "en_GB"
 
-# Parses a locale string to a form that `dateparser.parse()` accepts.
+# Mapping from Java locale strings to locale strings accepted by dateparser.parse()
 locale_to_dateparser_locale = {
     'en_US' : 'en-001',
     'en-GB' : 'en-150'
@@ -34,14 +74,15 @@ locale_to_dateparser_locale = {
 
 # --------------- Utility Functions ---------------:
 def obj_to_str(expected_obj:object, tested_obj:object=None) -> str:
-    """Prints the object as a string for debugging purposes on the test cases.
+    """
+    Generate a comparison string for expected and tested objects (for debugging).
 
     Args:
-        expected_obj (Union[datetime, object]): The expected object in the test case.
-        tested_obj (Union[datetime, object]): The object being tested in the test case.
+        expected_obj (object): The expected test result (datetime or other).
+        tested_obj (object, optional): The actual test result to compare. Defaults to None.
 
     Returns:
-        A string comparing the expected_obj and tested_obj and their fields if applicable.
+        str: Detailed comparison of expected vs. actual, including time since the unix epoch and tzinfo for datetimes.
     """
     if isinstance(expected_obj, datetime):
         str_expect = f"Expected: {expected_obj} and time {date_get_time(expected_obj)} and tzinfo: {expected_obj.tzinfo}"
@@ -59,14 +100,24 @@ def obj_to_str(expected_obj:object, tested_obj:object=None) -> str:
 
 
 def get_default_locale() -> str:
-    """Gets the system's default locale (`en_US`)."""
+    """
+    Retrieve the system's default locale code.
+
+    Returns:
+        str: Locale code (e.g., 'en_US').
+    """
     loc = locale.getlocale()
     return loc[0]
 
 
 
 def get_default_tzinfo() -> tzinfo:
-    """Gets the system's default timezone."""
+    """
+    Retrieve the system's default timezone as a tzinfo object.
+
+    Returns:
+        tzinfo: System local timezone.
+    """
     zone_name = get_localzone_name()
     tz_local = ZoneInfo(zone_name)
     return tz_local
@@ -74,49 +125,48 @@ def get_default_tzinfo() -> tzinfo:
 
 def get_tzname(timezone:tzinfo) -> str:
     """
-    Returns the name of the timezone (same as ``datetime.tzname``).
-    `tzinfo` does not have a name field, so this function is nessescary to get the name of a lone tzinfo objct.
+    Get the name of a tzinfo object.
 
+    Note:
+        Functionally the same as ``datetime.tzname``, except `tzinfo` does not have a ``name`` field.
+   
     Args:
-        timezone (tzinfo): The tzinfo object that we want the name of
+        timezone (tzinfo): tzinfo instance to get the name of.
 
     Returns:
-        The name of timezone as a string.  
+        str: tzinfo object's name (e.g., 'PST').
     """
     dt:datetime = datetime.now().astimezone(tz=timezone)
     return dt.tzname()
 
   
 def date_get_time(dt:datetime) -> float:
-    """Python wrapper for Java's ``Date.getTime()`` function. Returns the number of
-    milliseconds since January 1, 1970, 00:00:00 GMT represented by this ``datetime``
-    object.
-
-    **Note**
-    Java's validator calculates the time since the epoch using a ``Date`` object.
-    However, Java's ``Date`` is in the processes of deprecating all references to time fields (e.g. hour, minute, second, etc.).
-    In this project, even though we substitute python's ``date`` for Java's ``Date``,
-    we will use Python's ``date`` does not store time fields, hence we will be using a ``datetime`` for this.
-
+    """
+    Return milliseconds since Unix epoch (January 1, 1970, 00:00:00 GMT) for a datetime.
+    
+    Python wrapper for Java's ``Date.getTime()`` function.
+    
     Args:
-        dt (datetime): The Python date to get thet time from.
+        dt (datetime): Input datetime.
 
     Returns:
-        The number of milliseconds since January 1, 1970, 00:00:00 GMT represented by dt.
+        float: Milliseconds since 1970-01-01T00:00:00Z.
     """
     return dt.timestamp() * 1000
 
 
 def timezone_gmt(zone:str) -> ZoneInfo:
-    """Creates and returns a ``tzinfo`` object with the specified timezone. A
-    replacement for Java's ``org.apache.commons.lang3.time.TimeZones``.
+    """
+    Create a tzinfo object for a given timezone name.
+
+    Wrapper for Java's ``org.apache.commons.lang3.time.TimeZones``.
+
 
     Args:
-        zone (str): The timezone to return. e.g. "est", or "gmt".
+        zone (str): Timezone identifier (e.g., 'UTC', 'America/New_York').
 
     Returns:
-        A ``ZoneInfo`` object with the specified zone.
-        Note that ``tzinfo`` is an abstract class, and ``ZoneInfo`` is an implementation.
+        tzinfo or None: ZoneInfo instance or None if invalid.
     """
     try:
         return ZoneInfo(zone)
@@ -127,22 +177,20 @@ def timezone_gmt(zone:str) -> ZoneInfo:
 
 def timezone_has_same_rules(val1: Union[datetime, tzinfo], val2: Union[datetime, tzinfo]) -> bool:
     """
+    Determine if two timezones share the same UTC offset and DST time adjustment rules,
+    including the raw UTC offset and daylight saving time rules. Disregards the
+    time zone identifier (i.e. the name) and focuses solely on the effective behavior 
+    (time zone offset).
+
     Wrapper function for java.util.TimeZone.hasSameRules().
-    
-    Determines if two datetime or tzinfo objects share the same rules for time adjustments,
-    including the raw UTC offset and daylight saving time rules. This function disregards the
-    time zone identifier (i.e. the name) and focuses solely on the effective behavior (offset)
-    of the time zones.
-    
+
     Args:
-        val1 (Union[datetime, tzinfo]): A datetime object (from which the tzinfo is extracted)
-            or a tzinfo instance representing the first time zone.
-        val2 (Union[datetime, tzinfo, None]): A datetime object or tzinfo instance representing the
-            second time zone. If None, the function returns False.
-    
+        val1 (Union[datetime, tzinfo]): First datetime or tzinfo.
+        val2 (Union[datetime, tzinfo]): Second datetime or tzinfo.
+
     Returns:
-        ``True`` if the time zones have identical rules (i.e. the same UTC offset at the reference time); 
-        ``False`` otherwise, or if either value does not have tzinfo information.
+        bool: True if both have identical offset rules; False if otherwise or if 
+        `val1` or `val2` is None.
     """
     if val2 is None:
         return False
@@ -165,26 +213,14 @@ def timezone_has_same_rules(val1: Union[datetime, tzinfo], val2: Union[datetime,
 
 # ------------ Parsing Functions ---------------:
 def ldml_to_strptime_format(java_input:str) -> str:
-    """Convert a Java SimpleDateFormat pattern into an equivalent Python strftime
-    pattern.
-
-    Steps:
-        1. Scan the input string for substrings like 'yyyy', 'MM', 'dd', etc.
-        2. For each match, look up its replacement in JAVA_TO_PY.
-        3. Produce a new format string with all tokens swapped out.
-
-    Example:
-        java_fmt = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-        returns "%Y-%m-%dT%H:%M:%S.%f%z"
-
-    (Used for testing date, time, and calendar validators.)
+    """
+    Convert Java SimpleDateFormat patterns to patterns accepted by Python's ``strptime()``.
 
     Args:
-        java_fmt (str): The Java SimpleDateFormat pattern to convert
+        java_fmt (str): Java date/time format string (ldml format).
 
     Returns:
-        The Python string pattern, that when fed into ``datetime.strftime()`` produces
-        an equivalent date/time string representation.
+        str: Equivalent Python strftime format.
     """
     # Define Java→Python token mappings.
     java2py = {
@@ -229,15 +265,22 @@ def ldml_to_strptime_format(java_input:str) -> str:
 
 def fuzzy_parse(*, value:str, pattern:str, locale:str, settings:dict) -> datetime:
     """
-    Uses ``dateparser.parse()`` to parse a datetime given a value string, locale, and pattern.
-    This is a last resort, if all else fails, because dateparser.parse() is too loose;
-    it allows differing value strings to be parsed. We still use it because it respects locales the best.
+    Attempt to parse a datetime string using `dateparser.parse()`, respecting locale and pattern
+    with fallback strategies for language-only or region-only parsing.
+
+    Note:
+        This function is a last resort, only called if all else fails, because 
+        ``dateparser.parse()`` is too loose; it allows differing value strings to be parsed. 
+        It exists ``dateparser.parse()`` is best for parsing locale sensitive strings.
     
     Args:
-        TODO
-    
-    Returns: 
-        TODO
+        value (str): Date/time string to parse.
+        pattern (str): LDML pattern for parsing.
+        locale (str): Locale code (e.g., 'en_US').
+        settings (dict): Additional settings for dateparser.
+
+    Returns:
+        datetime or None: Parsed datetime or None if all attempts fail.
     """
     date_parser_locale = locale_to_dateparser_locale.get(locale, locale)
     dt = parse(date_string=value, date_formats=[pattern], locales=[date_parser_locale], settings=settings)
@@ -258,18 +301,15 @@ def fuzzy_parse(*, value:str, pattern:str, locale:str, settings:dict) -> datetim
 
 def ldml2strptime(value:str, style_format:str = 'short', locale:str = None) -> datetime:
     """
-    Parses the value to a ``datetime`` based on the style_format and locale.
-    Uses system default if the locale is ``None``.
+    Parse a time string into datetime using Babel's LDML style formats.
 
     Args:
-        value (str): The string to parse into a ``datetime``
-        style_format (str): The style of the ``value`` string passed in ('short' by default.) 
-            One of: 'short', 'medium', 'long', or 'full'
-        locale (str): The locale of the value string.
+        value (str): `time` string to parse.
+        style_format (str): LDML style ('short', 'medium', 'long', 'full').
+        locale (str, optional): Locale code to use; system default if None.
     
     Returns:
-        The parsed ``datetime`` from the value string.
-        ``None`` if the value string is unparseable with the given locale.
+        datetime or None: Parsed datetime or None on parsing failure.
     """   
     # Get the default locale if locale is None
     if locale is None:
@@ -285,19 +325,17 @@ def ldml2strptime(value:str, style_format:str = 'short', locale:str = None) -> d
 
 
 def ldml2strpdate(value:str, style_format:str = 'short', locale:str = None) -> datetime:
-    """Parses the value to a ``datetime`` based on the style_format and locale. Uses
-    system default if the locale is ``None``.
+    """
+    Parse a date string into datetime using Babel's LDML style formats.
 
     Args:
-        value (str): The string to parse into a datetie
-        style_format (str): The style of the ``value`` string passed in ('short' by default.)
-            One of: 'short', 'medium', 'long', or 'full'
-        locale (str): The locale of the value string.
-
+        value (str): `date` string to parse.
+        style_format (str): LDML style ('short', 'medium', 'long', 'full').
+        locale (str, optional): Locale code to use; system default if None.
+    
     Returns:
-        The parsed ``datetime`` from the value string.
-        ``None`` if the value string is unparseable with the given locale.
-    """
+        datetime or None: Parsed datetime or None on parsing failure.
+    """ 
     # Get the default locale if locale is None
     if locale is None:
         locale = get_default_locale()
@@ -317,7 +355,14 @@ def ldml2strpdate(value:str, style_format:str = 'short', locale:str = None) -> d
 
 def parse_pattern_strict(value:str, ldml_pattern:str) -> datetime:
     """
-    TODO:
+    Strictly parse a string into datetime using a converted LDML pattern.
+
+    Args:
+        value (str): String to parse.
+        ldml_pattern (str): LDML pattern to convert and use.
+
+    Returns:
+        datetime: Parsed datetime.
     """
     pat = ldml_to_strptime_format(ldml_pattern)
     return datetime.strptime(value, pat)
@@ -325,10 +370,17 @@ def parse_pattern_strict(value:str, ldml_pattern:str) -> datetime:
 
 def parse_pattern_flexible(value:str, ldml_pattern:str) -> datetime:
     """
-    TODO: Parses value string into the representing datetime in the locale's "short" style.
-    Except there are multiple acceptable "short" strings in Java, but only one acceptable 
-    "short" string in Python. This function aims to mimic Java's flexibility. Uses the 
-    system's default locale if a locale is not provided.
+    Flexibly parse a date string mimicking Java's flexible locale-dependent 'short' style.
+
+    There are multiple acceptable "short" strings per locale in Java's SimpleDateFormat, 
+    but only one acceptable "short" string per locale in Python. 
+    
+    Args:
+        value (str): Date string to parse.
+        ldml_pattern (str): LDML 'short' pattern to guide parsing.
+
+    Returns:
+        datetime or None: Parsed datetime or None if unparseable.
     """
     pat = parse_pattern(ldml_pattern).format  # e.g. '%(M)s/%(d)s/%(yy)s'
 

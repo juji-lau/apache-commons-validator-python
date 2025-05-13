@@ -1,8 +1,13 @@
 """ 
 Module Name: time_validator.py
 
-Description: Translates apache.commons.validator.routines.TimeValidator.java
-Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/TimeValidator.java
+Description: 
+    This module provides a Python translation of Apache Commons Validator’s
+    ``TimeValidator.java``, focusing on validating and converting time strings
+    into Python’s ``datetime`` objects (with the date fields set to the unix epoch: Jan 1, 1970), 
+    using locale-aware formats and custom patterns.  Original Java source at:
+        https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/TimeValidator.java
+
 
 Author: Juji Lau
 
@@ -20,10 +25,7 @@ License (Taken from apache.commons.validator.routines.TimeValidator.java):
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
-    limitations under the License.
-
-Changes:
-  
+    limitations under the License.  
 """
 from __future__ import annotations
 from datetime import datetime, date, time, tzinfo
@@ -33,50 +35,27 @@ from src.apache_commons_validator_python.routines.abstract_calendar_validator im
 
 
 class TimeValidator(AbstractCalendarValidator):
-    """Time validation and conversion utilities.
+    """
+    Time validation and conversion utilities.
 
-    This module provides methods to validate and convert string representations
-    of times into `datetime.time` objects using various parsing formats and locales.
+    This class offers methods to parse and validate ``time`` string representations 
+    into ``datetime`` objects, with the ``date`` fields set to the unix epoch (Jan 1, 1970),
+    and methods to format ``datetime.time`` objects as strings.
 
-    Supported conversions:
-    - Default format for the default locale
-    - Specified pattern with the default locale
-    - Default format for a specified locale
-    - Specified pattern with a specified locale
-
-    All conversion methods (`validate()`) allow optional specification of time zones.
-    If this is not provided, the system default will be used.
-
-    Alternatively, the `CalendarValidator.adjust_to_timezone()` method can be used to adjuat the `tzinfo`
-    of the `datetime` object afterwards.
-
-    Once a value has been successfully converted the following methods can be
-    used to perform various time comparison checks:
-
-    Date comparison methods:
-    - `compare_time(d1, d2)`: Compares the hours, minutes, seconds, and milliseconds of two datettimes.
-    - `compare_seconds(d1, d2)`: Compares the hours, minutes, and seconds of two times.
-    - `compare_minutes(d1, d2)`: Compares hours and minutes of two times.
-    - `compare_hours(d1, d2)`: Compares the hours of two times
-
-    Formatting methods mirror parsing options and support:
-    - Specified pattern
-    - Format for a specified locale
-    - Format for the default locale
-
+    Formatting, parsing, and validation methods support custom patterns, locales, and timezones,
+    using the system default if not provided.
+    
     Attributes:
         serializable (bool): Indicates if the object is serializable.
         cloneable (bool): Indicates if the object can be cloned.
-        VALIDATOR (TimeValidator): The singleton instance of this class
     """
     serializable = True   # Class extends AbstracCalendarvalidator which is serializable
     cloneable = False      # Class extends AbstracCalendarvalidator which is not cloneable
-
-    __VALIDATOR: Optional[TimeValidator] = None  # Singleton instance
+    __VALIDATOR: Optional[TimeValidator] = None  # Singleton instance of this TimeValidator
 
     def __init__(self, *, strict:bool = True, time_style:int = 3) -> None:
         """Constructs a TimeValidator instance with configurable parsing strictness and
-        date style.
+        time style.
 
         Args:
             strict (bool): If True, enables strict date parsing. Defaults to True.
@@ -86,94 +65,89 @@ class TimeValidator(AbstractCalendarValidator):
     
     @classmethod
     def get_instance(cls) -> TimeValidator:
-        """Returns the singleton instance of TimeValidator. Ensures only one instance is
-        created and reused globally.
+        """
+        Retrieve the singleton TimeValidator instance.
 
         Returns:
-            TimeValidator: A singleton instance of the class.
+            TimeValidator: The single, shared instance of this class.
         """
         if cls.__VALIDATOR is None:
             cls.__VALIDATOR = cls()
         return cls.__VALIDATOR
     
     def compare_hours(self, value: datetime, compare: datetime) -> int:
-        """Compare two datetime values by hours (ignores date component).
+        """
+        Compare two datetimes by hour component only.
 
         Args:
-            value (datetime): The first datetime to compare.
-            compare (datetime): The second datetime to compare against.
+            value (datetime): First datetime to compare.
+            compare (datetime): Second datetime to compare against.
 
         Returns:
-            0 if the hours are equal,
-            -1 if the hour of value is less than the hour of compare,
-            +1 if the hour of value is greater than the hour of compare.
+            int: 0 if hours equal, -1 if ``value.hour`` < ``compare.hour``, +1 otherwise.
         """
         return self._compare(value, compare, "hour")
 
     
     def compare_minutes(self, value: datetime, compare: datetime) -> int:
-        """Compare two datetime values by hours and minutes (ignores the date
-        component).
+        """
+        Compare two datetimes by hour, then minute components.
 
         Args:
-            value (datetime): The first datetime to compare.
-            compare (datetime): The second datetime to compare against.
+            value (datetime): First datetime to compare.
+            compare (datetime): Second datetime to compare against.
 
         Returns:
-            0 if the hour/minutes are equal,
-            -1 if the minute of value is less than the minute of compare,
-            +1 if the minute of value is greater than the minute of compare.
+            int: 0 if minute/hour equal, -1 if ``value.minute`` < ``compare.minute``, +1 otherwise.
         """
         return self._compare(value, compare, "minute")
 
     
     def compare_seconds(self, value: datetime, compare: datetime) -> int:
-        """Compare two datetime values by hours, minutes, and seconds.
+        """Compare two datetimes by hour, minute, then second components.
 
         Args:
-            value (datetime): The first datetime to compare.
-            compare (datetime): The second datetime to compare against.
+            value (datetime): First datetime to compare.
+            compare (datetime): Second datetime to compare against.
 
         Returns:
-            0 if the hour/minutes/seconds are equal,
-            -1 if the seconds of value is less than the seconds of compare,
-            +1 if the seconds of value is greater than the seconds of compare.
+            int: 0 if second/minute/hour equal, -1 if ``value.second`` < ``compare.second``, +1 otherwise.
         """
         return self._compare_time(value, compare, "second")
     
 
     def compare_time(self, value:datetime, compare:datetime) -> int:
-        """Compare two datetime values by absolute time (hour, minute, second, and
-        microscecond).
+        """
+        Compare two datetimes by full time (hour, minute, second, then microsecond).
 
+         Note:
+            Python’s ``datetime`` uses microseconds rather than milliseconds (Java's Calendar).
+            This implementation accomodates that.
+        
         Args:
-            value (datetime): The first datetime to compare.
-            compare (datetime): The second datetime to compare against.
+            value (datetime): First datetime to compare.
+            compare (datetime): Second datetime to compare against.
 
         Returns:
-            0 if the times are equal
-            -1 if the time represented by value is less than (earlier) the time of compare.
-            +1 if the time represented by value is greater than (later) the time of compare.
-
-        Changes from Java:
-            Java compares the *millisecond* of two ``Calendar`` object.
-            Python's ``datetime`` does not have milliseconds.
-            The finest unit of time in a ``datetime.time`` is the *microsecond*.
-            This implementation compares milliseconds to determine the earlier time.
+            int: 0 if times equal, -1 if ``value`` < ``compare``, +1 otherwise.
         """
         return self._compare_time(value, compare, "microsecond")
 
     
     def _process_parsed_value(self, value:object, formatter:Callable) -> datetime:
-        """Convert the parsed timezone naieve ``datetime`` to a timezone aware
-        ``datetime``.
+        """
+        Converts the parsed value into a ``datetime`` with the time fields set to midnight
+        if the value is a `date`.
 
         Args:
-            value (object): The parsed ``date`` object created.
-            formatter (Callable): The formatter used during parsing (not used here, but included for consistency).
+            value (object): Parsed ``date`` or ``datetime`` from the parser.
+            formatter (Callable): Parsing formatter (unused, but included for consistency).
 
         Returns:
-            The newly timezone-aware ``datetime`` object.
+            datetime: A ``datetime``; midnight added for date inputs.
+
+        Raises:
+            TypeError: If ``value`` is not a ``date`` or ``datetime``.
         """
         if isinstance(value, datetime):
             return value
@@ -190,20 +164,19 @@ class TimeValidator(AbstractCalendarValidator):
         locale: Optional[str] = None,
         time_zone: Optional[tzinfo] = None
     ) -> Optional[datetime]:
-        """Validates and converts a time string into a datetime object using the
-        provided pattern, locale, and time zone. The datetime will represent the time
-        string elapsed since the epoch (year, month, day will be set to 1970, 1, 1
-        respectively.)
+        """
+        Validate and parse a time string into a datetime.
+
+        The resulting datetime represents the parsed time on the epoch date
+        (1970-01-01).
 
         Args:
-            value (str): The input string to validate.
-            pattern (Optional[str]): The date pattern (e.g., 'yyyy-MM-dd'). If None, a default pattern is used.
-            locale (Optional[str]): The locale to apply (e.g., 'en_US'). If None, the system default is used.
-            time_zone (Optional[tzinfo]): The timezone to apply to the resulting datetime. If None, no change is made.
+            value (str): Time string to validate.
+            pattern (str, optional): LDML pattern for parsing.
+            locale (str, optional): Locale code (e.g., 'en_US').
+            time_zone (tzinfo, optional): Time zone to apply.
 
         Returns:
-            Optional[datetime]:
-                A datetime object representing the time-string elapsed since the the Epoch, if parsing succeeds.
-                ``None`` if invalid.
+            datetime or None: Parsed datetime if valid, otherwise None.
         """
         return self._parse(value, pattern, locale, time_zone)

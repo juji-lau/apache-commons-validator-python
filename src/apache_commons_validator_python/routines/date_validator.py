@@ -31,10 +31,10 @@ from typing import Optional, Final, Callable
 
 from src.apache_commons_validator_python.routines.abstract_calendar_validator import AbstractCalendarValidator
 from src.apache_commons_validator_python.util.validator_utils import integer_compare
-# from src.apache_commons_validator_python.util.datetime_helpers import get_default_tzinfo, update_tz
 
 class DateValidator(AbstractCalendarValidator):
-    """Date validation and conversion utilities.
+    """
+    Date validation and conversion utilities.
 
     This module provides methods to validate and convert string representations
     of dates into timezone naive `datetime.datetime` objects using various parsing formats and locales.
@@ -86,8 +86,9 @@ class DateValidator(AbstractCalendarValidator):
     
     @classmethod
     def get_instance(cls) -> DateValidator:
-        """Returns the singleton instance of DateValidator. Ensures only one instance is
-        created and reused globally.
+        """
+        Returns the singleton instance of DateValidator.
+        Ensures only one instance is created and reused globally.
 
         Returns:
             DateValidator: A singleton instance of the class.
@@ -216,14 +217,15 @@ class DateValidator(AbstractCalendarValidator):
         calendar_compare: Final[datetime] = self.__get_calendar(compare, time_zone)
         return self._compare(calendar_value, calendar_compare, "year")
     
-    # TODO: Check what to do for naive cases.
+
     def __get_calendar(
         self,
         value: datetime,
         time_zone: Optional[tzinfo]
     ) -> datetime:
-        """Returns a datetime object adjusted to the specified time zone, or the
-        original if no time zone is provided.
+        """
+        Returns a datetime object adjusted to the specified time zone, 
+        or the original if no time zone is provided.
 
         Args:
             value (datetime): The input datetime.
@@ -232,7 +234,6 @@ class DateValidator(AbstractCalendarValidator):
         Returns:
             datetime: A timezone-adjusted datetime (or original).
         """
-        # TODO: hers
         if time_zone is not None:
             # If the datetime is naive (no tzinfo), attach the timezone directly
             if value.tzinfo is None:
@@ -240,11 +241,6 @@ class DateValidator(AbstractCalendarValidator):
             # If it's timezone-aware, convert to the new timezone
             return value.astimezone(time_zone)
         return value
-        # TODO: mines
-        # if time_zone is None:
-        #     time_zone = get_default_tzinfo()
-        # value = update_tz(dt=value, tz=time_zone)
-        # return value
     
     def _process_parsed_value(
         self,
@@ -261,15 +257,13 @@ class DateValidator(AbstractCalendarValidator):
         Returns:
             datetime: The normalized datetime object.
         """
-        # TODO: hers:
         if isinstance(value, datetime):
             return value
         elif isinstance(value, date):
             # Converts it to a datetime by adding a time of 00:00:00.
             return datetime.combine(value, time.min)
         raise TypeError(f"Unsupported value type: {type(value)}")
-        # TODO: mines
-        # return value
+
     
     def validate(
         self,

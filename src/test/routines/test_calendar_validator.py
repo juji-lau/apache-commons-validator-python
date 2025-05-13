@@ -29,8 +29,6 @@ Changes:
     - Hardcoded several test cases (instead of using language libraries to derive it) 
         for readability, simplicity, and because Python does not have a ``DateFormat`` equivalent.
     - Moved commonly used values and objects into fixtures to leverage Pytest functionality.
-
-
 """
 import pytest
 from datetime import tzinfo, datetime

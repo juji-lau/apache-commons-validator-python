@@ -5,8 +5,7 @@ Description: Translates apache.commons.validator.routines.CalendarValidator.java
 Link: https://github.com/apache/commons-validator/blob/master/src/main/java/org/apache/commons/validator/routines/CalendarValidator.java
     This file is meant to translate Java's ``Calendar`` class.  However, since Python's
     ``datetime.datetime`` class is much more closely functional to Java's ``Calendar`` class, this
-    file will be validating Python's ``datetime.datetime`` class.  See [TODO: insert place]
-    for more details on the changes and substitutions made. 
+    file will be validating Python's ``datetime.datetime`` class. 
 
 Author: Juji Lau
 
@@ -25,19 +24,6 @@ License (Taken from apache.commons.validator.routines.CalendarValidator.java):
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
-Changes:
-    Java uses a ``Calendar`` obect to represent both date and time (with timezone support). 
-    Python's closest equivalent would be a time-zone aware ``datetime.datetime`` object. 
-    The changes and substitutions made to the original Java CalendarValidator to tailor to Python's
-    ``datetime.datetime`` object are as follows:
-
-    File Chanves:
-
-    Substitutions (Java -> Python):
-        ``java.util.Calendar``        ->  ``datetime.datetime``         Closest functionlly
-
-
 """
 from __future__ import annotations            
 from datetime import datetime, date, time, tzinfo

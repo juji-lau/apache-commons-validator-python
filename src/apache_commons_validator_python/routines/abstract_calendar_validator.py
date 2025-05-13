@@ -434,8 +434,12 @@ class AbstractCalendarValidator(AbstractFormatValidator):
     
 
     def __parse_datetime(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
-        """A use case was not implemented in Java's Validator, so this function is
-        untested."""
+        """
+        A use case was not implemented in Java's Validator, so this function is untested.
+
+        Args:
+            TODO:
+        """
         if GenericValidator.is_blank_or_null(pattern):
             pattern = ""
         if locale is None:
@@ -445,10 +449,10 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
       
     def __parse_date(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
-        # TODO: Improve documentation
-        """Returns the ``datetime`` object parsed from the value stirng based on the
-        passed in locale and timezone. Uses system default for the locale and timezone
-        if any of them are ``None``.
+        # TODO: Write a more descriptive documentation
+        """
+        Returns the ``datetime`` object parsed from the value string based on the passed in locale and timezone.
+        Uses system default for the locale and timezone if any of them are ``None``.
 
         Args:
             value (str): TODO
@@ -493,10 +497,10 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
     def __parse_time(self, value:str, pattern:Optional[str]=None, locale:Optional[str]=None, time_zone:Optional[tzinfo]=None, settings=None) -> Optional[object]:
         # TODO: Improve documentation
-        """Returns the ``datetime`` object parsed from the value stirng based on the
-        passed in locale and timezone. Sets the year, month, day to the epoch (Jan 1,
-        1970), so the ``datetime`` represents time. Uses system default for the locale
-        and timezone if any of them are ``None``.
+        """
+        Returns the ``datetime`` object parsed from the value stirng based on the passed in locale and timezone.
+        Sets the year, month, day to the epoch (Jan 1, 1970), so the ``datetime`` represents time.
+        Uses system default for the locale and timezone if any of them are ``None``.
 
         Args:
             value (str): TODO
@@ -505,10 +509,10 @@ class AbstractCalendarValidator(AbstractFormatValidator):
             time_zone (tzinfo): The timezone to parse the object to.
             settings (dict): TODO
 
-        Returns:
-            The parsed ``datetime`` object that represents the timestring value by seting the
+        Returns: 
+            The parsed ``datetime`` object that represents the timestring value by seting the 
             datetime fields: (year, month, day) to the epoch: (1970, Jan, 1).
-
+        
         Changes from Java:
             This function does not exist in Java. It was created to mimic the logic in our
             ``_get_format()``, since we need the logic but cannot use the function.
@@ -544,8 +548,9 @@ class AbstractCalendarValidator(AbstractFormatValidator):
 
 
     def _process_parsed_value(self, value:object, formatter):
-        """Process the parsed value, performing any further validation and type
-        conversion required. (Abstract method)
+        """
+        Process the parsed value, performing any further validation and type conversion required.
+        (Abstract method)
 
         Args:
             value (object): The parsed object created.

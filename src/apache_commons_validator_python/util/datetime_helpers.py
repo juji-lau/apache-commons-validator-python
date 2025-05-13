@@ -64,6 +64,7 @@ def get_default_locale() -> str:
     return loc[0]
 
 
+
 def get_default_tzinfo() -> tzinfo:
     """Gets the system's default timezone."""
     zone_name = get_localzone_name()
@@ -71,8 +72,18 @@ def get_default_tzinfo() -> tzinfo:
     return tz_local
 
 
-def get_tzname(tz:tzinfo):
-    dt:datetime = datetime.now().astimezone(tz=tz)
+def get_tzname(timezone:tzinfo) -> str:
+    """
+    Returns the name of the timezone (same as ``datetime.tzname``).
+    `tzinfo` does not have a name field, so this function is nessescary to get the name of a lone tzinfo objct.
+
+    Args:
+        timezone (tzinfo): The tzinfo object that we want the name of
+
+    Returns:
+        The name of timezone as a string.  
+    """
+    dt:datetime = datetime.now().astimezone(tz=timezone)
     return dt.tzname()
 
   
@@ -115,21 +126,22 @@ def timezone_gmt(zone:str) -> ZoneInfo:
 
 
 def timezone_has_same_rules(val1: Union[datetime, tzinfo], val2: Union[datetime, tzinfo]) -> bool:
-    """Wrapper function for java.util.TimeZone.hasSameRules().
-
+    """
+    Wrapper function for java.util.TimeZone.hasSameRules().
+    
     Determines if two datetime or tzinfo objects share the same rules for time adjustments,
     including the raw UTC offset and daylight saving time rules. This function disregards the
     time zone identifier (i.e. the name) and focuses solely on the effective behavior (offset)
     of the time zones.
-
+    
     Args:
         val1 (Union[datetime, tzinfo]): A datetime object (from which the tzinfo is extracted)
             or a tzinfo instance representing the first time zone.
         val2 (Union[datetime, tzinfo, None]): A datetime object or tzinfo instance representing the
             second time zone. If None, the function returns False.
-
+    
     Returns:
-        ``True`` if the time zones have identical rules (i.e. the same UTC offset at the reference time);
+        ``True`` if the time zones have identical rules (i.e. the same UTC offset at the reference time); 
         ``False`` otherwise, or if either value does not have tzinfo information.
     """
     if val2 is None:
@@ -216,12 +228,16 @@ def ldml_to_strptime_format(java_input:str) -> str:
 
 
 def fuzzy_parse(*, value:str, pattern:str, locale:str, settings:dict) -> datetime:
-    """Uses ``dateparser.parse()`` to parse a datetime given a value string, locale, and
-    pattern.
-
+    """
+    Uses ``dateparser.parse()`` to parse a datetime given a value string, locale, and pattern.
     This is a last resort, if all else fails, because dateparser.parse() is too loose;
-    it allows differing value strings to be parsed. We still use it because it respects
-    locales the best.
+    it allows differing value strings to be parsed. We still use it because it respects locales the best.
+    
+    Args:
+        TODO
+    
+    Returns: 
+        TODO
     """
     date_parser_locale = locale_to_dateparser_locale.get(locale, locale)
     dt = parse(date_string=value, date_formats=[pattern], locales=[date_parser_locale], settings=settings)
@@ -241,15 +257,16 @@ def fuzzy_parse(*, value:str, pattern:str, locale:str, settings:dict) -> datetim
 
 
 def ldml2strptime(value:str, style_format:str = 'short', locale:str = None) -> datetime:
-    """Parses the value to a ``datetime`` based on the style_format and locale. Uses
-    system default if the locale is ``None``.
+    """
+    Parses the value to a ``datetime`` based on the style_format and locale.
+    Uses system default if the locale is ``None``.
 
     Args:
         value (str): The string to parse into a ``datetime``
-        style_format (str): The style of the ``value`` string passed in ('short' by default.)
+        style_format (str): The style of the ``value`` string passed in ('short' by default.) 
             One of: 'short', 'medium', 'long', or 'full'
         locale (str): The locale of the value string.
-
+    
     Returns:
         The parsed ``datetime`` from the value string.
         ``None`` if the value string is unparseable with the given locale.

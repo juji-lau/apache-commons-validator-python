@@ -34,7 +34,7 @@ def test_copy_map():
   """ Tests validator_utils.py"""
   pass
 
-
+# Java's version:
 # @Test
 #     public void testCopyFastHashMap() {
 #         final FastHashMap original = new FastHashMap();

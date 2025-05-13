@@ -19,21 +19,6 @@ License (Taken from apache.commons.validator.routines.TimeValidatorTest):
     Unless required by applicable law or agreed to in writing, software distributed under the License is
     distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and limitations under the License.
-
-Changes:
-    - Moved specific tests from TestAbstractCalendarValidator into this file (to avoid initialization errors)
-    - Separated test_compare() into different test functions for better readability.
-    - Moveed ``_create_date()`` and ``_create_time()`` functions into the module level so they can be called anywhere whithin the TestTimeValidator class.
-    - Moved variables commonly used across multiple functions into the class (as class attributes) to improve readablility, and making it possible to leverage Pytest's ``@parameterize`` feature.
-    - Hardcoded several test cases (instead of using language libraries to derive it) 
-        for readability, simplicity, and because Python does not have a ``DateFormat`` equivalent.
-    - set the locale system default locale in the ``setup()`` method and reset it to the original locale in the ``teardown()`` method
-        most functions use the locale "en_GB" to test the system defaults. I did this to match.
-    - TODO: check this: Moved commonly used values and objects into fixtures to leverage Pytest functionality.
-    
-    - Added a new property: `test_calendars(cls) -> dict[datetime] that 
-        creates a bunch of datetime objects to be reused over the next few tests.
-        This property not in Java's implementation, and was added purely for readability purposes.
 """
 from __future__ import annotations
 

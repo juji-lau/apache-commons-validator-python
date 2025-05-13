@@ -23,8 +23,8 @@ License (Taken from apache.commons.validator.routines.AbstractCalendarValidatorT
 Changes:
 """
 from __future__ import annotations
-from typing import Final, Optional, Union
-from datetime import date, time, tzinfo, timedelta, timezone, datetime
+from typing import Optional
+from datetime import tzinfo, timezone, datetime
 
 # from src.apache_commons_validator_python.util.calendar_wrapper import Calendar
 from src.apache_commons_validator_python.util.datetime_helpers import get_default_tzinfo, JavaToPyLocale
@@ -91,7 +91,7 @@ class TestAbstractCalendarValidator:
         validator (AbstractCalendar): The concrete implementation of the Time validator to test. (Initialized in concrete classes)
         pattern_valid (list[str]): A list of valid dates in string format with dash ('-') separators to test.
         locale_valid (list[str]): A list of valid dates in string format with slash ('/') separators to test.
-        pattern_expect (list[datetime]): TODO: add info
+        pattern_expect (list[datetime]): A list of expected dates to test against ``pattern_valid``.
         pattern_invalid (list[str]): A list of invalid dates formated as stirngs with dash ('-') separators.
         locale_invalid (list[str]): A list of invalid dates formated as strings with slash ('/') separators.
     """

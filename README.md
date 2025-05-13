@@ -1,25 +1,33 @@
 # apache-commons-validator-python
 This is a Python translation of the Apache Commons Validator, which provides libraries for client-side validation and server-side data validation. 
 
+
 ### Documentation
-Documentation can be found in this repository at docs/_build/latex/apachecommonsvalidatorpython.pdf
+Documentation can be found at [docs/_build/latex/apachecommonsvalidatorpython.pdf](https://github.coecis.cornell.edu/sn523/apache-commons-validator-python/blob/main/docs/_build/latex/apachecommonsvalidatorpython.pdf)
 
-### Installation
+### Package Installation
 
-Clone the repository locally. 
+Make sure to be an environment with Python 3.12.
+
+`pip install apache-commons-validator-python`
+
+### Local Installation
+
+Clone the repository locally.
 
 `git clone https://github.coecis.cornell.edu/sn523/apache-commons-validator-python.git`
 
-Change current working directory. 
+Change current working directory.
 
 `cd apache-commons-validator-python`
 
-Create and activate a conda environment with python 3.12 specifically. 
+Create and activate a conda environment with python 3.12 specifically.
 
 `conda create -n <my_env> python=3.12`
+
 `conda activate <my_env>`
 
-Install the requirements. 
+Install the requirements.
 
 `pip install -r requirements.txt`
 

@@ -4,10 +4,6 @@
 # pytest cache
 .pytest_cache/
 
-# Sphinx build files
-docs/_build/
-docs/
-
 # VSCode/IDE files
 .vscode/
 *.swp

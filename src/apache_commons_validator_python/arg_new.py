@@ -13,6 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+from typing import Optional
+
+
 class Arg:
     """A default argument or an argument for a specific validator definition (ex:
     required) can be stored to pass into a message as parameters. This can be used in a
@@ -25,6 +28,15 @@ class Arg:
     Instances of this class are configured with an <arg> xml element.
 
     Taken from apache.commons.validator.Arg;
+
+    Attributes:
+        serializable (bool): Indicates if the object is serializable.
+        cloneable (bool): Indicates if the object can be cloned.
+        bundle (str): The resource bundle name that this Arg's `key` should be resolved in (optional).
+        key (str): The key or value of the argument.
+        name (str): The name dependency that this argument goes with (optional).
+        position (int): This argument's position in the message. Set position=0 to make a replacement in this string: "some msg {0}". @since 1.1
+        resource(bool): Whether or not the key is a message resource (optional). Defaults to True. If it is 'true', the value will try to be resolved as a message resource.
     """
 
     serializable = True
@@ -34,13 +46,15 @@ class Arg:
     #: class is cloneable
 
     def __init__(self):
-        self._bundle: str = None
-        #: The resource bundle name that this Arg's {@code key} should beresolved in (optional).
+        """Constructor for Arg, a default argument or an argument for a specific validator definition.
+        """
+        self._bundle: Optional[str] = None
+        #: The resource bundle name that this Arg's `key` should beresolved in (optional).
 
-        self._key: str = None
+        self._key: Optional[str] = None
         #: The key or value of the argument.
 
-        self._name: str = None
+        self._name: Optional[str] = None
         #: The name dependency that this argument goes with (optional).
 
         self._position: int = -1
@@ -50,52 +64,77 @@ class Arg:
         #: Whether or not the key is a message resource (optional). Defaults to True. If it is 'true', the value will try to be resolved as a message resource.
 
     @property
-    def bundle(self):
-        """Get the resource bundle name."""
+    def bundle(self) -> Optional[str]:
+        """
+        Get the resource bundle name.
+
+        Returns: 
+            bundle (str)
+        """
         return self._bundle
 
     @bundle.setter
-    def bundle(self, value):
+    def bundle(self, value) -> None:
         """Sets the resource bundle name."""
         self._bundle = value
 
     @property
-    def key(self):
-        """Gets the key/value."""
+    def key(self) -> Optional[str]:
+        """
+        Gets the key/value.
+        
+        Returns:
+            key (str)
+        """
         return self._key
 
     @key.setter
-    def key(self, value):
+    def key(self, value) -> None:
         """Sets the key/value."""
         self._key = value
 
     @property
-    def name(self):
-        """Gets the name of the dependency."""
+    def name(self) -> Optional[str]:
+        """
+        Gets the name of the dependency.
+        
+        Returns: 
+            name (str)
+        """
         return self._name
 
     @name.setter
-    def name(self, value):
+    def name(self, value) -> None:
         """Sets the name of the dependency."""
         self._name = value
 
     @property
-    def position(self):
-        """Gets the replacement position."""
+    def position(self) -> int:
+        """
+        Gets the replacement position.
+        
+        Returns: 
+            position (int)
+        """
         return self._position
 
     @position.setter
-    def position(self, value):
+    def position(self, value) -> None:
         """Sets the replacement position."""
         self._position = value
 
     @property
-    def resource(self):
-        """Tests whether or not the key is a resource key or literal value."""
+    def resource(self) -> bool:
+        """
+        Tests whether or not the key is a resource key or literal value.
+        
+        Returns:
+            resource (bool)
+        """
         return self._resource
 
     @resource.setter
-    def resource(self, value):
+    def resource(self, value) -> None:
         """Sets whether or not the key is a resource."""
         self._resource = value
 

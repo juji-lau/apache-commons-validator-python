@@ -49,7 +49,7 @@ class Form:
     def add_field(self, field: "Field") -> None:
         """Add a `Field` to the `Form`.
 
-        Method Arguments:
+        Args:
             field (Field): the field
         """
         self._l_fields.append(field)
@@ -58,32 +58,39 @@ class Form:
     def contains_field(self, field_name: str) -> bool:
         """Returns true if this Form contains a Field with the given name.
 
-        Method Arguments     field_name (str): the field name
+        Args:   
+            field_name (str): the field name
 
-        Return     True if this form contains the field by the given name.
+        Return:
+            True if this form contains the field by the given name.
         """
         return field_name in self.get_field_map()
 
     def get_extends(self) -> str:
         """Gets the name/key of the parent set of validation rules.
 
-        Returns     the extends value
+        Returns:
+            the extends value
         """
         return self._inherit
 
     def get_field(self, field_name: str) -> Optional["Field"]:
         """Returns the Field with the given name or None if this Form has no such field.
 
-        Method Arguments     field_name (str): the field name
+        Args:
+     
+            field_name (str): the field name
 
-        Returns     the field value
+        Returns:
+            the field value
         """
         return self.get_field_map().get(field_name)
 
     def get_field_map(self) -> Dict[str, "Field"]:
         """Returns a dict of str field keys to Field objects.
 
-        Returns     the field map value
+        Returns:
+            the field map value
         """
         return self._h_fields
 
@@ -97,7 +104,8 @@ class Form:
     def name(self) -> str:
         """Gets the name of the form.
 
-        :return: The name of the form.
+        Returns:
+            The name of the form.
         """
         return self._name
 
@@ -110,7 +118,9 @@ class Form:
         """Checks whether the form has been processed.
 
         (translation of isProcessed())
-        :return: True if the form has been processed, False otherwise.
+
+        Returns:
+            True if the form has been processed, False otherwise.
         """
         return self._processed
 
@@ -119,7 +129,8 @@ class Form:
         in this form, include it. `depends` has precedence in the way the fields are
         ordered.
 
-        Method Arguments     depends (Form): the form we want to merge
+        Args:
+            depends (Form): the form we want to merge
         """
         temp_l_fields = []
         temp_h_fields = OrderedDict()
@@ -142,11 +153,12 @@ class Form:
         self, global_constants: dict, constants: dict, forms: Dict[str, "Form"]
     ) -> None:
         """Processes the form by handling inheritance and field processing.
-
         Marks the form as processed once complete.
-        :param global_constants: A dictionary of global constants.
-        :param constants: A dictionary of local constants.
-        :param forms: A dictionary of all forms.
+        
+        Args:
+            global_constants: A dictionary of global constants.
+            constants: A dictionary of local constants.
+            forms: A dictionary of all forms.
         """
         if self.processed:
             return
@@ -169,7 +181,8 @@ class Form:
     def set_extends(self, inherit: str) -> None:
         """Sets the name/key of the parent set of validation rules.
 
-        Method Arguments     the new extends value
+        Args:
+            the new extends value
         """
         self._inherit = inherit
 
@@ -177,7 +190,8 @@ class Form:
     def name(self, value: str) -> None:
         """Sets the name of the form.
 
-        :param value: The name of the form to be set.
+        Args:
+            value: The name of the form to be set.
         """
         self._name = value
 
@@ -198,7 +212,7 @@ class Form:
         only that specific field. Otherwise, it validates all fields in the form that are
         relevant for the given page.
 
-        Method Arguments:
+        Args:
             params (dict): A dictionary containing parameters required for validation.
             actions (dict): A dictionary of actions associated with the validation process.
             page (int): The current page number used for validating fields relevant to this page.

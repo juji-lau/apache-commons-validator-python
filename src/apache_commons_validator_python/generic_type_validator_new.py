@@ -37,7 +37,7 @@ class GenericTypeValidator:
     def format_byte(value: Optional[str]) -> Optional[int]:
         """Method to convert a string value to an integer (byte)
 
-        Method Arguments
+        Args:
             value (str): the value validation is being performed on
 
         Returns: the converted integer (byte) value
@@ -56,7 +56,7 @@ class GenericTypeValidator:
         """Method to convert a string value to an integer (byte) with optional locale
         support.
 
-        Method Arguments:
+        Args:
             value (str): the value validation is being performed on
             locale (str) the locale to use to parse the number (system default if null)
 
@@ -84,7 +84,7 @@ class GenericTypeValidator:
         """Method to check if a string value represents a valid credit card and convert
         it to an integer.
 
-        Method Arguments
+        Args:
             value (str): the valie validation is being performed on
 
         Returns: the converted Credit Card number
@@ -101,7 +101,7 @@ class GenericTypeValidator:
         """Method to convert a string value to a datetime object (date) using the
         system's locale.
 
-        Method Arguments
+        Args:
             value (str): the value validation is being performed on
             locale (str): the locale to use to parse the data (system default if null)
 
@@ -131,7 +131,7 @@ class GenericTypeValidator:
         """Method to convert a string value to a datetime object using a custom date
         pattern.
 
-        Method Arguments
+        Args:
             value (str): the value validation is being performed on
             date_pattern (str): the pattern
             strict (bool): whether or not to have an exact match of the date_pattern
@@ -157,7 +157,7 @@ class GenericTypeValidator:
     def format_double(value: Optional[str]) -> Optional[float]:
         """Method to convert a string value to a float with optional locale support.
 
-        Method Arguments
+        Args:
             value (str): the value validation is being performed on
 
         Returns: the converted Double value
@@ -176,7 +176,8 @@ class GenericTypeValidator:
         """Format a string value into a float (double-precision), respecting the
         provided locale.
 
-        Returns None if the value is invalid.
+        Returns:
+            None if the value is invalid.
         """
         if value is None:
             return None
@@ -198,7 +199,7 @@ class GenericTypeValidator:
     def format_float(value: Optional[str]) -> Optional[float]:
         """Method to convert a string value to a float.
 
-        Method Arguments
+        Args:
             value (str): the value validation is being performed on
 
         Returns: the converted Float value
@@ -216,7 +217,7 @@ class GenericTypeValidator:
     ) -> Optional[float]:
         """Method to convert a string value to a float with locale support.
 
-        Method Arguments
+        Args:
             value (str): the value validation is being performed on
             locale (str): the locale to use to parse the number (system default if None)
 
@@ -236,7 +237,7 @@ class GenericTypeValidator:
     def format_int(value: Optional[str]) -> Optional[int]:
         """Checks if the value can safely be converted to an int primitive.
 
-        Method Arguments
+        Args:
             value (str): the value validation is being performed on
 
         Returns: the converted int value

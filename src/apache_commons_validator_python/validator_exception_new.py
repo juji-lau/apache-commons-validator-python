@@ -15,7 +15,18 @@ limitations under the License.
 
 
 class ValidatorException(Exception):
-    serializable = True  # Corresponds to implementing Serializable in Java
+    """The base exception for the Validator Framework.  All other
+    `Exception`s thrown during calls to `Validator.validate()` are considered errors.
+    
+    Taken from org.apache.commons.validator.ValidatorException;
+    """
+    serializable = True  #: is the class serializable
+    cloneable = False #: is the class cloneable
 
     def __init__(self, message=None):
+        """ValidatorException.
+
+        Args:
+            message (str, optional): message for ValidatorException to contain. Defaults to None.
+        """
         super().__init__(message)

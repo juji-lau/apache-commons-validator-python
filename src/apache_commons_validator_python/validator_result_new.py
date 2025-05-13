@@ -3,30 +3,46 @@ from types import MappingProxyType
 
 class ValidatorResult:
     """Contains the results of a set of validation rules processed on a JavaBean."""
+    
+    serializable = True
+    #: whether the class is serializable
 
+    cloneable = False
+    #: whether the class is cloneable
     class ResultStatus:
         """Contains the status of a validation."""
 
+        serializable = True
+        #: is the class serializable
+
+        cloneable = False
+        #: is the class cloneable
+        
         def __init__(self, valid: bool, result: object = None):
-            self._valid = valid
-            self._result = result
-            self.serializable = True
-            self.cloneable = False
+            self._valid: bool = valid
+            #: whether or not the validation passed
+
+            self._result: object = result
+            #: result returned by a validation method
 
         @property
         def valid(self) -> bool:
+            """Returns whether or not the validation passed."""
             return self._valid
 
         @valid.setter
         def valid(self, valid: bool):
+            """Sets whether or not the validation passed."""
             self._valid = valid
 
         @property
         def result(self) -> object:
+            """Gets the result returned by a validation method."""
             return self._result
 
         @result.setter
         def result(self, result: object):
+            """Sets the result returned by a validation method."""
             self._result = result
 
     def __init__(self, field):
@@ -36,15 +52,17 @@ class ValidatorResult:
             field: The field that was validated.
         """
         self._field = field
-        self._h_actions = {}
-        self.serializable = True
+        #: the Field being validated
 
+        self._h_actions = {}
+        #: the map of actions
+    
     @property
     def field(self):
         """The field that was validated."""
         return self._field
 
-    def add(self, validator_name: str, result: bool, value: object = None):
+    def add(self, validator_name: str, result: bool, value: object = None) -> None:
         """Add the result of a validator action.
 
         Args:

@@ -18,29 +18,75 @@ class Validator:
         parameters: Optional[Dict[str, Any]] = None,
     ):
         self._resources = resources
-        self._form_key = form_key
-        self._params = parameters or {}
-        self._page: Optional[int] = None
-        self._only_return_errors = False
-        self._form: Optional["Form"] = None
-        self._locale: Optional[Dict[str, str]] = None  # Dict with keys: language, country, variant
+        #: The Validator Resources
 
-    def set_only_return_errors(self, only_errors: bool):
+        self._form_key = form_key
+
+        self._params = parameters or {}
+        #: Maps validation method parameter class names to the objects to be passed into the method.
+
+        self._page: Optional[int] = None
+        #: The current page number to validate
+
+        self._only_return_errors = False
+        #: Sets this to true to not return Fields that pass validation.  Only return failures.
+
+        self._form: Optional["Form"] = None
+        #: The form to validate
+
+        self._locale: Optional[Dict[str, str]] = None  
+        #: Dict with keys: language, country, variant
+
+    def set_only_return_errors(self, only_errors: bool) -> None:
+        """Sets only_return_errors
+
+        Args:
+            only_errors (bool): if true only return fields that don't pass validation.
+        """
         self._only_return_errors = only_errors
 
-    def set_page(self, page: int):
+    def set_page(self, page: int) -> None:
+        """Set the current page number to validate
+
+        Args:
+            page (int)
+        """
         self._page = page
 
-    def set_parameter(self, key: str, value: Any):
+    def set_parameter(self, key: str, value: Any) -> None:
+        """Add key, value to parameters.
+
+        Args:
+            key (str):
+            value (Any)
+        """
         self._params[key] = value
 
     def get_parameter(self, key: str) -> Any:
+        """Get value for key in parameters.
+        
+        Args: 
+            key (str)
+
+        Returns:
+            value (Any)
+        """
         return self._params.get(key)
 
     def get_form(self) -> Optional["Form"]:
+        """Returns form to validate.
+        """
         return self._form
 
     def get_result(self) -> "ValidatorResults":
+        """Get ValidatorResults of validating the form
+
+        Raises:
+            ValidatorException
+
+        Returns:
+            ValidatorResults
+        """
         if self._form is None:
             self._form = self._resolve_form()
 
@@ -68,9 +114,27 @@ class Validator:
             return self._resources.get_form("en", "US", None, self._form_key)
 
     def set_locale(self, language: str, country: str = None, variant: str = None):
+        """Set the locale of the validator.
+
+        Args:
+            language (str)
+            country (str, optional). Defaults to None.
+            variant (str, optional). Defaults to None.
+        """
         self._locale = {"language": language, "country": country, "variant": variant}
 
     def validate_field(self, field_name: str) -> "ValidatorResults":
+        """Validate the field in the form.
+
+        Args:
+            field_name (str): field name in form to validate.
+
+        Raises:
+            ValidatorException
+
+        Returns:
+            ValidatorResults
+        """
         if self._form is None:
             self._form = self._resolve_form()
 

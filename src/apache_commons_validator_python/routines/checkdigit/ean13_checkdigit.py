@@ -46,13 +46,11 @@ class EAN13CheckDigit(ModulusCheckDigit):
     Attributes:
         serializable (bool): Inherited from ModulusCheckDigit (True)
         clone (bool):  Inherited from ModulusCheckDigit (False)
-
-    Constants:
         EAN13_CHECK_DIGIT (EAN13CheckDigit): Singleton instance of this class.
-        POSITION_WEIGHT (list[int]): Weighting given to digits depending on their right position
     """
     # EAN13_CHECK_DIGIT should be public, but to make implementing singletons easier, I've made it private.
     __EAN13_CHECK_DIGIT:EAN13CheckDigit = None
+    # POSITION_WEIGHT (list[int]): Weighting given to digits depending on their right position
     __POSITION_WEIGHT:Final[list] = [3, 1]
 
     def __init__(self):

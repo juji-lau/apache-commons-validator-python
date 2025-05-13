@@ -54,8 +54,6 @@ class ISBN10CheckDigit(ModulusCheckDigit):
     Attributes:
         serializable (bool): Inherited from ModulusCheckDigit (True)
         clone (bool):  Inherited from ModulusCheckDigit (False)
-
-    Constants:
         ISBN10_CHECK_DIGIT (ISBN10CheckDigit): Singleton instance of this class.
     """
     # ISBN10_CHECK_DIGIT should be public, but to make implementing singletons easier, I've made it private.

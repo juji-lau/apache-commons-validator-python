@@ -72,7 +72,10 @@ class ModulusCheckDigit(AbstractCheckDigit):
 
     @property
     def modulus(self) -> int:
-        """Gets the modulus value this check digit routine is based on."""
+        """Gets the modulus value this check digit routine is based on.
+            Returns:
+                The modulus value (e.g., 10 or 11).
+        """
         return self.__modulus
     
     # # The modulus can be greater than 10 provided that the implementing class overrides toCheckDigit and toInt (for example as in ISBN10CheckDigit).
